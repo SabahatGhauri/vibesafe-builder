@@ -193,17 +193,53 @@
 
   /* ---------- pricing ---------- */
   section.pricing { padding: 30px 0 70px; }
-  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 30px; }
-  .price-card { border-radius: 18px; padding: 30px; transition: transform 0.3s, border-color 0.3s; position: relative; }
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; margin-top: 34px; align-items: stretch; }
+  .price-card {
+    border-radius: 20px; padding: 34px 30px 30px; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    position: relative; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .price-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--card-accent, var(--accent)), transparent 85%);
+  }
   .price-card:hover { transform: translateY(-4px); border-color: rgba(53,217,154,0.4); }
+  .price-card.featured {
+    border-color: rgba(53,217,154,0.45);
+    box-shadow: 0 0 0 1px rgba(53,217,154,0.18), 0 24px 60px -24px rgba(53,217,154,0.35);
+  }
+  .price-card.featured:hover { box-shadow: 0 0 0 1px rgba(53,217,154,0.3), 0 28px 70px -20px rgba(53,217,154,0.45); }
+  .price-card .plan-icon { font-size: 22px; margin-bottom: 10px; display: block; }
   .price-card .plan-name { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--dim); font-weight: 700; }
-  .price-card .plan-price { font-size: 36px; font-weight: 800; margin: 12px 0 4px; }
-  .price-card .plan-price span { font-size: 14px; color: var(--dim); font-weight: 400; }
-  .price-card .plan-note { color: var(--dim); font-size: 13px; margin-bottom: 20px; }
-  .price-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
-  .price-card li { font-size: 14px; color: var(--text); padding-left: 22px; position: relative; }
-  .price-card li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
-  .plan-badge { display: inline-block; padding: 4px 11px; border-radius: 100px; font-size: 11px; font-weight: 700; background: rgba(53,217,154,0.12); color: var(--accent); margin-bottom: 14px; border: 1px solid rgba(53,217,154,0.3); }
+  .price-card .plan-price {
+    font-size: 40px; font-weight: 800; margin: 12px 0 4px; letter-spacing: -0.01em;
+    background: linear-gradient(100deg, var(--text), var(--card-accent, var(--accent)) 140%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .price-card .plan-price span { font-size: 14px; color: var(--dim); font-weight: 400; -webkit-text-fill-color: var(--dim); }
+  .price-card .plan-note { color: var(--dim); font-size: 13px; margin-bottom: 22px; min-height: 54px; }
+  .price-card ul { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-bottom: 26px; flex-grow: 1; }
+  .price-card li { font-size: 14px; color: var(--text); padding-left: 24px; position: relative; }
+  .price-card li::before {
+    content: "✓"; position: absolute; left: 0; top: -1px; width: 16px; height: 16px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;
+    background: rgba(53,217,154,0.15); color: var(--accent);
+  }
+  .price-card li.strong { font-weight: 700; }
+  .price-card .btn { margin-top: auto; }
+  .plan-badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 100px; font-size: 11px;
+    font-weight: 700; background: rgba(53,217,154,0.12); color: var(--accent); margin-bottom: 14px;
+    border: 1px solid rgba(53,217,154,0.3); width: fit-content;
+  }
+  .price-card.featured .plan-badge { background: rgba(53,217,154,0.18); border-color: rgba(53,217,154,0.5); }
+  .price-card[data-accent="blue"] { --card-accent: var(--accent2); }
+  .price-card[data-accent="blue"] .plan-badge { background: rgba(79,195,255,0.12); color: var(--accent2); border-color: rgba(79,195,255,0.3); }
+  .price-card[data-accent="blue"] li::before { background: rgba(79,195,255,0.15); color: var(--accent2); }
+  .ribbon {
+    position: absolute; top: 18px; right: -34px; transform: rotate(40deg); padding: 4px 40px;
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent), #22b88a); color: #04180f;
+  }
 
   /* ---------- cost calculator ---------- */
   .cost-calc { border-radius: 18px; padding: 26px 30px; margin: 30px 0; }
@@ -232,14 +268,17 @@
   .cc-verdict b { color: var(--accent); }
 
   /* ---------- comparison table ---------- */
-  .compare-wrap { margin: 34px 0; overflow-x: auto; border-radius: 14px; }
+  .compare-wrap { margin: 40px 0; overflow-x: auto; border-radius: 16px; border: 1px solid var(--glass-border); }
   table.compare-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 480px; }
-  .compare-table th, .compare-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); }
-  .compare-table th { color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; background: var(--bg-panel); }
+  .compare-table th, .compare-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--line); }
+  .compare-table thead th { color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; background: var(--bg-panel); }
+  .compare-table thead th:nth-child(2) { color: var(--accent); }
+  .compare-table thead th:nth-child(3) { color: var(--accent2); }
   .compare-table th:not(:first-child), .compare-table td:not(:first-child) { text-align: center; }
   .compare-table td:first-child { color: var(--text); font-weight: 600; }
   .compare-table td.yes { color: var(--accent); font-weight: 700; }
-  .compare-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .compare-table tbody tr:last-child td { border-bottom: none; }
+  .compare-table tbody tr:hover { background: rgba(255,255,255,0.03); }
 
   /* ---------- pricing FAQ ---------- */
   .pricing-faq { max-width: 720px; margin: 40px auto 0; }
@@ -522,13 +561,15 @@ Public reports and user complaints about other AI app builders describe <b>large
       </div>
 
       <div class="price-grid">
-        <div class="price-card glass reveal">
-          <div class="plan-badge">🔑 No card required</div>
+        <div class="price-card glass reveal featured">
+          <div class="ribbon">Best value</div>
+          <span class="plan-icon">🔑</span>
+          <div class="plan-badge"><span class="fc-dot" style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span> No card required</div>
           <div class="plan-name">Bring your own key</div>
           <div class="plan-price">$0<span> / month platform fee</span></div>
           <div class="plan-note">Connect your own Anthropic API key. You're billed by Anthropic at their standard rates — we add no markup.</div>
           <ul>
-            <li>All 15 free templates, zero tokens</li>
+            <li class="strong">All 15 free templates, zero tokens</li>
             <li>Unlimited generations at your own pace</li>
             <li>Full version history, diffs &amp; rollback</li>
             <li>Security scan + Launch Check on every build</li>
@@ -537,13 +578,14 @@ Public reports and user complaints about other AI app builders describe <b>large
           </ul>
           <a class="btn primary" href="/app" style="width:100%; text-align:center; display:block;">Start building</a>
         </div>
-        <div class="price-card glass reveal">
-          <div class="plan-badge">⚡ No API key required</div>
+        <div class="price-card glass reveal" data-accent="blue">
+          <span class="plan-icon">⚡</span>
+          <div class="plan-badge"><span class="fc-dot" style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;"></span> No API key required</div>
           <div class="plan-name">Managed plan</div>
           <div class="plan-price">$15<span> / month</span></div>
           <div class="plan-note">No API key needed — $10/month of Anthropic usage included, on us.</div>
           <ul>
-            <li>Everything in Bring your own key</li>
+            <li class="strong">Everything in Bring your own key</li>
             <li>No Anthropic account required</li>
             <li>Up to $10/mo of generations covered — switch to your own key any time if you go past it</li>
           </ul>

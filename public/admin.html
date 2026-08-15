@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin — VibeSafe Builder</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<style>
+  :root {
+    --bg: #0a0d11; --bg-raise: #0f1318; --bg-panel: #141a21;
+    --glass: rgba(255,255,255,0.035); --glass-border: rgba(255,255,255,0.09);
+    --line: #232b34; --text: #eef3f7; --dim: #8d9aa8; --dim2: #5f6b78;
+    --accent: #35d99a; --accent2: #4fc3ff; --warn: #f0b84e; --danger: #ff6b6b;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, sans-serif; line-height: 1.6;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+  .glass { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; }
+
+  /* ---------- gate ---------- */
+  #gate { max-width: 380px; margin: 14vh auto 0; padding: 34px; text-align: center; }
+  #gate h1 { font-size: 18px; margin-bottom: 6px; }
+  #gate p { color: var(--dim); font-size: 13px; margin-bottom: 20px; }
+  #gate input {
+    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--glass-border);
+    background: var(--bg-panel); color: var(--text); font-family: var(--mono); font-size: 13.5px; margin-bottom: 12px;
+  }
+  #gate input:focus { outline: none; border-color: var(--accent); }
+  #gate button, .refresh-btn {
+    width: 100%; padding: 11px; border-radius: 10px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), #22b88a); color: #04180f; font-weight: 700; font-size: 14px;
+  }
+  #gateError { color: var(--danger); font-size: 12.5px; margin-top: 10px; min-height: 16px; }
+
+  /* ---------- dashboard ---------- */
+  #dashboard { display: none; }
+  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  header.top h1 { font-size: 20px; font-weight: 800; }
+  header.top .sub { color: var(--dim); font-size: 12.5px; margin-top: 4px; }
+  .refresh-btn { width: auto; padding: 9px 18px; font-size: 13px; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+  .stat { padding: 18px 20px; }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--dim); font-weight: 700; }
+  .stat-value { font-size: 26px; font-weight: 800; margin-top: 8px; font-family: var(--mono); }
+  .stat-value.warn { color: var(--warn); }
+  .stat-note { font-size: 11px; color: var(--dim2); margin-top: 4px; }
+
+  .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--glass-border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
+  th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--dim); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; background: var(--bg-panel); position: sticky; top: 0; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.email { font-weight: 600; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+  .badge.active { background: rgba(53,217,154,0.15); color: var(--accent); }
+  .badge.none, .badge.canceled { background: rgba(143,154,168,0.15); color: var(--dim); }
+  .spend.near-cap { color: var(--warn); font-weight: 700; }
+  .spend.over-cap { color: var(--danger); font-weight: 700; }
+  .empty, .error-box { text-align: center; padding: 50px 20px; color: var(--dim); }
+  .error-box { color: var(--danger); }
+  .loading { text-align: center; padding: 50px 20px; color: var(--dim); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div id="gate" class="glass">
+  <h1>🔒 Admin</h1>
+  <p>Enter your admin key to view signups and usage.</p>
+  <input type="password" id="keyInput" placeholder="Admin key" autocomplete="off" />
+  <button id="unlockBtn">Unlock</button>
+  <div id="gateError"></div>
+</div>
+
+<div id="dashboard" class="wrap">
+  <header class="top">
+    <div>
+      <h1>Managed-plan users</h1>
+      <div class="sub" id="periodLabel">—</div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn">Refresh</button>
+  </header>
+
+  <div class="summary-grid">
+    <div class="stat glass">
+      <div class="stat-label">Total signed-up users</div>
+      <div class="stat-value" id="statTotal">—</div>
+    </div>
+    <div class="stat glass">
+      <div class="stat-label">Active subscriptions</div>
+      <div class="stat-value" id="statActive">—</div>
+    </div>
+    <div class="stat glass">
+      <div class="stat-label">Spend this month</div>
+      <div class="stat-value" id="statSpend">—</div>
+      <div class="stat-note" id="statSpendNote"></div>
+    </div>
+    <div class="stat glass">
+      <div class="stat-label">Builds this month</div>
+      <div class="stat-value" id="statBuilds">—</div>
+    </div>
+  </div>
+
+  <div class="table-wrap glass">
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Signed up</th>
+          <th>Last login</th>
+          <th>Spend this month</th>
+          <th>Builds this month</th>
+        </tr>
+      </thead>
+      <tbody id="rows">
+        <tr><td colspan="6" class="loading">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function () {
+  const gate = document.getElementById("gate");
+  const dashboard = document.getElementById("dashboard");
+  const keyInput = document.getElementById("keyInput");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const gateError = document.getElementById("gateError");
+  const rowsEl = document.getElementById("rows");
+
+  const KEY_STORAGE = "vc_admin_key"; // sessionStorage only — cleared when the tab closes
+
+  function fmtMoney(n) { return "$" + Number(n || 0).toFixed(2); }
+  function fmtDate(iso) {
+    if (!iso) return "never";
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) +
+      " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  }
+
+  async function loadData(key) {
+    rowsEl.innerHTML = '<tr><td colspan="6" class="loading">Loading…</td></tr>';
+    let res;
+    try {
+      res = await fetch("/api/admin/users", { headers: { "x-admin-key": key } });
+    } catch (e) {
+      rowsEl.innerHTML = '<tr><td colspan="6" class="error-box">Network error: ' + e.message + "</td></tr>";
+      return;
+    }
+    if (res.status === 401) {
+      sessionStorage.removeItem(KEY_STORAGE);
+      showGate("Wrong key.");
+      return;
+    }
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      rowsEl.innerHTML = '<tr><td colspan="6" class="error-box">' + (body.error || ("Error " + res.status)) + "</td></tr>";
+      return;
+    }
+    const { summary, users } = await res.json();
+    renderSummary(summary);
+    renderRows(users, summary.budgetPerUser);
+  }
+
+  function renderSummary(s) {
+    document.getElementById("periodLabel").textContent = "Billing period: " + s.period;
+    document.getElementById("statTotal").textContent = s.totalUsers;
+    document.getElementById("statActive").textContent = s.activeSubscriptions;
+    document.getElementById("statSpend").textContent = fmtMoney(s.totalSpentThisPeriod);
+    document.getElementById("statSpendNote").textContent = "of $" + (s.budgetPerUser * s.activeSubscriptions).toFixed(2) + " budgeted";
+    document.getElementById("statBuilds").textContent = s.totalBuildsThisPeriod;
+  }
+
+  function renderRows(users, budget) {
+    if (!users.length) {
+      rowsEl.innerHTML = '<tr><td colspan="6" class="empty">No managed-plan users yet.</td></tr>';
+      return;
+    }
+    rowsEl.innerHTML = users.map((u) => {
+      const spendClass = u.periodSpent >= budget ? "over-cap" : u.periodSpent >= budget * 0.8 ? "near-cap" : "";
+      const badgeClass = u.subscriptionStatus === "active" ? "active" : "none";
+      return `<tr>
+        <td class="email">${escapeHtml(u.email || "(no email)")}</td>
+        <td><span class="badge ${badgeClass}">${escapeHtml(u.subscriptionStatus)}</span></td>
+        <td>${fmtDate(u.createdAt)}</td>
+        <td>${fmtDate(u.lastSignInAt)}</td>
+        <td class="spend ${spendClass}">${fmtMoney(u.periodSpent)}</td>
+        <td>${u.periodBuilds}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function showGate(err) {
+    gate.style.display = "block";
+    dashboard.style.display = "none";
+    gateError.textContent = err || "";
+    keyInput.focus();
+  }
+  function showDashboard(key) {
+    gate.style.display = "none";
+    dashboard.style.display = "block";
+    loadData(key);
+  }
+
+  unlockBtn.addEventListener("click", () => {
+    const key = keyInput.value.trim();
+    if (!key) return;
+    sessionStorage.setItem(KEY_STORAGE, key);
+    showDashboard(key);
+  });
+  keyInput.addEventListener("keydown", (e) => { if (e.key === "Enter") unlockBtn.click(); });
+  document.getElementById("refreshBtn").addEventListener("click", () => {
+    const key = sessionStorage.getItem(KEY_STORAGE);
+    if (key) loadData(key);
+  });
+
+  const savedKey = sessionStorage.getItem(KEY_STORAGE);
+  if (savedKey) showDashboard(savedKey);
+  else showGate();
+})();
+</script>
+
+</body>
+</html>
