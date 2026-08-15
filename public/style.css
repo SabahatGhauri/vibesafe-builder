@@ -38,6 +38,18 @@ body {
 .brand-name { font-weight: 700; font-size: 17px; letter-spacing: 0.3px; }
 .brand-tag { color: var(--text-dim); font-size: 12px; }
 
+.plan-badge {
+  display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 100px;
+  font-size: 12px; font-weight: 700; border: 1px solid var(--line); background: var(--bg-panel);
+  white-space: nowrap;
+}
+.plan-badge .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.plan-badge.pro { color: var(--accent); border-color: var(--accent-dim); }
+.plan-badge.pro .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.plan-badge.free { color: var(--warn); border-color: var(--warn); }
+.plan-badge.free .dot { background: var(--warn); }
+.plan-badge .name { color: var(--text-dim); font-weight: 400; }
+
 .meter { margin-left: auto; min-width: 220px; }
 .meter-row { display: flex; align-items: baseline; gap: 6px; font-size: 12px; }
 .meter-label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; font-size: 10px; }

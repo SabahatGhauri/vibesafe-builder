@@ -58,14 +58,48 @@ const managed = {
   renderStatus() {
     const signedOut = $("managedSignedOut");
     const signedIn = $("managedSignedIn");
+    const badge = $("planBadge");
     if (!signedOut || !signedIn) return;
     if (this.session) {
       signedOut.hidden = true;
       signedIn.hidden = false;
       $("managedSignedInAs").textContent = `Signed in as ${this.session.user.email}`;
+      this.refreshPlanStatus();
     } else {
       signedOut.hidden = false;
       signedIn.hidden = true;
+      if (badge) badge.hidden = true;
+    }
+  },
+
+  // Shows Pro vs Free clearly up front — both in the header badge (always visible)
+  // and in Settings (where the sign-in controls live) — instead of only surfacing
+  // plan status indirectly when a generation gets rejected for lacking one.
+  async refreshPlanStatus() {
+    const badge = $("planBadge");
+    const settingsLine = $("managedSignedInPlan");
+    if (!this.sb) return;
+    try {
+      const { data } = await this.sb.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) return;
+      const r = await fetch("/api/managed/status", { headers: { "x-vc-session": token } });
+      const status = await r.json();
+      if (!status.signedIn) return;
+      const label = status.plan === "pro" ? "Pro" : "Free";
+      const who = status.name || status.email;
+      if (badge) {
+        badge.hidden = false;
+        badge.className = `plan-badge ${status.plan}`;
+        badge.innerHTML = `<span class="dot"></span>${label}<span class="name">· ${esc(who)}</span>`;
+      }
+      if (settingsLine) {
+        settingsLine.textContent = status.plan === "pro"
+          ? `✓ Pro — active (${fmt$(status.spent)} of ${fmt$(status.budget)} used this month)`
+          : "⚠ Free — no active subscription. Pay for managed access to unlock Pro.";
+      }
+    } catch {
+      // Non-fatal — badge just stays hidden/stale if this fails; sign-in itself is unaffected.
     }
   },
 
