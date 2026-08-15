@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Why Your AI-Built App Might Already Be Exposing Your Database | VibeSafe Builder Blog</title>
+<meta name="description" content="A January 2026 breach, a 5,600-app vulnerability scan, and the specific mistake that keeps causing AI-generated apps to leak databases and secrets." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html" class="active">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Security</div>
+    <h1>Why Your AI-Built App Might Already Be Exposing Your Database</h1>
+    <div class="post-meta">Published August 2026 · 8 min read</div>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <p>In January 2026, an AI social network called Moltbook launched to a wave of attention. Within three days, security researchers found its production database wide open: 1.5 million API authentication tokens, 35,000 email addresses, and private messages between users, all reachable by anyone who looked. The root cause wasn't exotic — the AI-generated code shipped a Supabase API key directly in client-side JavaScript, and nobody had turned on Row Level Security (RLS) to restrict what that key could read.</p>
+      <p>That's not a freak accident. It's the single most common failure mode in AI-generated applications, and it happens for a specific, understandable reason.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">01</span>Why AI tools do this</h2>
+      <p>Models optimizing for "working code" and models optimizing for "secure code" aren't the same objective. When you ask an AI builder for a feature, the fastest path to something that visibly works is often the least secure one: hardcode the key, skip the access-control check, connect straight to the database from the browser. It runs. It looks done. Nothing in the demo tells you it's wide open.</p>
+      <p>This is also why the problem scales with usage rather than fading as the tools improve. A large-scale scan of <strong>5,600 publicly deployed vibe-coded applications</strong> found roughly <strong>2,000 highly critical vulnerabilities</strong>, <strong>400 exposed secrets</strong> (API keys, access tokens), and <strong>175 instances of exposed PII</strong> — including medical records and payment data — sitting in plainly reachable endpoints. Georgia Tech's Vibe Security Radar tracked <strong>35 new CVE entries directly caused by AI-generated code in March 2026 alone</strong>, up from six in January — a pace that's still climbing as more non-security-background builders ship faster than ever.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">02</span>The #1 root cause: broken access control</h2>
+      <p>Broken access control is the number one risk on the OWASP Top 10, and it's the specific cause behind most public vibe-coding breaches — not a novel exploit, just a database or an endpoint that anyone could read because nothing was checking who was asking. In the Moltbook case specifically, this meant no Row Level Security policy stood between a public API key and the entire dataset.</p>
+      <p>If you're not from a security background, "Row Level Security" and "access control" can sound like enterprise jargon. In practice it's one question: <em>if someone found this URL or this key, what could they see?</em> Most AI-generated apps never get asked that question before they ship, because nothing in the chat interface prompts it.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">03</span>What actually catches this before it ships</h2>
+      <p>The fixes that matter are boring and specific, not a general "be more careful":</p>
+      <ul>
+        <li><strong>Scan for hardcoded secrets on every generation</strong>, not just once at the end — a key that gets removed in v3 but was committed in v1's public repo history is still leaked.</li>
+        <li><strong>Check for <code>eval()</code> and dynamic code execution</strong> — a common vector for a second-stage exploit once an attacker has any foothold.</li>
+        <li><strong>Verify requests only go to the third parties you actually intended</strong> — silent data exfiltration to an unexpected endpoint is invisible in a normal demo.</li>
+        <li><strong>Actually load the app and check what a real visitor could reach</strong> — a static code read misses runtime issues; you need something that opens the app the way a user would.</li>
+      </ul>
+      <p>This is the exact reasoning behind how VibeSafe Builder is built: every generation is scanned server-side for hardcoded keys, <code>eval()</code>, and unexpected outbound requests before you can publish — and separately, <a href="/how-it-works.html">Launch Check</a> opens the app in a real headless browser to catch what a pattern-matching scan alone would miss. Neither replaces a professional security review for anything handling real user data at scale, but both catch the exact class of mistake that took Moltbook down in under an hour of review instead of after three days of public exposure.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">04</span>The takeaway</h2>
+      <p>If you're building with any AI tool — not just this one — the question to ask before every "Publish" click isn't "does this work?" It's "if someone found the URL, the key, or the database directly, what would they see?" Most vibe-coding breaches in 2026 have the same one-sentence postmortem: nothing was checking.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">05</span>Sources</h2>
+      <p class="post-sources">
+        <a href="https://www.arnica.io/blog/vibe-coding-security-risks" target="_blank" rel="noopener">Arnica — Vibe Coding Security Risks You Can't Ignore 2026</a><br>
+        <a href="https://northflank.com/blog/how-to-vibe-code-securely" target="_blank" rel="noopener">Northflank — How to Vibe Code Securely in 2026</a><br>
+        <a href="https://modall.ca/blog/vibe-coding-security-risks" target="_blank" rel="noopener">Modall — Vibe Coding Security Risks: What Founders Need to Know</a>
+      </p>
+    </section>
+  </article>
+
+  <a class="back-to-blog" href="/blog.html">← Back to the blog</a>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

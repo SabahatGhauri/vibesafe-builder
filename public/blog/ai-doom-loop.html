@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The AI "Doom Loop": Why Your App Keeps Breaking the Same Way Twice | VibeSafe Builder Blog</title>
+<meta name="description" content="The architectural reason AI coding tools repeat failed fixes instead of solving the actual bug — and what breaks the cycle." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html" class="active">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Reliability</div>
+    <h1>The AI "Doom Loop": Why Your App Keeps Breaking the Same Way Twice</h1>
+    <div class="post-meta">Published August 2026 · 6 min read</div>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <p>If you've spent more than an hour fixing a bug in an AI-built app, you've probably lived through this: you report the bug, the AI fixes it, a different thing breaks, you report that, the fix for the second thing quietly brings the first bug back. It's called the "doom loop," it's the single most-quoted pain point in 2026 vibe-coding discussion, and it has a specific, well-understood cause — it's not just "the AI being bad."</p>
+    </section>
+
+    <section>
+      <h2><span class="num">01</span>The actual mechanism</h2>
+      <p>AI coding tools don't hold a persistent mental model of your application. Each turn, the model re-reads the code fresh and makes a locally-reasonable edit — reasonable in isolation, but with no real memory of why an earlier turn made a different choice. Fix A propagates and breaks B. The fix for B reintroduces A. The more you prompt trying to chase the bug down, the more entangled the state becomes, and token spend spirals right along with it — the same 20-million-token authentication bug mentioned in AI builder postmortems is the doom loop taken to its extreme.</p>
+      <p>There's a second, subtler mechanism making it worse: once a wrong answer exists in the conversation, it becomes part of the context the model conditions on for every future turn. LLMs are trained to follow patterns in their own context — so a fix that already failed is, statistically, more likely to get proposed again, not less, unless something actively interrupts the pattern.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">02</span>Why "just explain it better" doesn't fix it</h2>
+      <p>The intuitive response is to write a longer, more detailed bug report. That mostly doesn't work, because the problem isn't that the model misunderstood the bug the first time — it's architectural. Researchers looking at this directly have found that fixing one doom loop can expose new failure points elsewhere in the same codebase; there's no single prompt-engineering trick that makes the underlying issue go away, because the issue is the absence of persistent context between turns, not a wording problem.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">03</span>What actually breaks the cycle</h2>
+      <p>Two things, and neither is "write a better prompt":</p>
+      <ul>
+        <li><strong>Detect the pattern, not just the bug.</strong> If the same category of complaint ("still broken," "didn't work," "same error") comes in twice in a row, that's the signal — not the third attempt at explaining it more clearly.</li>
+        <li><strong>Force a genuinely different approach on the second failure</strong>, instead of another pass at the same fix. Re-diagnosing from scratch, explicitly told to avoid repeating what was already tried, breaks the pattern-matching problem described above rather than feeding it more context to repeat.</li>
+      </ul>
+      <p>This is exactly what VibeSafe Builder's doom-loop detection does: two fix-complaints in a row trigger a visible banner and switch the next generation to a "rethink" strategy — re-diagnose the root cause step by step and take a genuinely different approach, rather than iterating on a fix that's already failed twice. Paired with full version history and one-click rollback, the cost of an approach not working out is a click backward, not a rebuild.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">04</span>The takeaway</h2>
+      <p>If you're two fix attempts deep on the same bug in any AI builder, stop asking it to try again the same way. The pattern is architectural, not a communication problem — and the tools that handle it well are the ones that detect the repeat and deliberately change strategy, instead of hoping the third try lands differently.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">05</span>Sources</h2>
+      <p class="post-sources">
+        <a href="https://getunblocked.com/blog/ai-agent-doom-loop/" target="_blank" rel="noopener">Unblocked — AI Agent Doom Loop: Why Agents Repeat the Same Mistake</a><br>
+        <a href="https://www.liquid.ai/blog/antidoom" target="_blank" rel="noopener">Liquid AI — Reducing Doom Loops with Final Token Preference Optimization</a><br>
+        <a href="https://afterbuildlabs.com/resources/why-ai-app-burning-credits" target="_blank" rel="noopener">Afterbuild Labs — Why Your AI App Is Burning Credits</a>
+      </p>
+    </section>
+  </article>
+
+  <a class="back-to-blog" href="/blog.html">← Back to the blog</a>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

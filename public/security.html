@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Security | VibeSafe Builder</title>
+<meta name="description" content="How VibeSafe Builder protects your code, your credentials, and your data — the scans, the database rules, and how to report a security issue." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html" class="active">Security</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Security</div>
+    <h1>How VibeSafe Builder protects your code and your credentials</h1>
+    <p class="lead">We're built by the same team behind <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>, a code security scanner — this is the same instinct applied to the builder itself, not just the apps it generates.</p>
+  </div>
+
+  <div class="toc glass">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#every-build">Every build is scanned</a></li>
+      <li><a href="#launch-check">Launch Check — real-browser validation</a></li>
+      <li><a href="#your-key">Your API key and session</a></li>
+      <li><a href="#published-apps">Published apps</a></li>
+      <li><a href="#database">Database and access rules</a></li>
+      <li><a href="#payments">Payments</a></li>
+      <li><a href="#report">Report a security issue</a></li>
+    </ol>
+  </div>
+
+  <article>
+    <section id="every-build" style="border-top:none; padding-top:8px;">
+      <h2><span class="num">01</span>Every build is scanned</h2>
+      <p>Every generation is checked for hardcoded API keys and secrets, <code>eval()</code> and dynamic code execution, insecure <code>http://</code> resources, passwords written to localStorage, and data sent to unrecognized third-party servers. This runs automatically in the builder's Security tab, and is enforced again server-side before anything can be published — a bypassed or stale client-side result can't slip a critical issue onto a public link.</p>
+    </section>
+
+    <section id="launch-check">
+      <h2><span class="num">02</span>Launch Check — real-browser validation</h2>
+      <p>A static scan reads code; it doesn't run it. Launch Check does — it loads your app in a real headless browser and checks for uncaught exceptions, console errors, and mobile-layout breaks that only surface when the app actually executes. This is combined with the security scan in the builder's <strong>Build Health</strong> tab for one overall verdict.</p>
+    </section>
+
+    <section id="your-key">
+      <h2><span class="num">03</span>Your API key and session</h2>
+      <p>In Bring Your Own Key mode, your Anthropic API key lives only in your browser's local storage and is sent directly from your browser to our server per request — we never log or store it. In Managed mode, your session comes from Supabase magic-link sign-in; we never see or store a password. Neither is ever embedded in an app's code — the model is instructed never to hardcode credentials, and the security scan blocks publishing if it tries. The live preview you see while building runs in a sandboxed frame with no access to the builder's storage. Published apps currently run on the same domain as the builder, so we scan every publish for code that tries to read the builder's storage and apply a restrictive Content-Security-Policy limiting where any data could be sent — we're completing further isolation for published-app hosting on top of that (see below).</p>
+    </section>
+
+    <section id="published-apps">
+      <h2><span class="num">04</span>Published apps</h2>
+      <p>Publishing re-runs the security scan server-side before anything goes live, blocking known-dangerous patterns regardless of what the client showed. Published pages are also served with a restrictive <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy" target="_blank" rel="noopener">Content-Security-Policy</a> limiting what they can connect to. We're in the process of moving published-app hosting to its own isolated domain, separate from the builder itself — the same approach code-sandboxing platforms like CodePen and Replit use — as an additional layer on top of the scan.</p>
+    </section>
+
+    <section id="database">
+      <h2><span class="num">05</span>Database and access rules</h2>
+      <p>Every table VibeSafe Builder writes to — published apps, subscriptions, and managed-plan usage records — uses <a href="https://supabase.com/docs/guides/database/postgres/row-level-security" target="_blank" rel="noopener">Row Level Security</a>, which we verified directly against the live database rather than assuming it. The service-role key that can bypass those rules is never sent to a browser; it's used only in server-side webhook and billing code.</p>
+    </section>
+
+    <section id="payments">
+      <h2><span class="num">06</span>Payments</h2>
+      <p>Managed-plan billing is handled entirely by Stripe. We receive a webhook confirming your subscription is active — never your card number or CVC. Stripe webhook signatures are verified on every call, so a request can't be forged into activating an account. BYOK has no platform fee, so no payment information passes through us at all.</p>
+    </section>
+
+    <section id="report">
+      <h2><span class="num">07</span>Report a security issue</h2>
+      <p>Found something? Email <a href="mailto:security@vibesafebuilder.com">security@vibesafebuilder.com</a> with what you found and how to reproduce it. We'll acknowledge real reports and won't take action against anyone testing in good faith against their own account or data. Please don't test against other users' published apps or accounts.</p>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

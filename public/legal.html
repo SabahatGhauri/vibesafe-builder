@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy &amp; Terms of Service | VibeSafe Builder</title>
+<meta name="description" content="VibeSafe Builder's Privacy Policy, Terms of Service, and Cookie Policy — what we collect, how BYOK and Managed mode handle your API key and data, and your rights." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html" class="active">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Legal &amp; Privacy</div>
+    <h1>Legal &amp; Privacy</h1>
+    <div class="meta">Last updated: August 13, 2026 · VibeSafe Builder · a product of SG Digital Ventures LLC</div>
+    <p class="lead">This page covers our Privacy Policy, Terms of Service, and Cookie Policy in one place. We kept it as plain-English as a legal page can be — the same principle behind the product itself.</p>
+  </div>
+
+  <div class="callout summary glass">
+    <div class="cal-label">Plain-English summary</div>
+    In <strong>Bring Your Own Key</strong> mode, your Anthropic API key and your app's chat history and version history stay in your browser (localStorage) — we never see or store your key, and we don't have a database of your projects. In <strong>Managed</strong> mode, we know your email (for sign-in) and your subscription status (via Stripe); we don't store your source code beyond what's needed to generate it. If you click <strong>Publish</strong>, that specific app's code becomes publicly viewable at its link until you ask us to take it down. We don't sell data, ever.
+  </div>
+
+  <div class="toc glass">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#who-we-are">Who we are</a></li>
+      <li><a href="#data-we-collect">What data we collect</a></li>
+      <li><a href="#byok">Bring Your Own Key mode</a></li>
+      <li><a href="#managed">Managed plan mode</a></li>
+      <li><a href="#publishing">Publishing your app</a></li>
+      <li><a href="#payments">Payments</a></li>
+      <li><a href="#cookies">Cookie policy</a></li>
+      <li><a href="#terms">Terms of Service</a></li>
+      <li><a href="#your-rights">Your rights</a></li>
+      <li><a href="#children">Children's privacy (COPPA)</a></li>
+      <li><a href="#us-privacy">California &amp; US state privacy rights</a></li>
+      <li><a href="#changes">Changes to this policy</a></li>
+      <li><a href="#contact">Contact us</a></li>
+    </ol>
+  </div>
+
+  <article>
+    <section id="who-we-are">
+      <h2><span class="num">01</span>Who we are</h2>
+      <p>VibeSafe Builder is a vibe-coding app operated by <strong>SG Digital Ventures LLC</strong>, a limited liability company registered in the State of Wyoming, USA (Entity ID: 2026-002034713, Wyoming Secretary of State). VibeSafe Builder is one product in SG Digital Ventures LLC's multi-SaaS portfolio, alongside its sibling product <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a> (code security scanning). Our contact email is <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a>.</p>
+      <p>References to "VibeSafe Builder", "we", "us", or "our" below mean SG Digital Ventures LLC doing business as VibeSafe Builder. By using vibesafebuilder.com or the builder at <code>/app</code>, you agree to this Privacy Policy and the Terms of Service below.</p>
+    </section>
+
+    <section id="data-we-collect">
+      <h2><span class="num">02</span>What data we collect</h2>
+      <h3>Information you provide directly</h3>
+      <ul>
+        <li><strong>Your Anthropic API key</strong> — only if you use Bring Your Own Key mode. See §3.</li>
+        <li><strong>Email address</strong> — only if you sign up for the Managed plan (via Stripe Checkout and Supabase magic-link sign-in).</li>
+        <li><strong>Prompts and app code</strong> — what you type in chat and the app it generates, sent to Anthropic's API to produce a response.</li>
+        <li><strong>Messages</strong> — if you use the on-site chat assistant or email us directly.</li>
+      </ul>
+      <h3>Information collected automatically</h3>
+      <ul>
+        <li><strong>Usage data</strong> — for Managed-plan customers only: build count and dollars spent per billing period, used solely to enforce the monthly budget.</li>
+        <li><strong>Standard server logs</strong> — request timestamps and IP address, used for security and abuse prevention, retained briefly by our hosting provider (Vercel).</li>
+      </ul>
+      <p>We do not run third-party analytics or advertising trackers on vibesafebuilder.com.</p>
+    </section>
+
+    <section id="byok">
+      <h2><span class="num">03</span>Bring Your Own Key mode</h2>
+      <p>This is the default mode and requires no account. Here's exactly what happens to your data:</p>
+      <ul>
+        <li>Your Anthropic API key is stored only in your browser's <code>localStorage</code>. It is sent to our server with each generation request (over HTTPS, as an <code>x-anthropic-key</code> header), used once to call the Anthropic API on your behalf, and is never written to a database or log by us.</li>
+        <li>Your chat history, generated code, and version history live only in your browser's <code>localStorage</code>. We do not have a database of BYOK projects — if you clear your browser data or switch devices, that project is gone unless you downloaded it first.</li>
+        <li>Your prompts and current app code are sent to Anthropic's API (the model provider) to generate a response, subject to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic's privacy policy</a>. Anthropic bills you directly at their standard rates; we never see or process your Anthropic invoice.</li>
+      </ul>
+    </section>
+
+    <section id="managed">
+      <h2><span class="num">04</span>Managed plan mode</h2>
+      <p>If you subscribe to the $15/month Managed plan, we handle the Anthropic costs on our own key so you don't need one. This requires:</p>
+      <ul>
+        <li><strong>An email address</strong>, used to create a Supabase-authenticated account and sign you in via a magic link (no password to store or leak).</li>
+        <li><strong>A Stripe subscription</strong>, so we know your subscription is active. We never see or store your card number — Stripe handles that entirely (see §6).</li>
+        <li><strong>Usage tracking</strong> — we record the dollar cost and count of your generations per billing period, solely to enforce the $10/month usage budget included in the plan. We do not store the resulting app code server-side beyond generating the response; your project's version history still lives in your browser's localStorage, same as BYOK mode.</li>
+      </ul>
+    </section>
+
+    <section id="publishing">
+      <h2><span class="num">05</span>Publishing your app</h2>
+      <p>The Publish button is opt-in and per-app. If you click it:</p>
+      <ul>
+        <li>The app's full HTML/CSS/JS is uploaded to our database and served publicly at a link like <code>vibesafebuilder.com/p/xxxxxx</code> — anyone with the link can view and use it.</li>
+        <li>We run a server-side security scan before accepting the publish (hardcoded keys/secrets, <code>eval()</code>) and refuse to publish if it fails, regardless of what the client-side scan showed.</li>
+        <li>Republishing the same app overwrites the content at that link. There is currently no self-service "unpublish" button — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> and we'll take a published app down.</li>
+        <li>Don't publish an app containing anyone else's personal data, or data you weren't authorized to share — publishing makes it public on the internet.</li>
+      </ul>
+    </section>
+
+    <section id="payments">
+      <h2><span class="num">06</span>Payments</h2>
+      <p>Managed-plan payments are processed by Stripe, Inc. We receive a webhook confirming your subscription is active and your billing email — never your card number, CVC, or full payment details. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a> for how they handle payment data. BYOK mode has no platform fee, so no payment information passes through us at all — you pay Anthropic directly for token usage.</p>
+    </section>
+
+    <section id="cookies">
+      <h2><span class="num">07</span>Cookie policy</h2>
+      <p>We don't use advertising or third-party tracking cookies. The site uses:</p>
+      <ul>
+        <li><strong>Browser localStorage</strong> (not a cookie, but similar in spirit) — stores your BYOK API key, spend cap, chat history, and version history locally so your project persists between visits.</li>
+        <li><strong>A session token</strong> (Managed plan only) — set after magic-link sign-in, used to authenticate your generation requests and check your subscription status.</li>
+        <li><strong>Stripe's own cookies</strong> during checkout, governed by Stripe's cookie policy, not ours.</li>
+      </ul>
+      <p>You can clear localStorage at any time via your browser settings — this logs you out of BYOK mode and erases any unpublished, undownloaded project.</p>
+    </section>
+
+    <section id="terms">
+      <h2><span class="num">08</span>Terms of Service</h2>
+      <h3>The service</h3>
+      <p>VibeSafe Builder lets you generate single-file web apps by describing them in chat, using either your own Anthropic API key or our Managed plan. The service is provided "as is" — generated code is created by an AI model and may contain bugs or be incomplete; review it before relying on it for anything important.</p>
+      <h3>Acceptable use</h3>
+      <ul>
+        <li>Don't use the service to generate malware, phishing pages, or anything designed to harm or deceive people.</li>
+        <li>Don't attempt to bypass the security scan, spend cap, or publish gate.</li>
+        <li>Don't publish apps containing other people's personal data without their consent.</li>
+        <li>BYOK usage is subject to Anthropic's own usage policies, since you're calling their API directly with your key.</li>
+      </ul>
+      <h3>Ownership</h3>
+      <p>You own the apps you generate. We claim no rights over your code — it's a portable HTML file you can download and take anywhere, by design.</p>
+      <h3>Managed plan billing</h3>
+      <p>The Managed plan is $15/month via Stripe subscription, covering up to $10/month of Anthropic usage at our cost. Usage beyond that pauses generation until your next billing cycle, or you can switch to your own API key at any time in Settings. Cancel anytime through the Stripe customer portal link included in your subscription confirmation email.</p>
+      <h3>Termination</h3>
+      <p>We may suspend access for abuse (attempts to bypass security gates, generate harmful content, or abuse the Managed plan's shared budget). You may stop using the service at any time; BYOK mode has nothing to cancel since there's no account.</p>
+      <h3>Limitation of liability</h3>
+      <p>SG Digital Ventures LLC is not liable for losses arising from code generated by the service, including bugs, security issues the scanner didn't catch, or Anthropic API costs incurred under your own key. The security scan is a best-effort first line of defense, not a substitute for a professional security review.</p>
+    </section>
+
+    <section id="your-rights">
+      <h2><span class="num">09</span>Your rights</h2>
+      <ul>
+        <li><strong>Access &amp; deletion (BYOK):</strong> your data is already local to your device — clear your browser's localStorage for vibesafebuilder.com to delete it entirely.</li>
+        <li><strong>Access &amp; deletion (Managed):</strong> email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> to request a copy of or delete your account data (email, subscription record, usage totals). We'll respond within 30 days.</li>
+        <li><strong>Published apps:</strong> email us with the link to have it taken down.</li>
+        <li><strong>Opt out of emails:</strong> Managed-plan account emails are transactional (billing, sign-in); we don't send marketing email at this time.</li>
+      </ul>
+    </section>
+
+    <section id="children">
+      <h2><span class="num">10</span>Children's privacy (COPPA)</h2>
+      <p>VibeSafe Builder is not directed at children under 13, and we do not knowingly collect personal information from children under 13. If you believe a child has provided us data, contact us and we'll delete it.</p>
+    </section>
+
+    <section id="us-privacy">
+      <h2><span class="num">11</span>California &amp; US state privacy rights</h2>
+      <p>If you're a California resident, the CCPA/CPRA gives you the right to know, delete, and opt out of the "sale" of personal information. We don't sell personal information. Other US states with comparable privacy laws (Virginia, Colorado, Connecticut, Utah, and others) have similar rights — the same contact process in §9 applies regardless of state.</p>
+    </section>
+
+    <section id="changes">
+      <h2><span class="num">12</span>Changes to this policy</h2>
+      <p>We'll update the "Last updated" date at the top of this page when we make material changes, and for Managed-plan customers, notify by email if a change materially affects how we handle your data.</p>
+    </section>
+
+    <section id="contact">
+      <h2><span class="num">13</span>Contact us</h2>
+      <p>Questions about this policy, a data request, or a takedown request for a published app: <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a>. For legal correspondence, contact SG Digital Ventures LLC via its Wyoming registered agent, or the same email address.</p>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

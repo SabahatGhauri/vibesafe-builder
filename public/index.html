@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VibeSafe Builder — build apps by vibe, safely</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-name">VibeSafe Builder</span>
+      <span class="brand-tag">doesn't waste your credits or leak your data</span>
+    </div>
+    <div class="meter" id="meter" title="Only successful generations count toward your build spend. Failed ones are tracked separately.">
+      <div class="meter-row">
+        <span class="meter-label">build spend</span>
+        <span class="meter-value" id="meterSpend">$0.00</span>
+        <span class="meter-cap">/ <span id="meterCap">$5.00</span> cap</span>
+      </div>
+      <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-wasted" id="meterWasted" hidden>failed (not counted): <span id="wastedVal">$0.00</span></div>
+    </div>
+    <button class="btn ghost" id="newProjectBtn" title="Start over — clears chat, versions and spend for this project">✦ New project</button>
+    <button class="btn ghost" id="settingsBtn">⚙ Settings</button>
+  </header>
+
+  <main class="layout">
+    <aside class="chat">
+      <div class="messages" id="messages">
+        <div class="msg system">
+          <p><strong>Describe the app you want.</strong> For example: “a habit tracker with streaks”, “an invoice generator”, “a flashcard app for Spanish”.</p>
+          <p class="hint">Before every generation you'll see a cost estimate. Failed generations don't count toward your build spend. Every change is a reviewable diff you can roll back.</p>
+        </div>
+        <div class="msg system">
+          <p><strong>Or start from a template</strong> — instant v1, zero generation cost:</p>
+          <div class="template-grid" id="templateGrid"></div>
+        </div>
+      </div>
+      <div class="stuck-banner" id="stuckBanner" hidden>
+        ⚡ Same problem twice — switching strategy. The AI will re-diagnose from scratch instead of repeating the failed fix.
+      </div>
+      <form class="composer" id="composer">
+        <textarea id="promptInput" rows="3" placeholder="Describe your app, or ask for a change…"></textarea>
+        <div class="composer-row">
+          <span class="estimate" id="estimate">est. —</span>
+          <button type="submit" class="btn primary" id="sendBtn">Build it</button>
+        </div>
+      </form>
+    </aside>
+
+    <section class="workspace">
+      <nav class="tabs">
+        <button class="tab active" data-tab="preview">Preview</button>
+        <button class="tab" data-tab="health">Build Health <span class="sec-badge" id="healthBadge" hidden></span></button>
+        <button class="tab" data-tab="code">Code</button>
+        <button class="tab" data-tab="versions">Versions</button>
+        <button class="tab" data-tab="security">Security <span class="sec-badge" id="secBadge" hidden></span></button>
+        <button class="tab" data-tab="launchcheck">Launch Check <span class="sec-badge" id="lcBadge" hidden></span></button>
+      </nav>
+
+      <div class="panel active" id="panel-preview">
+        <div class="panel-toolbar">
+          <button class="btn primary" id="publishBtn" disabled>🚀 Publish</button>
+          <span class="publish-url" id="publishUrl"></span>
+        </div>
+        <div class="empty" id="previewEmpty">Your app preview appears here.</div>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-popups" title="App preview" hidden></iframe>
+      </div>
+
+      <div class="panel" id="panel-health">
+        <div id="healthReport"><div class="empty">Generate an app to see its Build Health.</div></div>
+      </div>
+
+      <div class="panel" id="panel-code">
+        <div class="panel-toolbar">
+          <button class="btn ghost" id="copyBtn">Copy code</button>
+          <button class="btn ghost" id="downloadBtn" title="Installable — Add to Home Screen on phones, works like an app">Download .html</button>
+        </div>
+        <pre class="code" id="codeView">No code yet.</pre>
+      </div>
+
+      <div class="panel" id="panel-versions">
+        <div class="versions-split">
+          <ul class="version-list" id="versionList"></ul>
+          <div class="diff-view" id="diffView"><div class="empty">Select a version to see what changed.</div></div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-security">
+        <div id="securityReport"><div class="empty">Generate an app to run the security scan.</div></div>
+      </div>
+
+      <div class="panel" id="panel-launchcheck">
+        <div class="panel-toolbar">
+          <button class="btn primary" id="launchCheckBtn">🚀 Run Launch Check</button>
+          <span class="lc-status" id="lcStatus"></span>
+        </div>
+        <div id="launchCheckReport"><div class="empty">Run a Launch Check to load your app in a real browser and catch what a static scan can't — console errors, crashes, and mobile layout breaks.</div></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="settingsModal">
+    <form method="dialog" class="settings">
+      <h2>Settings</h2>
+
+      <div class="managed-box" id="managedSignedOut">
+        <label>Managed plan
+          <input type="email" id="managedEmailInput" placeholder="you@example.com" autocomplete="email" />
+          <span class="hint">If you've paid for the managed plan, sign in here — no API key needed. We'll email you a sign-in link.</span>
+        </label>
+        <button class="btn ghost" type="button" id="sendMagicLinkBtn" style="margin-top:8px;">Email me a sign-in link</button>
+        <div class="hint" id="magicLinkStatus" style="margin-top:6px;"></div>
+      </div>
+      <div class="managed-box" id="managedSignedIn" hidden>
+        <label>Managed plan
+          <span class="hint" id="managedSignedInAs"></span>
+        </label>
+        <button class="btn ghost" type="button" id="signOutBtn" style="margin-top:8px;">Sign out</button>
+      </div>
+
+      <label>Anthropic API key
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off" />
+        <span class="hint">Stored only in this browser (localStorage). Sent directly to your own local server — never anywhere else. Get one at platform.claude.com. Not needed if you're signed in to the managed plan above.</span>
+      </label>
+      <label>Session spend cap (USD)
+        <input type="number" id="capInput" min="0.5" step="0.5" value="5" />
+        <span class="hint">Generation is blocked when a new request could push successful-build spend past this cap. Doesn't apply to the managed plan, which has its own monthly budget.</span>
+      </label>
+      <div class="settings-actions">
+        <button class="btn primary" id="saveSettings" value="save">Save</button>
+        <button class="btn ghost" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="templates.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

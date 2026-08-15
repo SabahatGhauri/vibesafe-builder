@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Where Your AI App-Builder Credits Actually Go | VibeSafe Builder Blog</title>
+<meta name="description" content="The regression loops, the 20-million-token bug, and why 'credits ran out' usually isn't about the model being expensive." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html" class="active">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Cost</div>
+    <h1>Where Your AI App-Builder Credits Actually Go</h1>
+    <div class="post-meta">Published August 2026 · 7 min read</div>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <p>"Ran out of credits" is one of the most common complaints across every AI app builder in 2026, and it's usually described the same way: a user spends an afternoon and $40, and ends up with more broken features than they started with. One Bolt.new founder has publicly said <strong>20 million tokens</strong> went into a single authentication bug. That's not a story about the model being expensive. It's a story about where the spend actually went.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">01</span>The real mechanism: regression loops</h2>
+      <p>AI coding tools don't hold a persistent mental model of your app between turns — they re-read the code each time and make a locally-reasonable edit that can quietly conflict with something an earlier turn already fixed. Fix A breaks B. The next prompt fixes B, and reintroduces A. The more you prompt trying to chase down a bug, the more entangled the state gets, and the token spend spirals with it.</p>
+      <p>There's a second layer to this that makes it worse: once an LLM produces a wrong answer, that wrong answer becomes part of the conversation history. Models are trained to follow patterns, so they're statistically more likely to repeat logic that's already sitting in the chat — including the broken logic — unless something explicitly forces a different approach. Left alone, the tool keeps circling the same failed fix.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">02</span>Why it hits non-technical builders hardest</h2>
+      <p>Specific, well-documented friction points show up across the major tools: Lovable's daily credit structure means using all five daily credits for six days straight lands you at the 30-credit monthly cap with no more free credits until the next calendar month. Figma Make users report their limited credits burning down specifically <em>when the AI makes errors</em> — which, if you can't tell a wasted generation from a productive one, just feels like paying to train the model rather than paying for your app.</p>
+      <p>That last point is the crux of it. The complaint isn't really "AI is expensive." It's "I can't tell what I'm actually paying for until it's too late to stop."</p>
+    </section>
+
+    <section>
+      <h2><span class="num">03</span>What actually fixes this</h2>
+      <p>Three things, specifically:</p>
+      <ul>
+        <li><strong>See the cost before you commit to it.</strong> An estimate before every generation — not a monthly credit balance you have to do math against — is the only way to actually decide whether a request is worth it.</li>
+        <li><strong>Separate failed generations from real progress.</strong> If a generation didn't produce something usable, it shouldn't count the same as one that did. Lumping them together is exactly what makes "I paid for nothing" feel true.</li>
+        <li><strong>Break the loop instead of repeating it.</strong> If you're reporting the same bug for the second time, the tool re-diagnosing from scratch — instead of trying the same fix again — is the difference between one more attempt and ten more.</li>
+      </ul>
+      <p>This is the specific set of decisions behind VibeSafe Builder's cost model: an estimate shown before every generation, a hard spend cap you set yourself, failed generations tracked separately and never billed to your build spend, and — after two failed fix attempts on the same issue — an automatic switch to re-diagnosing from scratch rather than repeating a fix that already didn't work. None of that makes generation free. It makes the spend visible and legible, which is the actual thing missing from the complaints above.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">04</span>The takeaway</h2>
+      <p>Before you pick (or keep paying for) an AI app builder, ask one question that most pricing pages don't answer directly: <em>when a generation fails, do I pay for it the same as one that works?</em> If the answer is "yes, they're all just credits," the 20-million-token stories aren't outliers — they're the predictable result.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">05</span>Sources</h2>
+      <p class="post-sources">
+        <a href="https://afterbuildlabs.com/resources/why-ai-app-burning-credits" target="_blank" rel="noopener">Afterbuild Labs — Why Your AI App Is Burning Credits</a><br>
+        <a href="https://iconpolls.com/blogs/rork-max-review-2026-ai-app-pricing-app-builder-reddit-user-experience-and-faqs" target="_blank" rel="noopener">ICON — Rork Max Review 2026: Pricing, App Builder, User Experience</a>
+      </p>
+    </section>
+  </article>
+
+  <a class="back-to-blog" href="/blog.html">← Back to the blog</a>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

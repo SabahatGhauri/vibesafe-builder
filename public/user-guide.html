@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>User Guide — How to Use VibeSafe Builder</title>
+<meta name="description" content="A step-by-step walkthrough of VibeSafe Builder: choosing a mode, building your first app, reading the cost estimate, rolling back versions, and publishing." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html" class="active">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> User Guide</div>
+    <h1>How to use VibeSafe Builder — from first prompt to published app</h1>
+    <p class="lead">This guide walks through the whole journey: picking a mode, building and fixing an app, reading the cost meter, rolling back a version, and shipping it. Total time to your first working app: about 2 minutes.</p>
+  </div>
+
+  <div class="toc glass">
+    <h2>In this guide</h2>
+    <ol>
+      <li><a href="#what-it-does">What VibeSafe Builder does</a></li>
+      <li><a href="#choose-mode">Choose a mode: bring your key, or go Managed</a></li>
+      <li><a href="#first-build">Build your first app</a></li>
+      <li><a href="#cost">Read the cost estimate and spend meter</a></li>
+      <li><a href="#preview-code">Preview and code tabs</a></li>
+      <li><a href="#iterate">Ask for changes — and what happens when a fix doesn't work</a></li>
+      <li><a href="#versions">Version history and rollback</a></li>
+      <li><a href="#security">The security tab</a></li>
+      <li><a href="#ship">Download or publish</a></li>
+      <li><a href="#managed-budget">Managed plan budget and limits</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ol>
+  </div>
+
+  <article>
+    <section id="what-it-does">
+      <h2><span class="num">01</span>What VibeSafe Builder does</h2>
+      <p>You describe an app in plain English, and VibeSafe Builder generates a complete, working, single-file web app — one HTML document with the styling and logic built in. Every generation shows its cost <em>before</em> you commit to it, every change is a version you can roll back, and every build is scanned for common security mistakes before you can publish or feel good about sharing it.</p>
+    </section>
+
+    <section id="choose-mode">
+      <h2><span class="num">02</span>Choose a mode: bring your key, or go Managed</h2>
+      <p>Open <a href="/app">the builder</a> and click <strong>⚙ Settings</strong> in the top bar. You have two ways to pay for generations:</p>
+      <div class="steps">
+        <div class="step glass">
+          <div class="stepnum">A</div>
+          <div>
+            <h3>Bring Your Own Key (free platform fee)</h3>
+            <p>Paste an Anthropic API key (get one at <a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a>) into the <strong>Anthropic API key</strong> field. It's stored only in your browser and sent straight to our server per-request — we never log or store it. You're billed by Anthropic directly, at their standard rates, with no markup from us.</p>
+          </div>
+        </div>
+        <div class="step glass">
+          <div class="stepnum">B</div>
+          <div>
+            <h3>Managed plan ($15/month)</h3>
+            <p>Enter your email under <strong>Managed plan</strong> and click <strong>Email me a sign-in link</strong>. Click the link in your inbox, and you're signed in — no API key needed. We cover up to $10/month of Anthropic usage on our own key. Subscribe via the <a href="/#pricing">pricing section</a> on the homepage first if you haven't already.</p>
+          </div>
+        </div>
+      </div>
+      <p>You can also set a <strong>session spend cap</strong> in the same Settings panel (BYOK mode only) — generation is blocked once a new request would push your successful-build spend past that number.</p>
+    </section>
+
+    <section id="first-build">
+      <h2><span class="num">03</span>Build your first app</h2>
+      <p>Two ways to start, both in the chat panel on the left:</p>
+      <ul>
+        <li><strong>Describe it</strong> — type something like "a habit tracker with streaks" or "an invoice generator" into the composer and click <strong>Build it</strong>.</li>
+        <li><strong>Start from a template</strong> — pick one of the 15 free templates shown above the composer for an instant v1 at zero generation cost, then keep chatting to customize it.</li>
+      </ul>
+      <p>Generation streams in live; you'll see the assistant's one-line summary followed by the app appearing in the Preview tab on the right.</p>
+    </section>
+
+    <section id="cost">
+      <h2><span class="num">04</span>Read the cost estimate and spend meter</h2>
+      <p>Before you hit send, the composer shows an estimated cost range for that specific request. After it completes, the top bar's <strong>build spend</strong> meter updates — but only for generations that actually produced a working app. If a generation fails (an invalid response, a refusal, a timeout), its cost shows separately as "failed (not counted)" and is never added to your spend total. This is the "failures don't count" principle from the homepage, made literal.</p>
+    </section>
+
+    <section id="preview-code">
+      <h2><span class="num">05</span>Preview and code tabs</h2>
+      <p>The workspace on the right has four tabs:</p>
+      <ul>
+        <li><strong>Preview</strong> — your app running live in a sandboxed iframe, exactly as a user would see it.</li>
+        <li><strong>Code</strong> — the full HTML source, with <strong>Copy code</strong> and <strong>Download .html</strong> buttons.</li>
+        <li><strong>Versions</strong> — every generation you've kept, see §7.</li>
+        <li><strong>Security</strong> — the scan results for the current version, see §8.</li>
+      </ul>
+    </section>
+
+    <section id="iterate">
+      <h2><span class="num">06</span>Ask for changes — and what happens when a fix doesn't work</h2>
+      <p>Keep chatting to iterate: "add dark mode", "the delete button doesn't work", "make it mobile-friendly". Each request only touches what you asked for — the model is instructed to preserve everything that already works rather than silently rewriting your app.</p>
+      <div class="callout warn glass">
+        <div class="cal-label">Doom-loop protection</div>
+        If you report the same problem twice in a row, a banner appears — <em>"Same problem twice — switching strategy"</em> — and the next attempt re-diagnoses the issue from scratch instead of repeating the fix that already failed you.
+      </div>
+    </section>
+
+    <section id="versions">
+      <h2><span class="num">07</span>Version history and rollback</h2>
+      <p>Every successful generation is saved as a version in the <strong>Versions</strong> tab, newest first, each showing its cost and a short note. Click any version to see a line-by-line diff against the one before it. Click <strong>Restore</strong> on any older version to make it current again — nothing is lost, later versions stay in the list. Version history lives in your browser's localStorage (capped at the most recent 20 versions to stay within storage limits), so it survives a page reload but not a browser data wipe — download the app if you want a permanent copy.</p>
+    </section>
+
+    <section id="security">
+      <h2><span class="num">08</span>The security tab</h2>
+      <p>Every generation is checked against a set of common AI-coding mistakes — hardcoded API keys and secrets, <code>eval()</code> / dynamic code execution, passwords written to localStorage, insecure requests, and more. The <strong>Security</strong> tab badge turns red if anything critical is found, with a plain-English explanation of each issue and how to ask the AI to fix it. This same check runs again, server-side, the moment you try to publish — so a bypassed or stale client-side result can never slip a critical issue onto a public link.</p>
+    </section>
+
+    <section id="ship">
+      <h2><span class="num">09</span>Download or publish</h2>
+      <div class="steps">
+        <div class="step glass">
+          <div class="stepnum">↓</div>
+          <div><h3>Download .html</h3><p>From the Code tab — saves the current version as <code>my-app.html</code>, a single portable file you can open locally, host anywhere, or hand to someone else. This is your app; there's no lock-in. Installable to a phone's home screen out of the box.</p></div>
+        </div>
+        <div class="step glass">
+          <div class="stepnum">🚀</div>
+          <div><h3>Publish</h3><p>From the Preview tab — uploads the current version to a shareable link at <code>vibesafebuilder.com/p/&lt;id&gt;</code>. Blocked automatically if the security scan finds a critical issue. Publishing is public: anyone with the link can open it, installable to their home screen, and works offline. Click <strong>Republish</strong> after later changes to update the same link.</p></div>
+        </div>
+      </div>
+      <p style="margin-top:14px;">Want your own domain instead of a <code>vibesafebuilder.com</code> link? See the full <a href="/deploy-guide.html">deployment guide</a> — Netlify, Vercel, GitHub Pages, and more.</p>
+    </section>
+
+    <section id="managed-budget">
+      <h2><span class="num">10</span>Managed plan budget and limits</h2>
+      <p>The Managed plan's $10/month included usage is tracked automatically. If you hit that limit mid-month, generation pauses with a message telling you exactly how much you've used — you can wait for the next billing cycle, or switch to your own API key in Settings to keep going immediately. BYOK mode has no monthly cap beyond the session spend cap you set yourself.</p>
+    </section>
+
+    <section id="troubleshooting">
+      <h2><span class="num">11</span>Troubleshooting</h2>
+      <ul>
+        <li><strong>"Invalid API key" error</strong> — double-check the key in Settings; it should start with <code>sk-ant-</code>.</li>
+        <li><strong>Generation blocked by the spend cap</strong> — raise the session cap in Settings, or wait if you're near your intended budget on purpose.</li>
+        <li><strong>Lost my project</strong> — BYOK projects live in browser localStorage only; if you cleared browser data or switched devices without downloading first, it can't be recovered. Reload the same browser/profile to have it restored automatically.</li>
+        <li><strong>Publish button is disabled</strong> — you need at least one generated version, and the current version must pass the security scan.</li>
+        <li><strong>Something else</strong> — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a>.</li>
+      </ul>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

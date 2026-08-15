@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How VibeSafe Builder Works</title>
+<meta name="description" content="How VibeSafe Builder turns a chat prompt into a working, security-scanned app — cost estimate, generation, review, and publish." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html" class="active">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> How it works</div>
+    <h1>From a sentence to a shippable app in four steps</h1>
+    <p class="lead">No separate build pipeline to learn. You chat, it builds, you see the cost and the security verdict before you ever commit to keeping it.</p>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <div class="steps">
+        <div class="step glass">
+          <div class="stepnum">01</div>
+          <div>
+            <h3>Describe what you want</h3>
+            <p>Type a plain-English request — "a habit tracker with streaks" — or start from one of 15 free templates for an instant, zero-cost v1. Either way, you land in a chat interface next to a live preview pane, not a code editor.</p>
+          </div>
+        </div>
+        <div class="step glass">
+          <div class="stepnum">02</div>
+          <div>
+            <h3>See the cost before it runs</h3>
+            <p>A live estimate appears in the composer before you send. Generation is streamed from Claude and produces one complete, self-contained HTML app — styling and logic included, no partial files. If the generation fails, its cost is tracked separately and never billed to your build spend; if you report the same bug twice, the AI stops repeating itself and re-diagnoses from scratch instead.</p>
+          </div>
+        </div>
+        <div class="step glass">
+          <div class="stepnum">03</div>
+          <div>
+            <h3>Review the diff and the security scan</h3>
+            <p>Every change lands as a new version with a line-by-line diff against the last one — roll back with one click if you don't like it. In parallel, the build is checked for hardcoded API keys and secrets, <code>eval()</code> / dynamic code execution, and other common AI-coding security mistakes, with the verdict shown as a pass/fail badge on the Security tab.</p>
+          </div>
+        </div>
+        <div class="step glass">
+          <div class="stepnum">04</div>
+          <div>
+            <h3>Download it, or publish it</h3>
+            <p>Download the app as a single portable <code>.html</code> file you can run anywhere — no lock-in, the code is always fully visible. Or publish it to a shareable link; publishing re-runs the security scan server-side and refuses to go live if a critical issue is found, so a bypassed client-side check can never leak onto the public internet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">＋</span>Two ways to pay for it</h2>
+      <p>Bring your own Anthropic API key and pay Anthropic directly at their standard rates — we add no markup and never see your key or your invoice. Or take the $15/month Managed plan and we cover up to $10/month of usage on our own key, no API key required. See full details on the <a href="/#pricing">pricing section</a> and the <a href="/user-guide.html">user guide</a>.</p>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>

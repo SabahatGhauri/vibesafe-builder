@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Where to Deploy Your App — Deployment Guide | VibeSafe Builder</title>
+<meta name="description" content="Your app is a single portable HTML file. Here's the built-in way to publish it, and every major place you can host it yourself for a custom domain." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#35d99a"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html" class="active">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Deployment Guide</div>
+    <h1>Where to put your app once it's built</h1>
+    <p class="lead">Your app is one portable <code>.html</code> file with everything inline — no build step, no dependencies, no server required. That means it runs on <em>literally any</em> static host. Here's the built-in option, and every major place you can self-host for a custom domain.</p>
+  </div>
+
+  <div class="callout summary glass">
+    <div class="cal-label">Fastest path</div>
+    Don't need a custom domain? Click <strong>🚀 Publish</strong> in the builder — your app goes live at <code>vibesafebuilder.com/p/&lt;id&gt;</code> in seconds, security-scanned first, installable to a phone's home screen, works offline. Everything below is for when you want your own domain instead.
+  </div>
+
+  <div class="toc glass">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#builtin">Built-in: Publish in the app</a></li>
+      <li><a href="#prep">Before you deploy elsewhere: one prep step</a></li>
+      <li><a href="#netlify">Netlify Drop</a></li>
+      <li><a href="#vercel">Vercel</a></li>
+      <li><a href="#cloudflare">Cloudflare Pages</a></li>
+      <li><a href="#github">GitHub Pages</a></li>
+      <li><a href="#surge">Surge.sh</a></li>
+      <li><a href="#firebase">Firebase Hosting</a></li>
+      <li><a href="#compare">Which one should I use?</a></li>
+      <li><a href="#custom-domain">Adding a custom domain</a></li>
+      <li><a href="#pwa-note">A note on installability elsewhere</a></li>
+    </ol>
+  </div>
+
+  <article>
+    <section id="builtin">
+      <h2><span class="num">01</span>Built-in: Publish in the app</h2>
+      <p>The Preview tab has a <strong>🚀 Publish</strong> button. One click uploads the current version to <code>vibesafebuilder.com/p/&lt;id&gt;</code> — no account, no setup, no file renaming. It's security-scanned server-side before it goes live, and it's installable to a phone's home screen with offline support built in (see the <a href="/user-guide.html#ship">user guide</a>). Republish any time to update the same link.</p>
+      <p>Use everything below only if you want a custom domain (<code>myapp.com</code> instead of a <code>vibesafebuilder.com</code> link), or want the file hosted somewhere you fully control.</p>
+    </section>
+
+    <section id="prep">
+      <h2><span class="num">02</span>Before you deploy elsewhere: one prep step</h2>
+      <p>Every host below expects a file named <code>index.html</code> as the entry point. Your download is named <code>my-app.html</code> — rename it to <code>index.html</code> before uploading anywhere. That's the only preparation needed: there's no build command, no <code>npm install</code>, no framework to configure. It's one file with inline <code>&lt;style&gt;</code> and <code>&lt;script&gt;</code> — every static host on this list treats that as a complete, deployable site.</p>
+    </section>
+
+    <section id="netlify">
+      <h2><span class="num">03</span>Netlify Drop</h2>
+      <p><strong>Best for:</strong> the fastest possible way to get a real URL with zero account setup.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Go to app.netlify.com/drop</h3><p>No sign-up required to get a live link; create a free account only if you want to keep it long-term or add a custom domain.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Drag your renamed <code>index.html</code> onto the page</h3><p>Netlify uploads it and gives you a live <code>https://random-name.netlify.app</code> URL immediately.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Optional: claim it and add a domain</h3><p>Create an account to keep the site permanently, rename the subdomain, or connect your own domain under Site settings → Domain management.</p></div></div>
+      </div>
+    </section>
+
+    <section id="vercel">
+      <h2><span class="num">04</span>Vercel</h2>
+      <p><strong>Best for:</strong> builders who want a dashboard, previews, and easy custom-domain HTTPS.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Create a free account at vercel.com</h3><p>Sign up with GitHub, GitLab, or email.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>New Project → Deploy without Git</h3><p>Vercel supports dragging in a folder containing your renamed <code>index.html</code> — no repository required for a single static file.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Add your domain</h3><p>Project → Settings → Domains. Point your domain's DNS at Vercel and HTTPS is issued automatically.</p></div></div>
+      </div>
+    </section>
+
+    <section id="cloudflare">
+      <h2><span class="num">05</span>Cloudflare Pages</h2>
+      <p><strong>Best for:</strong> the fastest global CDN and generous free tier, if you already use Cloudflare for DNS.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Create a free Cloudflare account</h3><p>Go to the Pages section of the dashboard.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Create a project → Upload assets</h3><p>Upload your renamed <code>index.html</code> directly — no Git repo needed for a direct upload deploy.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Attach your domain</h3><p>Custom domains → Set up a domain. Works especially smoothly if the domain's DNS is already on Cloudflare.</p></div></div>
+      </div>
+    </section>
+
+    <section id="github">
+      <h2><span class="num">06</span>GitHub Pages</h2>
+      <p><strong>Best for:</strong> if you already have a GitHub account and want your app's source visible/version-controlled publicly.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Create a new repository</h3><p>Upload your renamed <code>index.html</code> to it (GitHub's web UI lets you drag-and-drop a file, no Git CLI required).</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Enable Pages</h3><p>Repository → Settings → Pages → set the source branch to <code>main</code> and folder to <code>/root</code>.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Visit your live URL</h3><p>Live in a minute or two at <code>yourusername.github.io/repo-name</code>. Custom domains are supported under the same Pages settings.</p></div></div>
+      </div>
+      <div class="callout warn glass">Note: GitHub Pages repositories are public by default (private-repo Pages requires a paid GitHub plan) — don't use this route for an app containing anything sensitive.</div>
+    </section>
+
+    <section id="surge">
+      <h2><span class="num">07</span>Surge.sh</h2>
+      <p><strong>Best for:</strong> builders comfortable with a terminal who want the fastest possible command-line deploy.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Install Surge</h3><p><code>npm install -g surge</code> (requires Node.js installed).</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Deploy from your app's folder</h3><p>With your renamed <code>index.html</code> in an otherwise-empty folder, run <code>surge</code> and follow the prompts — first run asks you to create a free account.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Get your URL</h3><p>Surge picks a random <code>*.surge.sh</code> domain by default, or you can type your own subdomain — and your own custom domain via <code>surge --domain yourdomain.com</code>.</p></div></div>
+      </div>
+    </section>
+
+    <section id="firebase">
+      <h2><span class="num">08</span>Firebase Hosting</h2>
+      <p><strong>Best for:</strong> if you're already in the Firebase/Google Cloud ecosystem, or want to add a real backend to your app later.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Install the Firebase CLI</h3><p><code>npm install -g firebase-tools</code>, then <code>firebase login</code>.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Initialize hosting</h3><p><code>firebase init hosting</code> in a folder containing your renamed <code>index.html</code> as the public directory.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Deploy</h3><p><code>firebase deploy</code> — live instantly at <code>yourproject.web.app</code>, with custom domain support in the Hosting dashboard.</p></div></div>
+      </div>
+    </section>
+
+    <section id="compare">
+      <h2><span class="num">09</span>Which one should I use?</h2>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Platform</th><th>Setup</th><th>Account needed?</th><th>Custom domain</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td>Our Publish button</td><td>One click</td><td>No</td><td>No</td><td>Instant sharing, zero setup</td></tr>
+            <tr><td>Netlify Drop</td><td>Drag &amp; drop</td><td>Only to keep it</td><td class="yes">✓</td><td>Fastest external option</td></tr>
+            <tr><td>Vercel</td><td>Drag folder or CLI</td><td>Yes</td><td class="yes">✓</td><td>Dashboard + previews</td></tr>
+            <tr><td>Cloudflare Pages</td><td>Upload assets</td><td>Yes</td><td class="yes">✓</td><td>Fastest global CDN</td></tr>
+            <tr><td>GitHub Pages</td><td>Upload to repo</td><td>Yes</td><td class="yes">✓</td><td>Public, version-controlled</td></tr>
+            <tr><td>Surge.sh</td><td>CLI command</td><td>Yes</td><td class="yes">✓</td><td>Terminal users, scripting</td></tr>
+            <tr><td>Firebase Hosting</td><td>CLI init + deploy</td><td>Yes</td><td class="yes">✓</td><td>Adding a backend later</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="custom-domain">
+      <h2><span class="num">10</span>Adding a custom domain</h2>
+      <p>The general pattern is the same everywhere: buy a domain from any registrar (Namecheap, Cloudflare Registrar, Google Domains successors, etc.), then in your chosen host's dashboard add the domain and point its DNS records (usually a <code>CNAME</code> or <code>A</code> record) at the values the host gives you. All six platforms above issue free HTTPS certificates automatically once the domain is verified — no extra cost or manual certificate setup.</p>
+    </section>
+
+    <section id="pwa-note">
+      <h2><span class="num">11</span>A note on installability elsewhere</h2>
+      <p>Your downloaded file already includes a manifest and icon, so it's installable to a phone's home screen wherever you host it. What it <em>won't</em> have outside our own domain is offline caching — that part of our Launch Check / publish pipeline registers a service worker scoped to <code>vibesafebuilder.com/p/&lt;id&gt;</code> specifically, since offline caching requires the host to serve that worker file itself. If you self-host and want offline support too, you'd add your own small service-worker script to the platform you choose — outside the scope of this guide, but every platform above supports it the same way any static site does.</p>
+    </section>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>
