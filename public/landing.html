@@ -589,7 +589,7 @@ Public reports and user complaints about other AI app builders describe <b>large
             <li>No Anthropic account required</li>
             <li>Up to $10/mo of generations covered — switch to your own key any time if you go past it</li>
           </ul>
-          <a class="btn primary" href="https://buy.stripe.com/eVq3cwgCAa2JbhV7R1g3606" style="width:100%; text-align:center; display:block;">Get managed access</a>
+          <button class="btn primary" type="button" id="getManagedBtn" style="width:100%; text-align:center; display:block; cursor:pointer;">Get managed access</button>
         </div>
       </div>
 
@@ -799,6 +799,26 @@ Public reports and user complaints about other AI app builders describe <b>large
       }
       ccSlider.addEventListener("input", updateCalc);
       updateCalc();
+    }
+
+    // ---------- pricing: managed checkout (server-created session) ----------
+    const getManagedBtn = document.getElementById("getManagedBtn");
+    if (getManagedBtn) {
+      getManagedBtn.addEventListener("click", async () => {
+        const originalText = getManagedBtn.textContent;
+        getManagedBtn.disabled = true;
+        getManagedBtn.textContent = "Starting checkout…";
+        try {
+          const r = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+          const data = await r.json();
+          if (!r.ok || !data.url) throw new Error(data.error || "Could not start checkout.");
+          location.href = data.url;
+        } catch (err) {
+          getManagedBtn.disabled = false;
+          getManagedBtn.textContent = originalText;
+          alert(err.message || "Could not start checkout. Please try again.");
+        }
+      });
     }
 
     // ---------- pricing: FAQ accordion ----------
