@@ -589,6 +589,9 @@ Public reports and user complaints about other AI app builders describe <b>large
             <li>No Anthropic account required</li>
             <li>Up to $10/mo of generations covered — switch to your own key any time if you go past it</li>
           </ul>
+          <input type="email" id="managedEmailInput" placeholder="you@example.com" autocomplete="email"
+            style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--glass-border); background:var(--bg-panel); color:var(--text); font-size:14px; margin-bottom:10px;" />
+          <div id="managedEmailError" style="color:var(--danger); font-size:12.5px; margin:-4px 0 8px; min-height:16px;"></div>
           <button class="btn primary" type="button" id="getManagedBtn" style="width:100%; text-align:center; display:block; cursor:pointer;">Get managed access</button>
         </div>
       </div>
@@ -802,14 +805,27 @@ Public reports and user complaints about other AI app builders describe <b>large
     }
 
     // ---------- pricing: managed checkout (server-created session) ----------
+    // Collecting the email here — before Stripe, not letting Stripe/Link supply
+    // one — is deliberate: it's what the customer actually typed, passed straight
+    // through as customer_email, so the checkout can't silently attach to some
+    // other saved identity the browser happens to have on file.
     const getManagedBtn = document.getElementById("getManagedBtn");
+    const managedEmailInput = document.getElementById("managedEmailInput");
+    const managedEmailError = document.getElementById("managedEmailError");
     if (getManagedBtn) {
       getManagedBtn.addEventListener("click", async () => {
+        const email = (managedEmailInput?.value || "").trim();
+        managedEmailError.textContent = "";
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          managedEmailError.textContent = "Enter a valid email first — this is who your account and receipt will go to.";
+          managedEmailInput?.focus();
+          return;
+        }
         const originalText = getManagedBtn.textContent;
         getManagedBtn.disabled = true;
         getManagedBtn.textContent = "Starting checkout…";
         try {
-          const r = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+          const r = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
           const data = await r.json();
           if (!r.ok || !data.url) throw new Error(data.error || "Could not start checkout.");
           location.href = data.url;
