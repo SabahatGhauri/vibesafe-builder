@@ -185,10 +185,15 @@
     }
     rowsEl.innerHTML = users.map((u) => {
       const spendClass = u.periodSpent >= budget ? "over-cap" : u.periodSpent >= budget * 0.8 ? "near-cap" : "";
-      const badgeClass = u.subscriptionStatus === "active" ? "active" : "none";
+      const isPro = u.subscriptionStatus === "active";
+      // Same Pro/Free language as the builder's own header badge — this is the plan
+      // the account actually has, not the raw Stripe status string, which reads as
+      // "active"/"none"/"canceled" and doesn't map cleanly to what a customer sees.
+      const badgeClass = isPro ? "active" : "none";
+      const planLabel = isPro ? "Pro" : "Free";
       return `<tr>
         <td class="email">${escapeHtml(u.email || "(no email)")}</td>
-        <td><span class="badge ${badgeClass}">${escapeHtml(u.subscriptionStatus)}</span></td>
+        <td><span class="badge ${badgeClass}">${planLabel}</span></td>
         <td>${fmtDate(u.createdAt)}</td>
         <td>${fmtDate(u.lastSignInAt)}</td>
         <td class="spend ${spendClass}">${fmtMoney(u.periodSpent)}</td>
