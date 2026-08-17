@@ -14,6 +14,27 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ---------- auth gate (blocks everything, BYOK included, until signed in) ---------- */
+.auth-gate {
+  position: fixed; inset: 0; z-index: 1000; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.auth-gate-card {
+  width: 100%; max-width: 400px; background: var(--bg-panel); border: 1px solid var(--line);
+  border-radius: 16px; padding: 32px 28px;
+}
+.auth-gate-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; color: var(--text-dim); margin-bottom: 22px; }
+.auth-gate-brand .brand-mark { color: var(--accent); }
+.auth-gate-card h1 { font-size: 20px; margin-bottom: 8px; }
+.auth-gate-sub { color: var(--text-dim); font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
+.auth-gate-card label { display: block; font-size: 12.5px; color: var(--text-dim); margin-bottom: 6px; }
+.auth-gate-card input {
+  width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font-size: 14px; margin-top: 4px;
+}
+.auth-gate-status { font-size: 12.5px; color: var(--text-dim); margin-top: 12px; min-height: 16px; text-align: center; }
+.auth-gate-status.error { color: var(--danger); }
+
 body {
   font-family: "Segoe UI", system-ui, sans-serif;
   background: var(--bg);

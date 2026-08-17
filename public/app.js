@@ -59,6 +59,10 @@ const managed = {
     const signedOut = $("managedSignedOut");
     const signedIn = $("managedSignedIn");
     const badge = $("planBadge");
+    const gate = $("authGate");
+    // Sign-in gates the whole app now — BYOK included, not just the managed plan —
+    // so this is the one place that decides whether the builder is even visible.
+    if (gate) gate.style.display = this.session ? "none" : "flex";
     if (!signedOut || !signedIn) return;
     if (this.session) {
       signedOut.hidden = true;
@@ -103,11 +107,15 @@ const managed = {
     }
   },
 
+  // shouldCreateUser: true — sign-in is required for everyone now, not just paying
+  // Managed customers, so this doubles as sign-UP for a brand-new free account. Whether
+  // that account also has an active subscription is a separate fact, checked later by
+  // refreshPlanStatus()/resolveMode() — not gated here.
   async sendMagicLink(email) {
-    if (!this.sb) throw new Error("Managed plan isn't available right now.");
+    if (!this.sb) throw new Error("Sign-in isn't available right now.");
     const { error } = await this.sb.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: location.origin + "/app", shouldCreateUser: false },
+      options: { emailRedirectTo: location.origin + "/app", shouldCreateUser: true },
     });
     if (error) throw error;
   },
@@ -127,13 +135,33 @@ $("sendMagicLinkBtn")?.addEventListener("click", async () => {
     await managed.sendMagicLink(email);
     status.textContent = "Check your email for a sign-in link.";
   } catch (err) {
-    status.textContent = err.message?.includes("Signups not allowed")
-      ? "That email hasn't paid for the managed plan yet."
-      : "Couldn't send link: " + (err.message || "unknown error");
+    status.textContent = "Couldn't send link: " + (err.message || "unknown error");
   }
 });
 $("signOutBtn")?.addEventListener("click", async () => {
   await managed.signOut();
+});
+
+$("gateSendLinkBtn")?.addEventListener("click", async () => {
+  const email = $("gateEmailInput").value.trim();
+  const status = $("gateStatus");
+  status.className = "auth-gate-status";
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    status.textContent = "Enter a valid email first.";
+    status.className = "auth-gate-status error";
+    return;
+  }
+  status.textContent = "Sending…";
+  try {
+    await managed.sendMagicLink(email);
+    status.textContent = "Check your email for a sign-in link, then come back here.";
+  } catch (err) {
+    status.textContent = "Couldn't send link: " + (err.message || "unknown error");
+    status.className = "auth-gate-status error";
+  }
+});
+$("gateEmailInput")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") $("gateSendLinkBtn")?.click();
 });
 
 /* ---------------- persistence (survives reloads) ---------------- */

@@ -8,6 +8,19 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="authGate" class="auth-gate">
+    <div class="auth-gate-card">
+      <div class="auth-gate-brand"><span class="brand-mark">◆</span> VibeSafe Builder</div>
+      <h1>Sign in to continue</h1>
+      <p class="auth-gate-sub">Every account here — whether you're bringing your own API key or on the managed plan — needs a quick sign-in first. No password: we email you a one-time link.</p>
+      <label>Email
+        <input type="email" id="gateEmailInput" placeholder="you@example.com" autocomplete="email" />
+      </label>
+      <button class="btn primary" type="button" id="gateSendLinkBtn" style="width:100%; margin-top:10px;">Email me a sign-in link</button>
+      <div class="auth-gate-status" id="gateStatus"></div>
+    </div>
+  </div>
+
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark">◆</span>
