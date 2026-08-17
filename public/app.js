@@ -107,16 +107,31 @@ const managed = {
     }
   },
 
-  // shouldCreateUser: true — sign-in is required for everyone now, not just paying
-  // Managed customers, so this doubles as sign-UP for a brand-new free account. Whether
-  // that account also has an active subscription is a separate fact, checked later by
-  // refreshPlanStatus()/resolveMode() — not gated here.
-  async sendMagicLink(email) {
-    if (!this.sb) throw new Error("Sign-in isn't available right now.");
-    const { error } = await this.sb.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: location.origin + "/app", shouldCreateUser: true },
+  // Sign-in is required for everyone now, not just paying Managed customers — being
+  // signed up and having an active subscription are separate facts, checked later by
+  // refreshPlanStatus()/resolveMode() — not gated here. Password auth, not magic-link:
+  // Supabase's default email-confirmation setting means signUp() may not return an
+  // active session immediately (data.session is null until the confirmation link is
+  // clicked) — callers must handle that case, not assume signUp = signed in.
+  async signUp(email, password, name) {
+    if (!this.sb) throw new Error("Sign-up isn't available right now.");
+    const { data, error } = await this.sb.auth.signUp({
+      email, password,
+      options: { data: name ? { full_name: name } : undefined, emailRedirectTo: location.origin + "/app" },
     });
+    if (error) throw error;
+    return { needsEmailConfirmation: !data.session };
+  },
+
+  async signIn(email, password) {
+    if (!this.sb) throw new Error("Sign-in isn't available right now.");
+    const { error } = await this.sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  },
+
+  async resetPassword(email) {
+    if (!this.sb) throw new Error("Sign-in isn't available right now.");
+    const { error } = await this.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/app" });
     if (error) throw error;
   },
 
@@ -126,42 +141,111 @@ const managed = {
 };
 managed.init();
 
-$("sendMagicLinkBtn")?.addEventListener("click", async () => {
-  const email = $("managedEmailInput").value.trim();
-  const status = $("magicLinkStatus");
-  if (!email) { status.textContent = "Enter your email first."; return; }
-  status.textContent = "Sending…";
-  try {
-    await managed.sendMagicLink(email);
-    status.textContent = "Check your email for a sign-in link.";
-  } catch (err) {
-    status.textContent = "Couldn't send link: " + (err.message || "unknown error");
-  }
-});
 $("signOutBtn")?.addEventListener("click", async () => {
   await managed.signOut();
 });
 
-$("gateSendLinkBtn")?.addEventListener("click", async () => {
+/* ---------------- auth gate: sign-up / log-in / forgot-password ---------------- */
+let gateMode = "signup"; // "signup" | "login"
+
+function setGateMode(mode) {
+  gateMode = mode;
+  const isSignup = mode === "signup";
+  $("gateTitle").textContent = isSignup ? "Create your account" : "Log in";
+  $("gateSub").textContent = isSignup
+    ? "Every account here — whether you're bringing your own API key or on the managed plan — needs to sign up first."
+    : "Welcome back — enter your email and password.";
+  $("gateNameLabel").hidden = !isSignup;
+  $("gateConfirmLabel").hidden = !isSignup;
+  $("gateSubmitBtn").textContent = isSignup ? "Create account" : "Log in";
+  $("gateSwitchPrompt").textContent = isSignup ? "Already have an account?" : "Need an account?";
+  $("gateSwitchLink").textContent = isSignup ? "Log in" : "Sign up";
+  $("gateForgotLink").hidden = isSignup;
+  $("gateStatus").textContent = "";
+  $("gateStatus").className = "auth-gate-status";
+}
+
+$("gateSwitchLink")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  setGateMode(gateMode === "signup" ? "login" : "signup");
+});
+
+$("gateForgotLink")?.addEventListener("click", async (e) => {
+  e.preventDefault();
   const email = $("gateEmailInput").value.trim();
   const status = $("gateStatus");
-  status.className = "auth-gate-status";
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    status.textContent = "Enter a valid email first.";
+    status.textContent = "Enter your email above first, then click this again.";
     status.className = "auth-gate-status error";
     return;
   }
-  status.textContent = "Sending…";
+  status.textContent = "Sending reset link…";
+  status.className = "auth-gate-status";
   try {
-    await managed.sendMagicLink(email);
-    status.textContent = "Check your email for a sign-in link, then come back here.";
+    await managed.resetPassword(email);
+    status.textContent = "Check your email for a password reset link.";
+    status.className = "auth-gate-status success";
   } catch (err) {
-    status.textContent = "Couldn't send link: " + (err.message || "unknown error");
+    status.textContent = "Couldn't send reset link: " + (err.message || "unknown error");
     status.className = "auth-gate-status error";
   }
 });
-$("gateEmailInput")?.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") $("gateSendLinkBtn")?.click();
+
+$("gateSubmitBtn")?.addEventListener("click", async () => {
+  const name = $("gateNameInput").value.trim();
+  const email = $("gateEmailInput").value.trim();
+  const password = $("gatePasswordInput").value;
+  const confirm = $("gateConfirmInput").value;
+  const status = $("gateStatus");
+  status.className = "auth-gate-status";
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    status.textContent = "Enter a valid email.";
+    status.className = "auth-gate-status error";
+    return;
+  }
+  if (!password || password.length < 8) {
+    status.textContent = "Password must be at least 8 characters.";
+    status.className = "auth-gate-status error";
+    return;
+  }
+  if (gateMode === "signup" && password !== confirm) {
+    status.textContent = "Passwords don't match.";
+    status.className = "auth-gate-status error";
+    return;
+  }
+
+  const btn = $("gateSubmitBtn");
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = gateMode === "signup" ? "Creating account…" : "Logging in…";
+  try {
+    if (gateMode === "signup") {
+      const { needsEmailConfirmation } = await managed.signUp(email, password, name);
+      if (needsEmailConfirmation) {
+        // setGateMode() resets gateStatus as part of switching views, so it must run
+        // BEFORE the success message is set below — not after — or it wipes the message
+        // out immediately.
+        setGateMode("login");
+        status.textContent = "Account created — check your email to confirm it, then come back and log in.";
+        status.className = "auth-gate-status success";
+      }
+      // else: onAuthStateChange fires on its own and the gate hides itself.
+    } else {
+      await managed.signIn(email, password);
+      // onAuthStateChange fires on its own and hides the gate.
+    }
+  } catch (err) {
+    status.textContent = (gateMode === "signup" ? "Couldn't create account: " : "Couldn't log in: ") + (err.message || "unknown error");
+    status.className = "auth-gate-status error";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+});
+
+document.querySelectorAll("#authGate input").forEach((input) => {
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") $("gateSubmitBtn")?.click(); });
 });
 
 /* ---------------- persistence (survives reloads) ---------------- */

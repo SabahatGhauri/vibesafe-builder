@@ -11,13 +11,30 @@
   <div id="authGate" class="auth-gate">
     <div class="auth-gate-card">
       <div class="auth-gate-brand"><span class="brand-mark">◆</span> VibeSafe Builder</div>
-      <h1>Sign in to continue</h1>
-      <p class="auth-gate-sub">Every account here — whether you're bringing your own API key or on the managed plan — needs a quick sign-in first. No password: we email you a one-time link.</p>
+      <h1 id="gateTitle">Create your account</h1>
+      <p class="auth-gate-sub" id="gateSub">Every account here — whether you're bringing your own API key or on the managed plan — needs to sign up first.</p>
+
+      <label id="gateNameLabel">Name
+        <input type="text" id="gateNameInput" placeholder="Your name" autocomplete="name" />
+      </label>
       <label>Email
         <input type="email" id="gateEmailInput" placeholder="you@example.com" autocomplete="email" />
       </label>
-      <button class="btn primary" type="button" id="gateSendLinkBtn" style="width:100%; margin-top:10px;">Email me a sign-in link</button>
+      <label>Password
+        <input type="password" id="gatePasswordInput" placeholder="At least 8 characters" autocomplete="new-password" />
+      </label>
+      <label id="gateConfirmLabel">Confirm password
+        <input type="password" id="gateConfirmInput" placeholder="Retype your password" autocomplete="new-password" />
+      </label>
+
+      <button class="btn primary" type="button" id="gateSubmitBtn" style="width:100%; margin-top:10px;">Create account</button>
       <div class="auth-gate-status" id="gateStatus"></div>
+
+      <div class="auth-gate-switch">
+        <span id="gateSwitchPrompt">Already have an account?</span>
+        <a href="#" id="gateSwitchLink">Log in</a>
+      </div>
+      <a href="#" id="gateForgotLink" class="auth-gate-forgot" hidden>Forgot your password?</a>
     </div>
   </div>
 

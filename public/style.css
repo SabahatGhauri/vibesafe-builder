@@ -34,6 +34,11 @@
 }
 .auth-gate-status { font-size: 12.5px; color: var(--text-dim); margin-top: 12px; min-height: 16px; text-align: center; }
 .auth-gate-status.error { color: var(--danger); }
+.auth-gate-status.success { color: var(--accent); }
+.auth-gate-switch { text-align: center; font-size: 12.5px; color: var(--text-dim); margin-top: 16px; }
+.auth-gate-switch a, .auth-gate-forgot { color: var(--accent); text-decoration: none; margin-left: 4px; }
+.auth-gate-switch a:hover, .auth-gate-forgot:hover { text-decoration: underline; }
+.auth-gate-forgot { display: block; text-align: center; font-size: 12px; margin-top: 10px; }
 
 body {
   font-family: "Segoe UI", system-ui, sans-serif;
