@@ -35,6 +35,12 @@ const managed = {
       this.sb.auth.onAuthStateChange((_event, session) => {
         this.session = session;
         this.renderStatus();
+        // SIGNED_IN fires on a genuine sign-in action (password login, OAuth
+        // callback, signup-with-immediate-session) — not on page load with an
+        // already-open session (that's INITIAL_SESSION). The server enforces
+        // "only actually email once" via a user_metadata flag, so it's safe to
+        // call this on every SIGNED_IN without tracking first-time state here.
+        if (_event === "SIGNED_IN" && session) this.notifyWelcome();
       });
       this.renderStatus();
     } catch {
@@ -44,6 +50,17 @@ const managed = {
 
   isSignedIn() {
     return !!this.session;
+  },
+
+  // Best-effort — never let a failed welcome-email call disrupt sign-in itself.
+  async notifyWelcome() {
+    try {
+      const headers = await this.headers();
+      if (!headers["x-vc-session"]) return;
+      await fetch("/api/welcome-email", { method: "POST", headers });
+    } catch {
+      // ignore
+    }
   },
 
   // Merges in the managed-session header when signed in — server checks this
