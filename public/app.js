@@ -135,6 +135,19 @@ const managed = {
     if (error) throw error;
   },
 
+  // Google/GitHub both go through Supabase's OAuth flow — this always redirects the
+  // whole page away to the provider's consent screen and back, so there is no local
+  // success/failure branch to return; errors here only mean the redirect itself
+  // couldn't be started (e.g. the provider isn't enabled in Supabase yet).
+  async signInWithOAuth(provider) {
+    if (!this.sb) throw new Error("Sign-in isn't available right now.");
+    const { error } = await this.sb.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: location.origin + "/app" },
+    });
+    if (error) throw error;
+  },
+
   async signOut() {
     if (this.sb) await this.sb.auth.signOut();
   },
@@ -169,6 +182,30 @@ $("gateSwitchLink")?.addEventListener("click", (e) => {
   e.preventDefault();
   setGateMode(gateMode === "signup" ? "login" : "signup");
 });
+
+async function startOAuth(provider, btn) {
+  const status = $("gateStatus");
+  status.className = "auth-gate-status";
+  status.textContent = "";
+  // Mutate only the label span, not btn.textContent — that would wipe out the SVG
+  // icon (a sibling element) permanently, since textContent replaces all children
+  // and the "restore" afterward would only bring back plain text, not the icon.
+  const label = btn.querySelector(".oauth-label");
+  const originalText = label.textContent;
+  btn.disabled = true;
+  label.textContent = "Redirecting…";
+  try {
+    // On success this navigates the page away — control never returns here.
+    await managed.signInWithOAuth(provider);
+  } catch (err) {
+    status.textContent = "Couldn't start sign-in: " + (err.message || "unknown error");
+    status.className = "auth-gate-status error";
+    btn.disabled = false;
+    label.textContent = originalText;
+  }
+}
+$("gateGoogleBtn")?.addEventListener("click", () => startOAuth("google", $("gateGoogleBtn")));
+$("gateGithubBtn")?.addEventListener("click", () => startOAuth("github", $("gateGithubBtn")));
 
 $("gateForgotLink")?.addEventListener("click", async (e) => {
   e.preventDefault();
