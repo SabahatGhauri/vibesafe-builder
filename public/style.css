@@ -47,6 +47,9 @@
 .auth-gate-switch { text-align: center; font-size: 12.5px; color: var(--text-dim); margin-top: 16px; }
 .auth-gate-switch a, .auth-gate-forgot { color: var(--accent); text-decoration: none; margin-left: 4px; }
 .auth-gate-switch a:hover, .auth-gate-forgot:hover { text-decoration: underline; }
+.auth-gate-contact { text-align: center; font-size: 11.5px; color: var(--text-dim); margin-top: 18px; }
+.auth-gate-contact a { color: var(--text-dim); text-decoration: underline; margin-left: 4px; }
+.auth-gate-contact a:hover { color: var(--accent); }
 .auth-gate-forgot { display: block; text-align: center; font-size: 12px; margin-top: 10px; }
 
 body {
