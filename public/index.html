@@ -105,6 +105,7 @@
         <button class="tab" data-tab="health">Build Health <span class="sec-badge" id="healthBadge" hidden></span></button>
         <button class="tab" data-tab="code">Code</button>
         <button class="tab" data-tab="versions">Versions</button>
+        <button class="tab" data-tab="github">GitHub</button>
         <button class="tab" data-tab="security">Security <span class="sec-badge" id="secBadge" hidden></span></button>
         <button class="tab" data-tab="launchcheck">Launch Check <span class="sec-badge" id="lcBadge" hidden></span></button>
       </nav>
@@ -178,6 +179,38 @@
         </div>
       </div>
 
+      <div class="panel" id="panel-github">
+        <div class="gh-panel" id="ghPanel" hidden>
+          <div id="ghSignedOut">
+            <h3>Connect GitHub</h3>
+            <p class="gh-meta">Push this project to a real repository you own, pull changes back, and keep your code outside this builder. You'll be asked for repository access — that permission is only requested here, never when signing in.</p>
+            <button class="btn primary" type="button" id="ghConnectBtn">Connect GitHub</button>
+          </div>
+          <div id="ghSignedIn" hidden>
+            <div class="gh-row">
+              <strong>Connected as <span id="ghAccount"></span></strong>
+              <button class="btn ghost mini" type="button" id="ghDisconnectBtn">Disconnect</button>
+            </div>
+            <div class="gh-row">
+              <select id="ghRepoSelect"></select>
+              <button class="btn ghost" type="button" id="ghNewRepoBtn">+ New repo</button>
+            </div>
+            <div class="gh-row" id="ghBranchRow" hidden>
+              <label class="gh-meta">Branch</label>
+              <select id="ghBranchSelect"></select>
+            </div>
+            <div class="gh-row">
+              <button class="btn primary" type="button" id="ghPushBtn" disabled>⬆ Push</button>
+              <button class="btn ghost" type="button" id="ghPullBtn" disabled>⬇ Pull</button>
+            </div>
+            <div class="gh-status" id="ghStatus"></div>
+            <h4>Recent commits</h4>
+            <ul class="gh-commits" id="ghCommits"></ul>
+          </div>
+        </div>
+        <div class="empty" id="ghUnavailable">GitHub sync is available for multi-file React projects.</div>
+      </div>
+
       <div class="panel" id="panel-versions">
         <div class="versions-split">
           <ul class="version-list" id="versionList"></ul>
@@ -239,5 +272,6 @@
   <script src="app.js"></script>
   <script src="visualEditor.js"></script>
   <script src="buildStatus.js"></script>
+  <script src="github.js"></script>
 </body>
 </html>

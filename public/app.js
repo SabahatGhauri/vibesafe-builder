@@ -660,6 +660,7 @@ async function renderAll() {
   $("fileTree").hidden = true;
   if (window.ve) ve.refreshAvailability();
   if (window.build) build.render();
+  if (window.gh) gh.render();
   renderVersions();
   runSecurityScan(code);
   renderLaunchCheck();
@@ -688,6 +689,7 @@ async function renderAllMulti() {
   renderFileTree();
   $("codeView").textContent = state.activeFile ? currentFiles()[state.activeFile] : "No code yet.";
   if (window.ve) ve.refreshAvailability();
+  if (window.gh) gh.render();
   renderVersions();
   runSecurityScan(sourcesForScan());
   renderLaunchCheck();

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/appBackend.test.js test/multifile.test.js test/visualEdit.test.js",
+    "test": "node --test test/appBackend.test.js test/multifile.test.js test/visualEdit.test.js test/github.test.js",
     "test:integration": "node --test test/integration.test.js",
     "test:smoke": "node test/smoke.js"
   },
