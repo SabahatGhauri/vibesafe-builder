@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/appBackend.test.js",
+    "test:integration": "node --test test/integration.test.js",
+    "test:smoke": "node test/smoke.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.114.0",
