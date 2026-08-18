@@ -655,6 +655,7 @@ async function renderAll() {
   // code
   $("codeView").textContent = code || "No code yet.";
   $("fileTree").hidden = true;
+  if (window.ve) ve.refreshAvailability();
   renderVersions();
   runSecurityScan(code);
   renderLaunchCheck();
@@ -679,6 +680,7 @@ async function renderAllMulti() {
   }
   renderFileTree();
   $("codeView").textContent = state.activeFile ? currentFiles()[state.activeFile] : "No code yet.";
+  if (window.ve) ve.refreshAvailability();
   renderVersions();
   runSecurityScan(sourcesForScan());
   renderLaunchCheck();

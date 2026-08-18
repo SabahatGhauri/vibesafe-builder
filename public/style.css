@@ -304,3 +304,27 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .file-tree .file-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
 .file-tree .file-item.active { background: rgba(53,217,154,0.12); color: var(--accent); }
 .code-split .code { flex: 1; min-width: 0; overflow: auto; margin: 0; }
+
+/* ---- Phase 2B: visual editor ---- */
+.preview-wrap { display: flex; flex: 1; min-height: 0; }
+.preview-wrap iframe { flex: 1; min-width: 0; }
+.props {
+  flex: 0 0 258px; overflow-y: auto; background: var(--bg-raise);
+  border-left: 1px solid var(--line); padding: 12px; font-size: 12.5px;
+}
+.props-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.props-history { display: flex; gap: 4px; }
+.btn.mini { padding: 2px 7px; font-size: 12px; line-height: 1.4; }
+.props-src { font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); margin-bottom: 12px; word-break: break-all; }
+.props-field { display: block; color: var(--text-dim); font-size: 11.5px; margin-bottom: 10px; }
+.props-field input[type="text"], .props-field select {
+  width: 100%; margin-top: 4px; padding: 6px 8px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--text); font-size: 12.5px;
+}
+.props-field input[type="color"] { width: 100%; height: 30px; margin-top: 4px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); cursor: pointer; }
+.props-field input[type="range"] { width: 100%; margin-top: 6px; }
+.props-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.props-status { font-size: 11px; color: var(--text-dim); min-height: 15px; margin-top: 6px; }
+.props-status.error { color: var(--danger); }
+.props-status.ok { color: var(--accent); }
+#visualEditBtn.on { border-color: var(--accent); color: var(--accent); }

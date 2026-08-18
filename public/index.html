@@ -114,8 +114,50 @@
           <button class="btn primary" id="publishBtn" disabled>🚀 Publish</button>
           <span class="publish-url" id="publishUrl"></span>
         </div>
+        <button class="btn ghost" type="button" id="visualEditBtn" hidden title="Click any element in the preview to edit it">✎ Edit visually</button>
         <div class="empty" id="previewEmpty">Your app preview appears here.</div>
-        <iframe id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-popups" title="App preview" hidden></iframe>
+        <div class="preview-wrap">
+          <iframe id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-popups" title="App preview" hidden></iframe>
+          <aside class="props" id="propsPanel" hidden>
+            <div class="props-head">
+              <strong id="propsTitle">Element</strong>
+              <div class="props-history">
+                <button class="btn ghost mini" type="button" id="veUndo" title="Undo" disabled>↶</button>
+                <button class="btn ghost mini" type="button" id="veRedo" title="Redo" disabled>↷</button>
+                <button class="btn ghost mini" type="button" id="propsClose" title="Close">✕</button>
+              </div>
+            </div>
+            <div class="props-src" id="propsSrc"></div>
+            <label class="props-field" id="propsTextField">Text
+              <input type="text" id="veText" placeholder="element text" />
+            </label>
+            <div class="props-grid">
+              <label class="props-field">Colour<input type="color" id="veColor" /></label>
+              <label class="props-field">Background<input type="color" id="veBg" /></label>
+            </div>
+            <label class="props-field">Font size <span id="veFontSizeVal"></span>
+              <input type="range" id="veFontSize" min="8" max="72" step="1" />
+            </label>
+            <label class="props-field">Font weight
+              <select id="veFontWeight">
+                <option value="">—</option><option value="300">Light</option><option value="400">Normal</option>
+                <option value="600">Semibold</option><option value="700">Bold</option><option value="800">Extrabold</option>
+              </select>
+            </label>
+            <label class="props-field">Text align
+              <select id="veAlign">
+                <option value="">—</option><option value="left">Left</option><option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </label>
+            <div class="props-grid">
+              <label class="props-field">Padding<input type="text" id="vePadding" placeholder="e.g. 12px" /></label>
+              <label class="props-field">Margin<input type="text" id="veMargin" placeholder="e.g. 0 auto" /></label>
+            </div>
+            <label class="props-field">Corner radius<input type="text" id="veRadius" placeholder="e.g. 8px" /></label>
+            <div class="props-status" id="propsStatus"></div>
+          </aside>
+        </div>
       </div>
 
       <div class="panel" id="panel-health">
@@ -192,5 +234,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="templates.js"></script>
   <script src="app.js"></script>
+  <script src="visualEditor.js"></script>
 </body>
 </html>
