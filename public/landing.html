@@ -397,29 +397,27 @@ Public reports and user complaints about other AI app builders describe <b>large
 
   <div class="wrap">
     <section class="scope-section" id="scope">
-      <h2 class="section-title reveal">Built for one job, on purpose</h2>
-      <p class="section-sub reveal">A single portable HTML file, no server behind it. That's a deliberate trade-off, not a limitation we're hiding — here's exactly what it means for you.</p>
+      <h2 class="section-title reveal">Start simple. Grow into more when you need it.</h2>
+      <p class="section-sub reveal">Every app starts as one portable file with zero setup. When a request needs more — accounts, shared data, a real codebase — the builder grows into that instead of hitting a wall.</p>
       <div class="scope-grid reveal">
         <div class="scope-card good glass">
           <h3>✅ Good for</h3>
           <ul>
-            <li>Prototypes and MVPs to test an idea fast</li>
+            <li>Prototypes and MVPs to test an idea fast — download a single HTML file and it just works, no install, no build step</li>
             <li>Internal tools, calculators, trackers, generators</li>
-            <li>Landing pages and one-off utilities</li>
-            <li>Apps where "download the file and open it" should just work — no install, no build step</li>
+            <li>Multi-user apps with shared or per-visitor data — ask for it and the builder switches to a real backend behind the scenes</li>
+            <li>Bigger builds — start a multi-file React project when a single page isn't enough, push it to a repository you own on GitHub, and deploy it to your own Vercel account when it's ready for the world</li>
           </ul>
         </div>
         <div class="scope-card limit glass">
           <h3>🚧 Not (yet) for</h3>
           <ul>
-            <li>Apps needing real multi-user accounts or server-side auth</li>
-            <li>Data that has to persist across devices or visitors — storage is per-browser (localStorage), not a server database</li>
-            <li>Payments, or logic that must run somewhere the user can't see the code</li>
-            <li>Multi-file codebases — this builds one HTML file, not a repo</li>
+            <li>Payments, or business logic that has to run somewhere the user can never see the code</li>
+            <li>Custom server-side endpoints beyond the built-in data backend — no arbitrary server code, yet</li>
           </ul>
         </div>
       </div>
-      <p class="scope-note reveal">Outgrow it? Your app is a plain file you can hand to a developer — no export step, no proprietary format, no lock-in either way.</p>
+      <p class="scope-note reveal">Outgrow it? A single-file app is a plain file you can hand to a developer — no export step, no proprietary format. A React project is real, ordinary code in a repository you own. No lock-in either way.</p>
     </section>
 
     <section class="demo-section" id="demo">
@@ -637,6 +635,22 @@ Public reports and user complaints about other AI app builders describe <b>large
         <div class="faq-item">
           <button type="button" class="faq-q">Is there a free way to try it first?<span class="faq-chevron">›</span></button>
           <div class="faq-a">Yes — all 15 templates are free and cost zero tokens on either plan, no API key or card needed to start there.</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q">Can it build more than one page?<span class="faq-chevron">›</span></button>
+          <div class="faq-a">Yes — start a multi-file React project instead of a single page, and the AI works across a real, multi-file codebase: components, hooks, and styles in separate files, only the files that need a change get touched.</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q">Can I get my code onto GitHub?<span class="faq-chevron">›</span></button>
+          <div class="faq-a">Yes, for multi-file projects — connect your GitHub account and push to a repository you own with one click, as a real commit. It's ordinary code the moment it lands there, not something specific to this builder.</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q">Can I deploy to my own domain?<span class="faq-chevron">›</span></button>
+          <div class="faq-a">Yes — connect a project-scoped Vercel token and deploy a multi-file project directly to your own Vercel account, your own domain, your own bill. It builds from real source, the same as if you'd pushed it yourself.</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-q">What stops an app going public with a leaked API key in it?<span class="faq-chevron">›</span></button>
+          <div class="faq-a">Every generation is scanned for hardcoded credentials before you can publish. Deploying to your own Vercel account runs an additional Publish Security Check at the moment you make something public — a live credential blocks the change outright, with no way to override it.</div>
         </div>
       </div>
     </section>

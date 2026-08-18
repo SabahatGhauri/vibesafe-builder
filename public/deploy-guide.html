@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Where to Deploy Your App — Deployment Guide | VibeSafe Builder</title>
-<meta name="description" content="Your app is a single portable HTML file. Here's the built-in way to publish it, and every major place you can host it yourself for a custom domain." />
+<meta name="description" content="How to ship what you build with VibeSafe Builder: the built-in Publish button, one-click deployment to your own Vercel account for multi-file projects, and every major static host for a single-file app on a custom domain." />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="stylesheet" href="/docs.css" />
 </head>
@@ -33,7 +33,7 @@
   <div class="doc-hero">
     <div class="doc-kicker"><span class="dot"></span> Deployment Guide</div>
     <h1>Where to put your app once it's built</h1>
-    <p class="lead">Your app is one portable <code>.html</code> file with everything inline — no build step, no dependencies, no server required. That means it runs on <em>literally any</em> static host. Here's the built-in option, and every major place you can self-host for a custom domain.</p>
+    <p class="lead">A single-file app is one portable <code>.html</code> file with everything inline, so it runs on <em>literally any</em> static host. A multi-file React project deploys to your own Vercel account with one click. Here's the built-in option, the connected deployment, and every place you can self-host for a custom domain.</p>
   </div>
 
   <div class="callout summary glass">
@@ -41,13 +41,18 @@
     Don't need a custom domain? Click <strong>🚀 Publish</strong> in the builder — your app goes live at <code>vibesafebuilder.com/p/&lt;id&gt;</code> in seconds, security-scanned first, installable to a phone's home screen, works offline. Everything below is for when you want your own domain instead.
   </div>
 
+  <div class="callout summary glass">
+    <div class="cal-label">Building a multi-file React project?</div>
+    Skip ahead to <a href="#vercel">Vercel</a>, below — for a multi-file project, VibeSafe deploys directly to your own Vercel account with one click. No dragging files, no renaming anything; Vercel builds your real source the same as if you'd pushed it yourself. See the <a href="/user-guide.html#vercel">full walkthrough</a> in the user guide.
+  </div>
+
   <div class="toc glass">
     <h2>Contents</h2>
     <ol>
       <li><a href="#builtin">Built-in: Publish in the app</a></li>
+      <li><a href="#vercel">Vercel — deploy to your own account</a></li>
       <li><a href="#prep">Before you deploy elsewhere: one prep step</a></li>
       <li><a href="#netlify">Netlify Drop</a></li>
-      <li><a href="#vercel">Vercel</a></li>
       <li><a href="#cloudflare">Cloudflare Pages</a></li>
       <li><a href="#github">GitHub Pages</a></li>
       <li><a href="#surge">Surge.sh</a></li>
@@ -65,28 +70,29 @@
       <p>Use everything below only if you want a custom domain (<code>myapp.com</code> instead of a <code>vibesafebuilder.com</code> link), or want the file hosted somewhere you fully control.</p>
     </section>
 
+    <section id="vercel">
+      <h2><span class="num">02</span>Vercel — deploy to your own account</h2>
+      <p><strong>Best for:</strong> multi-file React projects, and anyone who wants their own domain, their own bill, and a site that keeps working whether or not this builder does. This is a connected, one-click deployment — not the drag-and-drop pattern used for the other hosts below, and it only works from a multi-file project (a single-file app has no source for Vercel to build).</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Get a project-scoped token</h3><p>In Vercel, go to Settings → Tokens → Create Token. Under Scope, choose the single project you want to deploy to — not your whole account. That way the token can only ever touch that one project.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Connect it on the Deploy tab</h3><p>Paste the token in. It's encrypted before it's stored and never sent back to your browser again — you'll see only a masked hint, like <code>vcp_••••1234</code>.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Deploy</h3><p>Vercel runs a real build from your project's source — <code>npm install</code> and Vite, the same as if you'd pushed it yourself. Deploy a preview to check it first, or straight to production. Making it public runs a Publish Security Check first, and asks you to confirm by typing the project's name.</p></div></div>
+      </div>
+      <p>Full walkthrough, including Deployment Protection and Make Public/Make Private, in the <a href="/user-guide.html#vercel">user guide</a>.</p>
+    </section>
+
     <section id="prep">
-      <h2><span class="num">02</span>Before you deploy elsewhere: one prep step</h2>
-      <p>Every host below expects a file named <code>index.html</code> as the entry point. Your download is named <code>my-app.html</code> — rename it to <code>index.html</code> before uploading anywhere. That's the only preparation needed: there's no build command, no <code>npm install</code>, no framework to configure. It's one file with inline <code>&lt;style&gt;</code> and <code>&lt;script&gt;</code> — every static host on this list treats that as a complete, deployable site.</p>
+      <h2><span class="num">03</span>Deploying a single-file app elsewhere: one prep step</h2>
+      <p>Everything from here on is for a single-file app you want hosted outside VibeSafe entirely — Netlify, Cloudflare, GitHub Pages, and the rest. Every host below expects a file named <code>index.html</code> as the entry point. Your download is named <code>my-app.html</code> — rename it to <code>index.html</code> before uploading anywhere. That's the only preparation needed: there's no build command, no <code>npm install</code>, no framework to configure. It's one file with inline <code>&lt;style&gt;</code> and <code>&lt;script&gt;</code> — every static host on this list treats that as a complete, deployable site.</p>
     </section>
 
     <section id="netlify">
-      <h2><span class="num">03</span>Netlify Drop</h2>
+      <h2><span class="num">04</span>Netlify Drop</h2>
       <p><strong>Best for:</strong> the fastest possible way to get a real URL with zero account setup.</p>
       <div class="steps">
         <div class="step glass"><div class="stepnum">1</div><div><h3>Go to app.netlify.com/drop</h3><p>No sign-up required to get a live link; create a free account only if you want to keep it long-term or add a custom domain.</p></div></div>
         <div class="step glass"><div class="stepnum">2</div><div><h3>Drag your renamed <code>index.html</code> onto the page</h3><p>Netlify uploads it and gives you a live <code>https://random-name.netlify.app</code> URL immediately.</p></div></div>
         <div class="step glass"><div class="stepnum">3</div><div><h3>Optional: claim it and add a domain</h3><p>Create an account to keep the site permanently, rename the subdomain, or connect your own domain under Site settings → Domain management.</p></div></div>
-      </div>
-    </section>
-
-    <section id="vercel">
-      <h2><span class="num">04</span>Vercel</h2>
-      <p><strong>Best for:</strong> builders who want a dashboard, previews, and easy custom-domain HTTPS.</p>
-      <div class="steps">
-        <div class="step glass"><div class="stepnum">1</div><div><h3>Create a free account at vercel.com</h3><p>Sign up with GitHub, GitLab, or email.</p></div></div>
-        <div class="step glass"><div class="stepnum">2</div><div><h3>New Project → Deploy without Git</h3><p>Vercel supports dragging in a folder containing your renamed <code>index.html</code> — no repository required for a single static file.</p></div></div>
-        <div class="step glass"><div class="stepnum">3</div><div><h3>Add your domain</h3><p>Project → Settings → Domains. Point your domain's DNS at Vercel and HTTPS is issued automatically.</p></div></div>
       </div>
     </section>
 
@@ -138,9 +144,9 @@
           <thead><tr><th>Platform</th><th>Setup</th><th>Account needed?</th><th>Custom domain</th><th>Best for</th></tr></thead>
           <tbody>
             <tr><td>Our Publish button</td><td>One click</td><td>No</td><td>No</td><td>Instant sharing, zero setup</td></tr>
-            <tr><td>Netlify Drop</td><td>Drag &amp; drop</td><td>Only to keep it</td><td class="yes">✓</td><td>Fastest external option</td></tr>
-            <tr><td>Vercel</td><td>Drag folder or CLI</td><td>Yes</td><td class="yes">✓</td><td>Dashboard + previews</td></tr>
-            <tr><td>Cloudflare Pages</td><td>Upload assets</td><td>Yes</td><td class="yes">✓</td><td>Fastest global CDN</td></tr>
+            <tr><td>Vercel (connected)</td><td>One click, in the builder</td><td>Yes (token)</td><td class="yes">✓</td><td>Multi-file projects, your own account</td></tr>
+            <tr><td>Netlify Drop</td><td>Drag &amp; drop</td><td>Only to keep it</td><td class="yes">✓</td><td>Fastest external option, single-file</td></tr>
+            <tr><td>Cloudflare Pages</td><td>Upload assets</td><td>Yes</td><td class="yes">✓</td><td>Fastest global CDN, single-file</td></tr>
             <tr><td>GitHub Pages</td><td>Upload to repo</td><td>Yes</td><td class="yes">✓</td><td>Public, version-controlled</td></tr>
             <tr><td>Surge.sh</td><td>CLI command</td><td>Yes</td><td class="yes">✓</td><td>Terminal users, scripting</td></tr>
             <tr><td>Firebase Hosting</td><td>CLI init + deploy</td><td>Yes</td><td class="yes">✓</td><td>Adding a backend later</td></tr>

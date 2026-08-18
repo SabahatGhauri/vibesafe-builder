@@ -40,9 +40,10 @@
     <ol>
       <li><a href="#every-build">Every build is scanned</a></li>
       <li><a href="#launch-check">Launch Check — real-browser validation</a></li>
+      <li><a href="#publish-security-check">Publish Security Check — deploying to Vercel</a></li>
       <li><a href="#your-key">Your API key and session</a></li>
       <li><a href="#published-apps">Published apps</a></li>
-      <li><a href="#database">Database and access rules</a></li>
+      <li><a href="#database">Database, access rules, and connected accounts</a></li>
       <li><a href="#payments">Payments</a></li>
       <li><a href="#report">Report a security issue</a></li>
     </ol>
@@ -59,28 +60,34 @@
       <p>A static scan reads code; it doesn't run it. Launch Check does — it loads your app in a real headless browser and checks for uncaught exceptions, console errors, and mobile-layout breaks that only surface when the app actually executes. This is combined with the security scan in the builder's <strong>Build Health</strong> tab for one overall verdict.</p>
     </section>
 
+    <section id="publish-security-check">
+      <h2><span class="num">03</span>Publish Security Check — deploying to Vercel</h2>
+      <p>Deploying a project to your own Vercel account is a separate feature from publishing to <code>vibesafebuilder.com</code>, and it runs its own gate. Before a project can be made public on Vercel, every file is scanned for live credentials — API keys, database passwords, tokens, private keys — and other serious issues, each ranked by severity. A live credential blocks the change outright, with no way to override it: there's no legitimate reason to knowingly publish a working key, and by the time it's caught it may already need rotating. Less severe findings can be reviewed and consciously proceeded past; restoring protection (making a project private again) is never blocked by this check, since that action can only make a site more restricted, not less. The scan re-runs at the moment you make something public, rather than trusting an earlier result — so a file changed since the last check can't slip through on an old pass.</p>
+    </section>
+
     <section id="your-key">
-      <h2><span class="num">03</span>Your API key and session</h2>
-      <p>In Bring Your Own Key mode, your Anthropic API key lives only in your browser's local storage and is sent directly from your browser to our server per request — we never log or store it. In Managed mode, your session comes from Supabase magic-link sign-in; we never see or store a password. Neither is ever embedded in an app's code — the model is instructed never to hardcode credentials, and the security scan blocks publishing if it tries. The live preview you see while building runs in a sandboxed frame with no access to the builder's storage. Published apps currently run on the same domain as the builder, so we scan every publish for code that tries to read the builder's storage and apply a restrictive Content-Security-Policy limiting where any data could be sent — we're completing further isolation for published-app hosting on top of that (see below).</p>
+      <h2><span class="num">04</span>Your API key and session</h2>
+      <p>In Bring Your Own Key mode, your Anthropic API key lives only in your browser's local storage and is sent directly from your browser to our server per request — we never log or store it. In Managed mode, you sign in with a password, or with Google or GitHub — authentication is handled by Supabase Auth, which stores your password hashed; we never see or handle it in plaintext ourselves. Neither your API key nor your account credentials are ever embedded in an app's code — the model is instructed never to hardcode credentials, and the security scan blocks publishing if it tries. The live preview you see while building runs in a sandboxed frame with no access to the builder's storage. Published apps currently run on the same domain as the builder, so we scan every publish for code that tries to read the builder's storage and apply a restrictive Content-Security-Policy limiting where any data could be sent — we're completing further isolation for published-app hosting on top of that (see below).</p>
     </section>
 
     <section id="published-apps">
-      <h2><span class="num">04</span>Published apps</h2>
+      <h2><span class="num">05</span>Published apps</h2>
       <p>Publishing re-runs the security scan server-side before anything goes live, blocking known-dangerous patterns regardless of what the client showed. Published pages are also served with a restrictive <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy" target="_blank" rel="noopener">Content-Security-Policy</a> limiting what they can connect to. We're in the process of moving published-app hosting to its own isolated domain, separate from the builder itself — the same approach code-sandboxing platforms like CodePen and Replit use — as an additional layer on top of the scan.</p>
     </section>
 
     <section id="database">
-      <h2><span class="num">05</span>Database and access rules</h2>
-      <p>Every table VibeSafe Builder writes to — published apps, subscriptions, and managed-plan usage records — uses <a href="https://supabase.com/docs/guides/database/postgres/row-level-security" target="_blank" rel="noopener">Row Level Security</a>, which we verified directly against the live database rather than assuming it. The service-role key that can bypass those rules is never sent to a browser; it's used only in server-side webhook and billing code.</p>
+      <h2><span class="num">06</span>Database, access rules, and connected accounts</h2>
+      <p>Every table VibeSafe Builder writes to — published apps, subscriptions, managed-plan usage records, and connected GitHub and Vercel accounts — uses <a href="https://supabase.com/docs/guides/database/postgres/row-level-security" target="_blank" rel="noopener">Row Level Security</a>, which we verified directly against the live database rather than assuming it. The service-role key that can bypass those rules is never sent to a browser; it's used only in server-side code.</p>
+      <p>GitHub and Vercel tokens are encrypted at rest, with separate encryption keys for each — a database copy of one cannot be used to decrypt the other. Neither is ever sent back to your browser once stored; the connection status you see shows only a masked hint, like <code>vcp_••••1234</code>, never the value itself. Every action taken with a connected account — deploying, or changing a project's public/private state — re-verifies your session first, and is logged to an activity trail you can review from the Deploy tab.</p>
     </section>
 
     <section id="payments">
-      <h2><span class="num">06</span>Payments</h2>
+      <h2><span class="num">07</span>Payments</h2>
       <p>Managed-plan billing is handled entirely by Stripe. We receive a webhook confirming your subscription is active — never your card number or CVC. Stripe webhook signatures are verified on every call, so a request can't be forged into activating an account. BYOK has no platform fee, so no payment information passes through us at all.</p>
     </section>
 
     <section id="report">
-      <h2><span class="num">07</span>Report a security issue</h2>
+      <h2><span class="num">08</span>Report a security issue</h2>
       <p>Found something? Email <a href="mailto:security@vibesafebuilder.com">security@vibesafebuilder.com</a> with what you found and how to reproduce it. We'll acknowledge real reports and won't take action against anyone testing in good faith against their own account or data. Please don't test against other users' published apps or accounts.</p>
     </section>
   </article>

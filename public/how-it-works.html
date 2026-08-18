@@ -43,7 +43,7 @@
           <div class="stepnum">01</div>
           <div>
             <h3>Describe what you want</h3>
-            <p>Type a plain-English request — "a habit tracker with streaks" — or start from one of 15 free templates for an instant, zero-cost v1. Either way, you land in a chat interface next to a live preview pane, not a code editor.</p>
+            <p>Type a plain-English request — "a habit tracker with streaks" — or start from one of 15 free templates for an instant, zero-cost v1. Either way, you land in a chat interface next to a live preview pane, not a code editor. For most requests you get one self-contained app in seconds; for something bigger, start a <a href="#bigger">multi-file React project</a> instead and the same loop below still applies.</p>
           </div>
         </div>
         <div class="step glass">
@@ -63,11 +63,34 @@
         <div class="step glass">
           <div class="stepnum">04</div>
           <div>
-            <h3>Download it, or publish it</h3>
-            <p>Download the app as a single portable <code>.html</code> file you can run anywhere — no lock-in, the code is always fully visible. Or publish it to a shareable link; publishing re-runs the security scan server-side and refuses to go live if a critical issue is found, so a bypassed client-side check can never leak onto the public internet.</p>
+            <h3>Download it, or ship it</h3>
+            <p>Download the app as a single portable <code>.html</code> file you can run anywhere — no lock-in, the code is always fully visible. Or publish it to a shareable link on <code>vibesafebuilder.com</code>; publishing re-runs the security scan server-side and refuses to go live if a critical issue is found, so a bypassed client-side check can never leak onto the public internet. A multi-file project has two more paths — see below.</p>
           </div>
         </div>
       </div>
+    </section>
+
+    <section id="bigger">
+      <h2><span class="num">＋</span>When one file isn't enough</h2>
+      <p>Some ideas need more than one HTML page — separate components, a shared backend, a real repository. Click <strong>⚛ New React project</strong> instead of building a single page, and the loop above still applies, but the AI now works across a real, multi-file codebase — components, hooks, and styles in separate files, assembled with Vite. Ask for a change and only the files that need it get rewritten. If your app needs data shared between people or across devices, the AI can reach for a built-in backend automatically, no setup required.</p>
+      <p>Two more ways to ship a project like this, on top of download and publish:</p>
+      <div class="steps">
+        <div class="step glass">
+          <div class="stepnum">⇪</div>
+          <div>
+            <h3>Push to GitHub</h3>
+            <p>Connect your GitHub account and push the project into a repository you own, as a real commit — ordinary code, not something trapped in this builder. Pull changes back in later, too.</p>
+          </div>
+        </div>
+        <div class="step glass">
+          <div class="stepnum">▲</div>
+          <div>
+            <h3>Deploy to your own Vercel account</h3>
+            <p>Connect a Vercel token scoped to one project, and deploy — Vercel builds your project from real source, the same as if you'd pushed it yourself. Making it public runs a dedicated <strong>Publish Security Check</strong> first: it scans every file for live credentials and refuses, with no override, if it finds one.</p>
+          </div>
+        </div>
+      </div>
+      <p>Full detail on both in the <a href="/user-guide.html">user guide</a>.</p>
     </section>
 
     <section>
