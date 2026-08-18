@@ -91,6 +91,28 @@
       <div class="stuck-banner" id="stuckBanner" hidden>
         ⚡ Same problem twice — switching strategy. The AI will re-diagnose from scratch instead of repeating the failed fix.
       </div>
+      <div class="palette-picker" id="palettePicker">
+        <button type="button" class="palette-toggle" id="paletteToggleBtn" title="Pick a color palette the AI should build with">
+          <span class="palette-toggle-swatch" id="paletteToggleSwatch" hidden></span>
+          <span id="paletteToggleLabel">🎨 Colors: no preference</span>
+          <span class="palette-chevron">›</span>
+        </button>
+        <div class="palette-panel" id="palettePanel" hidden>
+          <p class="gh-meta">Pick a palette and the AI builds (and keeps editing) with these colors, instead of choosing its own.</p>
+          <div class="palette-grid" id="paletteGrid"></div>
+          <details class="palette-custom">
+            <summary>Custom colors…</summary>
+            <div class="palette-custom-row">
+              <label>Background <input type="color" id="paletteCustomBg" value="#12100f" /></label>
+              <label>Primary <input type="color" id="paletteCustomPrimary" value="#3fd6c4" /></label>
+              <label>Accent <input type="color" id="paletteCustomAccent" value="#f7b267" /></label>
+              <label>Text <input type="color" id="paletteCustomText" value="#f2ede6" /></label>
+            </div>
+            <button type="button" class="btn ghost mini" id="paletteCustomApplyBtn">Use these colors</button>
+          </details>
+          <button type="button" class="btn ghost mini" id="paletteClearBtn">No preference (let the AI choose)</button>
+        </div>
+      </div>
       <form class="composer" id="composer">
         <textarea id="promptInput" rows="3" placeholder="Describe your app, or ask for a change…"></textarea>
         <div class="composer-row">
@@ -331,6 +353,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="templates.js"></script>
+  <script src="palettes.js"></script>
   <script src="app.js"></script>
   <script src="visualEditor.js"></script>
   <script src="buildStatus.js"></script>

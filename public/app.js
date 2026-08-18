@@ -19,6 +19,7 @@ const state = {
   kind: "single",
   activeFile: null,   // which file the Code tab is showing in multi mode
   assembled: "",      // cached assembled preview HTML for the current version
+  palette: null,      // { bg, primary, accent, text } — customer-chosen colors the AI builds with, or null for "no preference"
 };
 
 const $ = (id) => document.getElementById(id);
@@ -369,6 +370,7 @@ function saveProject() {
     publishId: state.publishId,
     previewId: state.previewId || null,
     kind: state.kind,
+    palette: state.palette,
     chatHTML: messagesEl.innerHTML,
   };
   try {
@@ -386,6 +388,10 @@ function loadProject() {
     const raw = localStorage.getItem(PROJECT_KEY);
     if (!raw) return false;
     const p = JSON.parse(raw);
+    // Palette is a pre-build preference — restore it even when there is
+    // nothing built yet, so picking colors before ever hitting "Build it"
+    // survives a reload instead of silently resetting to "no preference".
+    state.palette = isValidPalette(p.palette) ? p.palette : null;
     if (!Array.isArray(p.versions) || p.versions.length === 0) return false;
     state.versions = p.versions;
     state.currentVersion = typeof p.currentVersion === "number" ? p.currentVersion : p.versions.length - 1;
@@ -472,7 +478,7 @@ async function refreshEstimate() {
     const r = await fetch("/api/estimate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles() }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles(), palette: state.palette }),
     });
     if (!r.ok) throw new Error((await r.json()).error || r.status);
     const est = await r.json();
@@ -590,7 +596,7 @@ $("composer").addEventListener("submit", async (e) => {
     const r = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles() }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles(), palette: state.palette }),
     });
     if (!r.ok && !r.headers.get("content-type")?.includes("event-stream")) {
       const errBody = await r.json();
@@ -1261,6 +1267,98 @@ function useTemplate(t) {
   saveProject();
 }
 
+/* ---------------- color palette picker ---------------- */
+// A customer-chosen palette the AI builds (and keeps editing) with, instead of
+// picking its own every generation. Purely a client-side concern until a
+// build actually runs — the four hex values just ride along in the request
+// body; see lib/palette.js for how the server validates and uses them.
+
+// Same #RRGGBB shape the server enforces (lib/palette.js) — checked here only
+// to guard against corrupted localStorage, not as any kind of security
+// boundary. The server never trusts this input either way.
+function isValidPalette(p) {
+  if (!p || typeof p !== "object") return false;
+  const HEX = /^#[0-9a-fA-F]{6}$/;
+  return ["bg", "primary", "accent", "text"].every((k) => typeof p[k] === "string" && HEX.test(p[k]));
+}
+
+function swatchStripHTML(colors) {
+  return `<span class="palette-strip">${["bg", "primary", "accent", "text"]
+    .map((k) => `<span style="background:${colors[k]}"></span>`)
+    .join("")}</span>`;
+}
+
+function renderPaletteGrid() {
+  const grid = $("paletteGrid");
+  if (!grid || !window.PALETTES) return;
+  grid.innerHTML = window.PALETTES.map(
+    (p, i) =>
+      `<button type="button" class="palette-swatch" data-p="${i}" title="${esc(p.name)}">
+         ${swatchStripHTML(p.colors)}
+         <span class="palette-swatch-name">${esc(p.name)}</span>
+       </button>`
+  ).join("");
+}
+
+function paletteLabel() {
+  if (!state.palette) return "🎨 Colors: no preference";
+  const found = window.PALETTES?.find((p) => JSON.stringify(p.colors) === JSON.stringify(state.palette));
+  return "🎨 Colors: " + (found ? found.name : "custom");
+}
+
+function renderPaletteToggle() {
+  const label = $("paletteToggleLabel");
+  const swatch = $("paletteToggleSwatch");
+  if (!label || !swatch) return;
+  label.textContent = paletteLabel();
+  if (state.palette) {
+    swatch.innerHTML = swatchStripHTML(state.palette);
+    swatch.hidden = false;
+  } else {
+    swatch.hidden = true;
+  }
+}
+
+function setPalette(colors) {
+  state.palette = colors; // colors, or null for "no preference"
+  renderPaletteToggle();
+  saveProject();
+}
+
+function initPalettePicker() {
+  renderPaletteGrid();
+  renderPaletteToggle();
+
+  $("paletteToggleBtn")?.addEventListener("click", () => {
+    const panel = $("palettePanel");
+    panel.hidden = !panel.hidden;
+  });
+
+  $("paletteGrid")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-p]");
+    if (!btn) return;
+    const preset = window.PALETTES[+btn.dataset.p];
+    setPalette(preset.colors);
+    $("palettePanel").hidden = true;
+  });
+
+  $("paletteCustomApplyBtn")?.addEventListener("click", () => {
+    const colors = {
+      bg: $("paletteCustomBg").value,
+      primary: $("paletteCustomPrimary").value,
+      accent: $("paletteCustomAccent").value,
+      text: $("paletteCustomText").value,
+    };
+    setPalette(colors);
+    $("palettePanel").hidden = true;
+  });
+
+  $("paletteClearBtn")?.addEventListener("click", () => {
+    setPalette(null);
+    $("palettePanel").hidden = true;
+  });
+}
+
 /* ---------------- init ---------------- */
 // loadProject() runs first: if it restores a saved chat, it overwrites
 // #messages.innerHTML wholesale (see loadProject below), which would wipe out
@@ -1269,6 +1367,7 @@ function useTemplate(t) {
 // #templateGrid element currently exists and attaches a fresh listener to it.
 const restored = loadProject();
 renderTemplateGrid();
+initPalettePicker();
 
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
 // choice rather than something the AI infers: single-file apps stay the default
