@@ -181,3 +181,69 @@ test("the runtime's error-reporting helpers survive escaping", () => {
   assert.ok(html.includes('report("build-ok"'), "build-ok reporting missing");
   assert.ok(html.includes('report("build-error"'), "build-error reporting missing");
 });
+
+/* ---------------- project scaffold (real Vite project) ---------------- */
+
+const { scaffold, withScaffold, hasScaffold, isRuntimeModule, SCAFFOLD_FILES } = require("../lib/multifile");
+
+test("scaffold produces a runnable Vite project", () => {
+  const s = scaffold("my-app");
+  const pkg = JSON.parse(s["package.json"]);
+  assert.strictEqual(pkg.name, "my-app");
+  assert.strictEqual(pkg.type, "module");
+  assert.ok(pkg.scripts.dev && pkg.scripts.build, "missing dev/build scripts");
+  assert.ok(pkg.dependencies.react && pkg.dependencies["react-dom"], "react not declared as a dependency");
+  assert.ok(pkg.devDependencies.vite, "vite not declared");
+  assert.match(s["vite.config.js"], /@vitejs\/plugin-react/);
+  // Vite needs index.html to point at the real entry module.
+  assert.match(s["index.html"], /<script type="module" src="\/src\/main\.jsx"><\/script>/);
+  assert.match(s["index.html"], /<div id="root">/);
+});
+
+test("project names are slugified into a valid package name", () => {
+  assert.strictEqual(JSON.parse(scaffold("Pricing Calculator!")["package.json"]).name, "pricing-calculator");
+  assert.strictEqual(JSON.parse(scaffold("")["package.json"]).name, "vibesafe-app");
+  assert.strictEqual(JSON.parse(scaffold("  ***  ")["package.json"]).name, "vibesafe-app");
+});
+
+test("withScaffold adds every missing file", () => {
+  const out = withScaffold({ "src/main.jsx": "x\n" });
+  for (const f of SCAFFOLD_FILES) assert.ok(f in out, f + " missing");
+  assert.strictEqual(out["src/main.jsx"], "x\n", "existing file was disturbed");
+});
+
+test("withScaffold never overwrites a file the user already edited", () => {
+  const mine = '{ "name": "mine" }\n';
+  const out = withScaffold({ "src/main.jsx": "x\n", "package.json": mine });
+  assert.strictEqual(out["package.json"], mine);
+});
+
+test("hasScaffold detects a complete project", () => {
+  assert.strictEqual(hasScaffold({ "src/main.jsx": "x" }), false);
+  assert.strictEqual(hasScaffold(withScaffold({ "src/main.jsx": "x" })), true);
+});
+
+test("scaffold files are not treated as runtime modules", () => {
+  for (const f of SCAFFOLD_FILES) assert.strictEqual(isRuntimeModule(f), false, f + " should not be a runtime module");
+  assert.strictEqual(isRuntimeModule("src/App.jsx"), true);
+  assert.strictEqual(isRuntimeModule("src/utils/x.js"), true);
+  assert.strictEqual(isRuntimeModule("src/styles.css"), false);
+});
+
+// The preview runtime must keep working unchanged now that the project also
+// contains build files — package.json is not JavaScript and would blow up if
+// Babel tried to transform it as a module.
+test("assembly excludes scaffold from the runtime module map", () => {
+  const html = assembleProject(withScaffold(APP), {});
+  const raw = html.match(/window\.__VS_SOURCES__ = (.*);/)[1];
+  const sources = JSON.parse(raw.split("\u003c").join("<"));
+  for (const f of SCAFFOLD_FILES) assert.ok(!(f in sources), f + " leaked into the runtime module map");
+  assert.ok("src/App.jsx" in sources);
+  assert.ok("src/main.jsx" in sources);
+});
+
+test("a scaffolded project still validates and assembles", () => {
+  const files = withScaffold(APP);
+  assert.deepStrictEqual(validateFiles(files), []);
+  assert.match(assembleProject(files, {}), /^<!DOCTYPE html>/);
+});
