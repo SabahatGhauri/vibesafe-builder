@@ -197,7 +197,59 @@ async function api(session, method, path, body) {
     check("deployment history is readable", (hist.body.deployments || []).length > 0);
 
     console.log("");
-    console.log("9. Disconnecting");
+    console.log("9. Changing protection through the route (Phase 3B)");
+    const startProtection = (await api(session, "GET", "/api/vercel/status")).body.protection;
+    console.log("     starting state: protected=" + startProtection.protected + " sso=" + startProtection.sso);
+    let madePublic = false;
+
+    try {
+      // The confirmation gate, against the real thing.
+      const noConfirm = await api(session, "POST", "/api/vercel/protection", { action: "disable" });
+      check("a change without confirmation is refused", noConfirm.status === 400);
+      const wrongName = await api(session, "POST", "/api/vercel/protection", {
+        action: "disable",
+        confirmProjectName: "not-the-project",
+      });
+      check("a change confirming the WRONG project is refused", wrongName.status === 400);
+      const badAction = await api(session, "POST", "/api/vercel/protection", {
+        action: "nuke",
+        confirmProjectName: "vibesafe-deploy-test",
+      });
+      check("an unknown action is refused", badAction.status === 400);
+
+      const pub = await api(session, "POST", "/api/vercel/protection", {
+        action: "disable",
+        confirmProjectName: "vibesafe-deploy-test",
+      });
+      madePublic = pub.status === 200 && pub.body.applied === true;
+      check("Make Public applies", madePublic, JSON.stringify(pub.body).slice(0, 200));
+      check("the site is verified as genuinely reachable", pub.body.access && pub.body.access.public === true,
+        pub.body.access ? pub.body.access.reason : "no access check ran");
+
+      const ev = (await api(session, "GET", "/api/vercel/events")).body.events.find(
+        (e) => e.event === "protection_disabled"
+      );
+      check("the change is in the audit log", Boolean(ev));
+      check("the audit log records the state before the change", Boolean(ev && ev.detail && ev.detail.before));
+    } finally {
+      // Restore whatever was there, pass or fail.
+      if (madePublic) {
+        const priv = await api(session, "POST", "/api/vercel/protection", {
+          action: "enable",
+          confirmProjectName: "vibesafe-deploy-test",
+        });
+        check("Make Private restores protection", priv.body && priv.body.applied === true);
+        const now = (await api(session, "GET", "/api/vercel/status")).body.protection;
+        check(
+          "the ORIGINAL mode was restored, not a default",
+          now.sso === startProtection.sso,
+          "was " + startProtection.sso + ", now " + now.sso
+        );
+      }
+    }
+
+    console.log("");
+    console.log("10. Disconnecting");
     const dis = await api(session, "POST", "/api/vercel/disconnect", {});
     check("disconnect succeeds", dis.body.disconnected === true);
     const { count: afterDisc } = await admin
