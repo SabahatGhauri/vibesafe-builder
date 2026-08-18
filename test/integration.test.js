@@ -15,6 +15,8 @@
 // drives it over HTTP, so it exercises routing, middleware, auth and SQL for
 // real; only the environment differs from production.
 
+require("./loadTestEnv");
+
 const { test, before, after, describe } = require("node:test");
 const assert = require("node:assert");
 const http = require("node:http");
