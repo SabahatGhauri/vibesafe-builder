@@ -464,7 +464,15 @@ const vercel = {
         const link = `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a>`;
         done("✓ Deployed — " + link, "ok");
         const label = environment === "production" ? "production" : "preview";
-        addMsg("system", `🚀 <strong>Deployed to Vercel</strong> (${label}) — ${link}`);
+        // Publish already tells people "Republish any time to update it" — Deploy
+        // didn't, so a customer's first deploy gave no hint that clicking the
+        // same button again, after more changes, is literally how you ship an
+        // update. Said explicitly here to match.
+        const nextStep =
+          environment === "production"
+            ? " Keep chatting to make changes, then <strong>Deploy to production</strong> again any time to update this."
+            : " Keep chatting to make changes, then deploy a new preview any time to check them before they go live.";
+        addMsg("system", `🚀 <strong>Deployed to Vercel</strong> (${label}) — ${link}` + nextStep);
         // Said plainly here too, because a link that shows a Vercel login page
         // reads as a broken deployment unless we explain it.
         if (this.protection && this.protection.protected) {

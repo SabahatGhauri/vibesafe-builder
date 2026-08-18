@@ -214,7 +214,19 @@ const gh = {
         body: JSON.stringify({ ...this.link, files: currentFiles(), message, projectKey: state.publishId || "default" }),
       });
       this.status("Pushed " + r.files + " files", "ok");
-      addMsg("system", "⬆ Pushed " + r.files + " files to " + esc(this.link.owner + "/" + this.link.repo) + " (" + esc(r.sha.slice(0, 7)) + ").");
+      // Same gap Publish already closed for itself ("Republish any time to
+      // update it") — a customer's first push gave no hint that Push is also
+      // how you'd ship every later change, not a one-time action.
+      addMsg(
+        "system",
+        "⬆ Pushed " +
+          r.files +
+          " files to " +
+          esc(this.link.owner + "/" + this.link.repo) +
+          " (" +
+          esc(r.sha.slice(0, 7)) +
+          "). Keep chatting to make changes, then <strong>Push</strong> again any time to update the repository."
+      );
       this.loadCommits();
     } catch (err) {
       this.status(err.message, "error");
