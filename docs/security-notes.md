@@ -1,14 +1,17 @@
 # Security notes
 
-## OPEN — anyone with the public anon key can overwrite any published app
+## FIXED (2026-08-18) — anyone with the public anon key could overwrite any published app
 
 **Found:** 2026-08-18, while introspecting the live schema into `db/schema.sql`.
-**Status:** not fixed. Recorded rather than changed silently, because the fix
-touches the publish path and needs a deliberate decision.
+**Status:** FIXED in commit `3a84207` + `db/migrations/001`. Verified closed in
+production: an anon-key PATCH against a real published app now updates 0 rows and
+an anon INSERT is rejected with `42501`, while `GET /p/:id` still serves normally
+and publishing still works. Two regression tests in `test/integration.test.js`
+guard it (they were written first and watched to FAIL against the old policies).
 
 ### What it is
 
-`published_apps` has these policies in production:
+`published_apps` had these policies:
 
 ```sql
 create policy "public insert" on published_apps for insert with check (true);
@@ -59,11 +62,22 @@ drop policy "public update" on published_apps;
 -- keep "public read": GET /p/:id serves published apps via the anon client
 ```
 
-### Why it wasn't just fixed
+### Why it was not fixed the moment it was found
 
-Changing it alters the publish path, which is the single most load-bearing
-route in the product and currently has no integration coverage (see
-`test/integration.test.js` — the layer is written but has no environment to run
-against yet). Fixing this against production with no test environment is exactly
-the pattern being moved away from. Sequence should be: stand up the test
-environment → run the integration suite → make this change → re-run → deploy.
+The fix alters the publish path — the single most load-bearing route in the
+product — and at the time there was no integration coverage and no environment
+to run it against. Patching production directly was exactly the pattern being
+moved away from. The sequence actually followed was:
+
+1. Stand up a dedicated test Supabase project (separate account, own credentials).
+2. Apply `db/schema.sql` to it — which also proved the schema is reproducible.
+3. Write the two regression tests and confirm they FAIL against the old policies.
+4. Change the code, drop the policies in test, confirm 10/10 including that
+   publishing still works.
+5. Deploy the code to production, smoke-test it (32/32) while the old policies
+   were still in place and harmless.
+6. Only then drop the policies in production, and verify the hole is closed
+   against a real published app.
+
+Order mattered: dropping the policies before the code shipped would have broken
+publishing for everyone in the gap.
