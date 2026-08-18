@@ -520,6 +520,22 @@ function applyChangesLocally(previous, changes) {
   return next;
 }
 
+// Everything downstream of "the project" needs one of two things: the SOURCE to
+// analyse, or a RUNNABLE document. For single-file apps they're the same string,
+// which is why the multi-file path silently broke Publish, Copy, Download,
+// Launch Check and Build Health — they all called currentCode(), which is empty
+// for a multi-file project.
+function analysisSource() {
+  return isMulti() ? sourcesForScan() : currentCode();
+}
+function hasProject() {
+  return isMulti() ? currentFilePaths().length > 0 : Boolean(currentCode());
+}
+// Assembly is async, so callers that need runnable HTML must await this.
+async function runnableHtml() {
+  return isMulti() ? (state.assembled || (await assembleCurrent())) : currentCode();
+}
+
 async function assembleCurrent() {
   const files = currentFiles();
   if (!Object.keys(files).length) return "";
@@ -778,7 +794,7 @@ function renderFileTree() {
 
 /* ---------------- publish (security-gated) ---------------- */
 function renderPublish() {
-  $("publishBtn").disabled = !currentCode() || state.busy;
+  $("publishBtn").disabled = !hasProject() || state.busy;
   $("publishBtn").textContent = state.publishId ? "🚀 Republish" : "🚀 Publish";
   const urlEl = $("publishUrl");
   if (state.publishId) {
@@ -790,8 +806,8 @@ function renderPublish() {
 }
 
 $("publishBtn").addEventListener("click", async () => {
-  const code = currentCode();
-  if (!code) return;
+  if (!hasProject()) return;
+  const code = analysisSource();
   // Nudge, not a gate — headless-browser checks can be flaky, so this never blocks publishing.
   if (!(state.launchCheck && state.launchCheck.forVersion === state.currentVersion)) {
     addMsg("system", `💡 Tip: you haven't run a <b>Launch Check</b> on this version yet — it opens your app in a real browser and catches crashes a static scan can't. Publishing anyway.`);
@@ -835,7 +851,12 @@ $("publishBtn").addEventListener("click", async () => {
   }
 });
 
-$("copyBtn").addEventListener("click", () => navigator.clipboard.writeText(currentCode()));
+$("copyBtn").addEventListener("click", () => {
+  // In multi-file mode the Code tab shows one file, so that's what "Copy code"
+  // should copy — copying the whole assembled bundle would be surprising.
+  const text = isMulti() ? currentFiles()[state.activeFile] || "" : currentCode();
+  navigator.clipboard.writeText(text);
+});
 
 // Mirrors lib/pwa.js's server-side injectPWATags (minus the service-worker
 // registration — a downloaded file has no network requests to cache offline,
@@ -868,8 +889,12 @@ function addPWATags(html) {
   return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + "\n" + tags) : tags + "\n" + html;
 }
 
-$("downloadBtn").addEventListener("click", () => {
-  const blob = new Blob([addPWATags(currentCode())], { type: "text/html" });
+$("downloadBtn").addEventListener("click", async () => {
+  const html = await runnableHtml();
+  if (!html) return;
+  // Multi-file projects download as the assembled single document — the same
+  // artifact that gets published, so what you download is what ships.
+  const blob = new Blob([isMulti() ? html : addPWATags(html)], { type: "text/html" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "my-app.html";
@@ -1038,7 +1063,7 @@ function runSecurityScan(code) {
 $("launchCheckBtn").addEventListener("click", runLaunchCheck);
 
 async function runLaunchCheck() {
-  const code = currentCode();
+  const code = await runnableHtml();
   if (!code) return;
   const btn = $("launchCheckBtn");
   const statusEl = $("lcStatus");
@@ -1097,8 +1122,8 @@ function renderLaunchCheck() {
 function renderBuildHealth() {
   const report = $("healthReport");
   const badge = $("healthBadge");
-  const code = currentCode();
-  if (!code) {
+  const code = analysisSource();
+  if (!hasProject()) {
     report.innerHTML = `<div class="empty">Generate an app to see its Build Health.</div>`;
     badge.hidden = true;
     return;
