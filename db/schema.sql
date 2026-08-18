@@ -59,19 +59,14 @@ create table if not exists published_apps (
 );
 alter table published_apps enable row level security;
 
--- !! KNOWN ISSUE — see docs/security-notes.md !!
--- These policies allow ANY holder of the public anon key to insert or update ANY
--- row, because /api/publish writes through the anon client. That means a third
--- party can overwrite someone else's published app. Recorded here as-is because
--- this file documents what production actually has; the fix (route publish
--- writes through the service-role client, then drop these policies) is tracked
--- separately rather than changed silently.
+-- Only public SELECT is granted. GET /p/:id serves published apps through the anon
+-- client, so reads must be public; WRITES go through the service-role client in
+-- POST /api/publish and therefore need no policy at all.
+-- The former "public insert"/"public update" policies (using(true)) were removed by
+-- db/migrations/001 -- they allowed any holder of the public anon key to overwrite
+-- any published app. See docs/security-notes.md.
 drop policy if exists "public read" on published_apps;
 create policy "public read" on published_apps for select using (true);
-drop policy if exists "public insert" on published_apps;
-create policy "public insert" on published_apps for insert with check (true);
-drop policy if exists "public update" on published_apps;
-create policy "public update" on published_apps for update using (true);
 
 -- Idempotency ledger so a retried publish returns the original result instead of
 -- re-running. Keyed by a client-supplied UUID, not app_id, so deliberate

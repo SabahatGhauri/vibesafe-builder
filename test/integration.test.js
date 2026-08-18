@@ -116,6 +116,35 @@ describe("integration", { skip: !configured }, () => {
     await admin.from("app_records").delete().eq("app_id", appId);
   });
 
+  // Regression guard for the vulnerability documented in docs/security-notes.md:
+  // published_apps carried `for update using (true)` / `for insert with check (true)`
+  // policies (needed because /api/publish used to write through the anon client), so
+  // anyone holding the public anon key could overwrite anyone else's published app.
+  // Combined with the Phase 1a injected app key, that let an attacker replace an
+  // app's HTML and then act as that app against /api/backend.
+  test("the anon key cannot overwrite someone else's published app", async () => {
+    const victim = appId + "v";
+    await admin.from("published_apps").upsert({ id: victim, html: "<html><head></head><body>original</body></html>" });
+
+    const { createClient } = require("@supabase/supabase-js");
+    const anon = createClient(URL_, ANON);
+    await anon.from("published_apps").update({ html: "<html><body>PWNED</body></html>" }).eq("id", victim);
+
+    const { data } = await admin.from("published_apps").select("html").eq("id", victim).single();
+    await admin.from("published_apps").delete().eq("id", victim);
+    assert.ok(!data.html.includes("PWNED"), "anon key was able to overwrite another app's HTML");
+  });
+
+  test("the anon key cannot insert arbitrary published apps", async () => {
+    const { createClient } = require("@supabase/supabase-js");
+    const anon = createClient(URL_, ANON);
+    const rogue = appId + "r";
+    await anon.from("published_apps").insert({ id: rogue, html: "<html></html>" });
+    const { data } = await admin.from("published_apps").select("id").eq("id", rogue);
+    await admin.from("published_apps").delete().eq("id", rogue);
+    assert.strictEqual((data || []).length, 0, "anon key was able to insert a published_apps row");
+  });
+
   test("the anon key cannot write to app_records", async () => {
     const { createClient } = require("@supabase/supabase-js");
     const anon = createClient(URL_, ANON);
