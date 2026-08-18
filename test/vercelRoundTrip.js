@@ -217,12 +217,36 @@ async function api(session, method, path, body) {
       });
       check("an unknown action is refused", badAction.status === 400);
 
+      // Not a mock this time: a project containing a real-shaped credential,
+      // scanned by the actual Launch Check gate, against the actual route.
+      // Proves the thing the user explicitly asked for end-to-end — "App with
+      // secret: Build -> Scan -> CRITICAL -> Block -> Not public" — rather than
+      // only against the mocked Vercel API in the unit suite.
+      const filesWithSecret = {
+        ...files,
+        "src/leaked.js": 'export const key = "sk-ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";\n',
+      };
+      const shouldBlock = await api(session, "POST", "/api/vercel/protection", {
+        action: "disable",
+        confirmProjectName: "vibesafe-deploy-test",
+        files: filesWithSecret,
+      });
+      check("Make Public is blocked when the project has a live credential", shouldBlock.status === 422, JSON.stringify(shouldBlock.body).slice(0, 200));
+      check("the block is not overridable for a critical finding", shouldBlock.body.overridable === false);
+      const stillProtected = (await api(session, "GET", "/api/vercel/status")).body.protection;
+      check(
+        "the project is still protected after the blocked attempt",
+        stillProtected.protected === startProtection.protected,
+        "was " + startProtection.protected + ", now " + stillProtected.protected
+      );
+
       const pub = await api(session, "POST", "/api/vercel/protection", {
         action: "disable",
         confirmProjectName: "vibesafe-deploy-test",
+        files,
       });
       madePublic = pub.status === 200 && pub.body.applied === true;
-      check("Make Public applies", madePublic, JSON.stringify(pub.body).slice(0, 200));
+      check("Make Public applies once the secret is removed", madePublic, JSON.stringify(pub.body).slice(0, 200));
       check("the site is verified as genuinely reachable", pub.body.access && pub.body.access.public === true,
         pub.body.access ? pub.body.access.reason : "no access check ran");
 
