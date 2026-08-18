@@ -632,16 +632,24 @@ $("publishBtn").addEventListener("click", async () => {
     addMsg("system", `⚠ Publishing with ${findings.length} warning${findings.length > 1 ? "s" : ""} — check the <b>Security</b> tab to review.`);
   }
   try {
+    // One key per publish attempt, reused across retries of THAT attempt so a slow
+    // connection or an accidental double-click can't run the publish twice. A later
+    // deliberate republish generates a fresh key and goes through normally.
+    if (!state.pendingPublishKey) {
+      state.pendingPublishKey =
+        (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()) + Math.random().toString(36).slice(2);
+    }
     const r = await fetch("/api/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, id: state.publishId }),
+      body: JSON.stringify({ code, id: state.publishId, publishKey: state.pendingPublishKey }),
     });
     const data = await r.json();
     if (!r.ok) {
       const detail = data.blockers ? " (" + data.blockers.join("; ") + ")" : "";
       throw new Error((data.error || "Publish failed") + detail);
     }
+    state.pendingPublishKey = null;
     state.publishId = data.id;
     const url = location.origin + data.url;
     addMsg("system", `🚀 Published! Your app is live: <a href="${url}" target="_blank" rel="noopener">${url}</a> — share the link. Visitors can add it to their home screen like an app, and it'll work offline. Republish any time to update it.`);

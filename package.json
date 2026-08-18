@@ -4,9 +4,12 @@
   "private": true,
   "description": "Vibe-coding app that doesn't waste your credits or leak your data",
   "main": "server.js",
-  "engines": { "node": "22.x" },
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.114.0",
