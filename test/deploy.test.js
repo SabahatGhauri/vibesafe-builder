@@ -162,3 +162,72 @@ test("a failed backend provision still yields a working deployment", async () =>
   assert.strictEqual(r.url, "/p/myapp2", "but the app itself must still be deployed");
   assert.ok(writes.length >= 1);
 });
+
+/* ---------------- Vercel provider ---------------- */
+
+const vercelLib = require("../lib/deployVercel");
+
+test("project files are converted to Vercel's inline format", () => {
+  const out = vercelLib.filesToVercel({ "src/App.jsx": "hello\n", "package.json": "{}\n" });
+  assert.strictEqual(out.length, 2);
+  const app = out.find((f) => f.file === "src/App.jsx");
+  assert.strictEqual(app.encoding, "base64");
+  assert.strictEqual(Buffer.from(app.data, "base64").toString("utf8"), "hello\n");
+});
+
+// Vercel builds from SOURCE, so it must receive package.json and vite.config.js —
+// not the assembled preview bundle. Without them there is nothing to build and
+// "deploy" degrades to uploading one pre-built HTML file.
+test("the build scaffold is included in what gets sent to Vercel", () => {
+  const files = withScaffold({ "src/main.jsx": "x\n" });
+  const sent = vercelLib.filesToVercel(files).map((f) => f.file);
+  for (const f of ["package.json", "vite.config.js", "index.html"]) {
+    assert.ok(sent.includes(f), f + " missing from the deployment payload");
+  }
+});
+
+test("unicode survives the base64 round trip", () => {
+  const out = vercelLib.filesToVercel({ "src/x.js": "const s = '→ café ✓';\n" });
+  assert.strictEqual(Buffer.from(out[0].data, "base64").toString("utf8"), "const s = '→ café ✓';\n");
+});
+
+test("the Vercel provider implements the same contract as VibeSafe hosting", () => {
+  assert.strictEqual(vercelLib.vercel.id, "vercel");
+  assert.strictEqual(vercelLib.vercel.needsConnection, true);
+  for (const fn of ["isAvailable", "status", "deploy"]) {
+    assert.strictEqual(typeof vercelLib.vercel[fn], "function", "missing " + fn);
+  }
+});
+
+test("deploying without a token fails clearly rather than calling the API", async () => {
+  await assert.rejects(
+    () => vercelLib.vercel.deploy({}, { files: { "a.js": "x" } }),
+    /Connect a Vercel token/
+  );
+});
+
+test("deploying nothing is refused", async () => {
+  await assert.rejects(() => vercelLib.vercel.deploy({ vercelToken: "t" }, { files: {} }), /Nothing to deploy/);
+});
+
+test("a disconnected account reports not connected", async () => {
+  assert.deepStrictEqual(await vercelLib.vercel.status({}), { connected: false });
+});
+
+// The token must never reach the browser, so the UI is given a masked hint.
+test("the token hint reveals only the ends", () => {
+  const h = vercelLib.hint("vcp_abcdefghijklmnop1234");
+  assert.ok(h.startsWith("vcp_"));
+  assert.ok(h.endsWith("1234"));
+  assert.ok(!h.includes("efghijklmn"), "hint leaked the middle of the token");
+});
+
+test("vercel credentials are encrypted with a key separate from GitHub's", () => {
+  const token = "vcp_secret_value_here";
+  const enc = vercelLib.encrypt(token);
+  assert.notStrictEqual(enc, token);
+  assert.strictEqual(vercelLib.decrypt(enc), token);
+  // Domain separation: the GitHub cipher must not be able to read it.
+  const gh = require("../lib/github");
+  assert.strictEqual(gh.decrypt(enc), null, "a GitHub key decrypted a Vercel credential");
+});
