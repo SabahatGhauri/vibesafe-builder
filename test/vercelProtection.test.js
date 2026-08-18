@@ -13,6 +13,17 @@ const { fakeSupabase, stubVercel, makeApp, call, connected } = require("./vercel
 const PROTECTED = { ssoProtection: { deploymentType: "all_except_custom_domains" } };
 const UNPROTECTED = {};
 
+// Make Public re-runs Launch Check, so every request that expects to succeed
+// has to carry files that pass it.
+const CLEAN_FILES = {
+  "package.json": '{"name":"my-app"}',
+  "src/App.jsx": 'export default function App(){ return <h1>hi</h1>; }',
+};
+const FILES_WITH_SECRET = {
+  ...CLEAN_FILES,
+  "src/api.js": 'const key = "sk-ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";',
+};
+
 // A project whose protection state actually changes when PATCHed, so the
 // read-back that setProtection() performs sees the new value — which is the
 // whole point of reading it back. A fixture that always returned the old state
@@ -90,6 +101,7 @@ test("the confirmation tolerates surrounding whitespace", async () => {
     const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "  my-app  ",
+      files: CLEAN_FILES,
     });
     assert.strictEqual(r.status, 200);
   } finally {
@@ -105,6 +117,7 @@ test("only the selected project is ever touched", async () => {
     await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     const patches = s.calls.filter((c) => c.method === "PATCH");
     assert.strictEqual(patches.length, 1, "exactly one project should be modified");
@@ -124,6 +137,7 @@ test("disabling sends ssoProtection: null", async () => {
     await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     assert.strictEqual(s.calls.find((c) => c.method === "PATCH").body.ssoProtection, null);
   } finally {
@@ -142,6 +156,7 @@ test("a change that did not take effect is reported as failed", async () => {
     const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     assert.strictEqual(r.body.applied, false);
     assert.match(r.body.error, /didn't change/);
@@ -164,6 +179,7 @@ test("public accessibility is verified by actually fetching the site", async () 
     const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     assert.strictEqual(r.body.applied, true);
     assert.strictEqual(r.body.access.public, true);
@@ -192,6 +208,7 @@ test("a site still redirecting to Vercel login is reported as NOT public", async
     const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     assert.strictEqual(r.body.applied, true, "the setting itself did change");
     assert.strictEqual(r.body.access.public, false, "but visitors still cannot see it");
@@ -211,6 +228,7 @@ test("the change is recorded with the state before AND after", async () => {
     await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     const ev = db._tables.deployment_events.find((e) => e.event === "protection_disabled");
     assert.ok(ev, "no audit event recorded");
@@ -274,9 +292,205 @@ test("a token without permission to change settings says so usefully", async () 
     const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
       action: "disable",
       confirmProjectName: "my-app",
+      files: CLEAN_FILES,
     });
     assert.strictEqual(r.status, 403);
     assert.match(r.body.error, /Vercel dashboard/);
+  } finally {
+    s.restore();
+  }
+});
+
+/* ---------------- Launch Check as a deployment gate ---------------- */
+
+// The property that matters most in this file: Make Public must re-run the scan
+// and must not be able to inherit an earlier pass.
+test("Make Public is refused when the project contains a live credential", async () => {
+  const db = connected();
+  const s = stubVercel(disableWorks());
+  try {
+    const r = await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/protection", {
+      action: "disable",
+      confirmProjectName: "my-app",
+      files: FILES_WITH_SECRET,
+    });
+    assert.strictEqual(r.status, 422);
+    assert.strictEqual(r.body.blocked, true);
+    assert.strictEqual(r.body.overridable, false, "a live credential must not be overridable");
+    assert.deepStrictEqual(
+      s.calls.filter((c) => c.method === "PATCH"),
+      [],
+      "protection was changed despite a blocking Launch Check"
+    );
+  } finally {
+    s.restore();
+  }
+});
+
+// An acknowledgement flag must not be a skeleton key.
+test("acknowledgeWarnings cannot bypass a critical finding", async () => {
+  const s = stubVercel(disableWorks());
+  try {
+    const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
+      action: "disable",
+      confirmProjectName: "my-app",
+      files: FILES_WITH_SECRET,
+      acknowledgeWarnings: true,
+    });
+    assert.strictEqual(r.status, 422, "override made a live credential public");
+    assert.deepStrictEqual(s.calls.filter((c) => c.method === "PATCH"), []);
+  } finally {
+    s.restore();
+  }
+});
+
+// Not being able to check is not the same as passing.
+test("Make Public without files is refused rather than assumed safe", async () => {
+  const s = stubVercel(disableWorks());
+  try {
+    const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
+      action: "disable",
+      confirmProjectName: "my-app",
+    });
+    assert.strictEqual(r.status, 400);
+    assert.match(r.body.error, /Launch Check/);
+    assert.deepStrictEqual(s.calls.filter((c) => c.method === "PATCH"), []);
+  } finally {
+    s.restore();
+  }
+});
+
+// Restoring protection is always safe. A scan failure must never trap someone
+// in a public state.
+test("Make Private is never blocked by Launch Check", async () => {
+  const s = stubVercel(project(UNPROTECTED));
+  try {
+    const r = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/protection", {
+      action: "enable",
+      confirmProjectName: "my-app",
+      files: FILES_WITH_SECRET,
+    });
+    assert.strictEqual(r.status, 200, "putting protection back must always be possible");
+    assert.strictEqual(r.body.applied, true);
+  } finally {
+    s.restore();
+  }
+});
+
+test("the blocked attempt is recorded in the audit log", async () => {
+  const db = connected();
+  const s = stubVercel(disableWorks());
+  try {
+    await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/protection", {
+      action: "disable",
+      confirmProjectName: "my-app",
+      files: FILES_WITH_SECRET,
+    });
+    const ev = db._tables.deployment_events.find((e) => e.event === "make_public_blocked");
+    assert.ok(ev, "a blocked attempt should be recorded");
+    assert.strictEqual(ev.detail.launchCheck.verdict, "blocked");
+    assert.strictEqual(ev.detail.launchCheck.counts.critical, 1);
+  } finally {
+    s.restore();
+  }
+});
+
+test("a successful Make Public records the Launch Check result", async () => {
+  const db = connected();
+  const s = stubVercel(disableWorks());
+  try {
+    await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/protection", {
+      action: "disable",
+      confirmProjectName: "my-app",
+      files: CLEAN_FILES,
+    });
+    const ev = db._tables.deployment_events.find((e) => e.event === "protection_disabled");
+    assert.ok(ev.detail.launchCheck, "the Launch Check result should be recorded");
+    assert.strictEqual(ev.detail.launchCheck.verdict, "clean");
+  } finally {
+    s.restore();
+  }
+});
+
+// The audit log is read back by the user and stored indefinitely, so it is one
+// more place a secret must not end up.
+test("no secret reaches the audit log or the error response", async () => {
+  const SECRET = "sk-ant-api03-AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
+  const db = connected();
+  const s = stubVercel(disableWorks());
+  try {
+    const r = await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/protection", {
+      action: "disable",
+      confirmProjectName: "my-app",
+      files: FILES_WITH_SECRET,
+    });
+    assert.ok(!JSON.stringify(db._tables.deployment_events).includes(SECRET), "the audit log leaked the secret");
+    assert.ok(!JSON.stringify(r.body).includes(SECRET), "the error response leaked the secret");
+    // But it must still say where to look.
+    assert.strictEqual(r.body.scan.findings[0].file, "src/api.js");
+    assert.strictEqual(r.body.scan.findings[0].line, 1);
+  } finally {
+    s.restore();
+  }
+});
+
+/* ---------------- the same gate on deploy ---------------- */
+
+test("deploying a project with a live credential is refused", async () => {
+  const db = connected();
+  const s = stubVercel({
+    "/v13/deployments": { body: { id: "dpl_1", url: "x.vercel.app", readyState: "QUEUED" } },
+    "/v9/projects/prj_1": { body: {} },
+  });
+  try {
+    const r = await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/deploy", {
+      files: FILES_WITH_SECRET,
+    });
+    assert.strictEqual(r.status, 422);
+    assert.deepStrictEqual(
+      s.calls.filter((c) => c.url.includes("/v13/deployments")),
+      [],
+      "the deployment went ahead despite a blocking Launch Check"
+    );
+    assert.ok(db._tables.deployment_events.find((e) => e.event === "deploy_blocked"));
+  } finally {
+    s.restore();
+  }
+});
+
+// High severity is a judgement call, so it blocks by default and can be
+// overridden deliberately — unlike a live credential.
+test("a high-severity finding blocks deploy but can be acknowledged", async () => {
+  const risky = { ...CLEAN_FILES, "src/run.js": "eval(userInput);" };
+  const s = stubVercel({
+    "/v13/deployments": { body: { id: "dpl_1", url: "x.vercel.app", readyState: "QUEUED" } },
+    "/v9/projects/prj_1": { body: {} },
+  });
+  try {
+    const blocked = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/deploy", { files: risky });
+    assert.strictEqual(blocked.status, 422);
+    assert.strictEqual(blocked.body.overridable, true);
+
+    const allowed = await call(makeApp({ supabaseAdmin: connected() }), "POST", "/api/vercel/deploy", {
+      files: risky,
+      acknowledgeWarnings: true,
+    });
+    assert.strictEqual(allowed.status, 200);
+  } finally {
+    s.restore();
+  }
+});
+
+test("a clean deployment records the Launch Check result", async () => {
+  const db = connected();
+  const s = stubVercel({
+    "/v13/deployments": { body: { id: "dpl_1", url: "x.vercel.app", readyState: "QUEUED" } },
+    "/v9/projects/prj_1": { body: {} },
+  });
+  try {
+    await call(makeApp({ supabaseAdmin: db }), "POST", "/api/vercel/deploy", { files: CLEAN_FILES });
+    const ev = db._tables.deployment_events.find((e) => e.event === "deploy");
+    assert.strictEqual(ev.detail.launchCheck.verdict, "clean");
   } finally {
     s.restore();
   }

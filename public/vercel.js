@@ -39,8 +39,71 @@ const vercel = {
     const headers = { "Content-Type": "application/json", ...(await managed.headers()) };
     const r = await fetch(path, { ...opts, headers });
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.error || "Vercel request failed");
+    if (!r.ok) {
+      const err = new Error(data.error || data.reason || "Vercel request failed");
+      // A 422 is Launch Check refusing, not a transport failure — the body
+      // carries the findings the user needs, so it must survive the throw.
+      err.status = r.status;
+      err.data = data;
+      throw err;
+    }
     return data;
+  },
+
+  /* ---------------- Launch Check results ---------------- */
+
+  // A block with no explanation is useless: the user needs the file, the line,
+  // and what to do. The secret itself is never shown — the server masks it
+  // before it leaves, and we do not un-mask it here.
+  renderScan(data) {
+    const el = $("vcConfirm");
+    if (!el) return;
+    const scan = data.scan || { findings: [], counts: {} };
+    const icon = { critical: "🔴", high: "🟠", medium: "🟡", info: "🔵" };
+
+    const rows = scan.findings
+      .slice(0, 12)
+      .map(
+        (f) =>
+          `<li class="vc-finding ${esc(f.severity)}">
+             <div>${icon[f.severity] || "•"} <strong>${esc(f.label)}</strong></div>
+             <div class="gh-meta">${esc(f.file)}:${f.line}</div>
+             ${f.snippet ? `<pre class="vc-snippet">${esc(f.snippet)}</pre>` : ""}
+             <div class="gh-meta">${esc(f.remediation || "")}</div>
+           </li>`
+      )
+      .join("");
+
+    const more = scan.findings.length > 12 ? `<p class="gh-meta">…and ${scan.findings.length - 12} more.</p>` : "";
+
+    el.hidden = false;
+    el.className = "vc-confirm danger";
+    el.innerHTML =
+      `<p><strong>🛑 Launch Check stopped this.</strong></p>
+       <p>${esc(data.reason || "")}</p>
+       <ul class="vc-findings">${rows}</ul>${more}` +
+      (data.overridable
+        ? `<p class="gh-meta">These are judgement calls rather than leaked credentials. If you've reviewed them and want to continue anyway:</p>
+           <div class="gh-row">
+             <button class="btn ghost" type="button" id="vcOverrideBtn">Continue anyway</button>
+             <button class="btn ghost" type="button" id="vcCancelBtn">Cancel</button>
+           </div>`
+        : `<p class="gh-meta"><strong>Fix these before publishing.</strong> A credential in a public site is compromised the moment anyone visits — remove it from the code <em>and</em> rotate it, since it may already have been pushed to GitHub.</p>
+           <div class="gh-row"><button class="btn ghost" type="button" id="vcCancelBtn">Close</button></div>`);
+
+    $("vcCancelBtn").onclick = () => {
+      el.hidden = true;
+      el.innerHTML = "";
+    };
+    // Only offered when the server said the finding is overridable. There is no
+    // client-side path to overriding a critical one.
+    if (data.overridable && $("vcOverrideBtn")) {
+      $("vcOverrideBtn").onclick = () => {
+        el.hidden = true;
+        el.innerHTML = "";
+        if (this.pendingAction) this.pendingAction(true);
+      };
+    }
   },
 
   status(msg, kind = "") {
@@ -200,13 +263,18 @@ const vercel = {
     input.focus();
   },
 
-  async applyProtection(action, confirmProjectName) {
+  async applyProtection(action, confirmProjectName, acknowledgeWarnings = false) {
     const el = $("vcConfirm");
-    this.status(action === "disable" ? "Making the project public…" : "Restoring protection…");
+    // Make Public re-runs Launch Check server-side against the CURRENT files —
+    // a project that passed at deploy time may not pass now.
+    const files = typeof currentFiles === "function" ? currentFiles() : null;
+    this.pendingAction = (ack) => this.applyProtection(action, confirmProjectName, ack);
+
+    this.status(action === "disable" ? "Running Launch Check…" : "Restoring protection…");
     try {
       const r = await this.api("/api/vercel/protection", {
         method: "POST",
-        body: JSON.stringify({ action, confirmProjectName }),
+        body: JSON.stringify({ action, confirmProjectName, files, acknowledgeWarnings }),
       });
 
       if (el) {
@@ -238,6 +306,11 @@ const vercel = {
       }
       await this.refresh();
     } catch (err) {
+      if (err.status === 422 && err.data && err.data.blocked) {
+        this.status("🛑 Launch Check blocked this — the project was not made public.", "error");
+        this.renderScan(err.data);
+        return;
+      }
       this.status(esc(err.message), "error");
     }
   },
@@ -321,28 +394,36 @@ const vercel = {
 
   /* ---------------- deploying ---------------- */
 
-  async deploy(environment) {
+  async deploy(environment, acknowledgeWarnings = false) {
     const files = typeof currentFiles === "function" ? currentFiles() : null;
     if (!files || !Object.keys(files).length) {
       this.status("Generate a project first.", "error");
       return;
     }
-    if (environment === "production") {
+    if (environment === "production" && !acknowledgeWarnings) {
       if (!confirm(`Deploy to production on "${this.projectName}"? This replaces what's live at your project's main URL.`)) return;
     }
+    // Remembered so "Continue anyway" can retry the same action with the
+    // acknowledgement set, rather than the user starting over.
+    this.pendingAction = (ack) => this.deploy(environment, ack);
 
     this.setBusy(true);
-    this.status(environment === "production" ? "Deploying to production…" : "Deploying a preview…");
+    this.status(environment === "production" ? "Running Launch Check…" : "Running Launch Check…");
     try {
       const dep = await this.api("/api/vercel/deploy", {
         method: "POST",
-        body: JSON.stringify({ files, environment }),
+        body: JSON.stringify({ files, environment, acknowledgeWarnings }),
       });
       this.protection = dep.protection || this.protection;
       this.renderProtection();
       this.pollBuild(dep, environment);
     } catch (err) {
       this.setBusy(false);
+      if (err.status === 422 && err.data && err.data.blocked) {
+        this.status("🛑 Launch Check blocked this deployment.", "error");
+        this.renderScan(err.data);
+        return;
+      }
       this.status(esc(err.message), "error");
     }
   },

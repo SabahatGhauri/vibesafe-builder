@@ -46,9 +46,12 @@ test("invalid input reports which stage failed", () => {
 
 /* ---------------- the security gate ---------------- */
 
+// The label now names the provider rather than saying "a secret", because the
+// rules moved to lib/securityGate.js and identify what they found.
 test("a hardcoded secret is blocked", () => {
   const blockers = scanBlockers('const key = "sk-ant-abcdefghijklmnopqrstuvwxyz123456";');
-  assert.ok(blockers.some((b) => /secret/i.test(b)));
+  assert.ok(blockers.length > 0, "a live API key was not blocked");
+  assert.ok(blockers.some((b) => /API key/i.test(b)), "expected the finding to name the credential type: " + blockers);
 });
 
 test("eval is blocked", () => {

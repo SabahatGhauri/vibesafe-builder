@@ -436,3 +436,26 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .vc-confirm input { min-width: 200px; }
 .vc-confirm .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
 .vc-protection-actions { margin-top: 10px; }
+
+/* Launch Check findings. Colour-coded by severity so the difference between a
+   leaked credential and a missing header is visible before reading. */
+.vc-findings { list-style: none; margin: 10px 0; padding: 0; }
+.vc-finding {
+  border-left: 3px solid var(--border, #444);
+  padding: 8px 0 8px 10px;
+  margin: 8px 0;
+}
+.vc-finding.critical { border-left-color: #ef4444; }
+.vc-finding.high { border-left-color: #f97316; }
+.vc-finding.medium { border-left-color: #eab308; }
+.vc-finding.info { border-left-color: #3b82f6; }
+.vc-snippet {
+  font-family: var(--mono, monospace);
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin: 6px 0;
+  overflow-x: auto;
+  white-space: pre;
+}
