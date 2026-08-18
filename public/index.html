@@ -107,6 +107,7 @@
         <button class="tab" data-tab="code">Code</button>
         <button class="tab" data-tab="versions">Versions</button>
         <button class="tab" data-tab="github">GitHub</button>
+        <button class="tab" data-tab="deploy">Deploy</button>
         <button class="tab" data-tab="security">Security <span class="sec-badge" id="secBadge" hidden></span></button>
         <button class="tab" data-tab="launchcheck">Launch Check <span class="sec-badge" id="lcBadge" hidden></span></button>
       </nav>
@@ -217,6 +218,59 @@
         </div>
       </div>
 
+      <div class="panel" id="panel-deploy">
+        <div class="gh-panel" id="vcPanel" hidden>
+          <div id="vcSignedOut">
+            <h3>Deploy to your own Vercel account</h3>
+            <p class="gh-meta">Publishing here is great for showing someone what you built. Deploying to Vercel makes it <strong>yours</strong> — your account, your domain, your bill — and it keeps working whether or not this builder does.</p>
+
+            <div class="vc-howto">
+              <p><strong>How to get a token</strong></p>
+              <ol>
+                <li>In Vercel, open <strong>Settings → Tokens</strong> and click <strong>Create Token</strong>.</li>
+                <li>Under <strong>Scope</strong>, pick the single project you want to deploy to — <em>not</em> your whole account.</li>
+                <li>Copy the token and paste it below.</li>
+              </ol>
+              <p class="gh-meta">A project-scoped token is the important part. It can only touch that one project, so VibeSafe can never see your other projects or their environment variables.</p>
+            </div>
+
+            <div class="gh-row">
+              <input type="password" id="vcToken" placeholder="vcp_…" autocomplete="off" spellcheck="false" />
+              <button class="btn primary" type="button" id="vcConnectBtn">Connect</button>
+            </div>
+            <div class="gh-row" id="vcProjectRow" hidden>
+              <select id="vcProjectSelect"></select>
+              <button class="btn primary" type="button" id="vcProjectConfirmBtn">Use this project</button>
+            </div>
+            <p class="gh-meta">Your token is encrypted before it is stored and is never sent back to your browser. VibeSafe uses it only to deploy this project — nothing else.</p>
+          </div>
+
+          <div id="vcSignedIn" hidden>
+            <div class="gh-row">
+              <strong>Deploying to <span id="vcProject"></span></strong>
+              <span class="gh-meta" id="vcTokenHint"></span>
+              <button class="btn ghost mini" type="button" id="vcTestBtn">Test connection</button>
+              <button class="btn ghost mini" type="button" id="vcDisconnectBtn">Disconnect</button>
+            </div>
+            <div class="vc-scope" id="vcScope"></div>
+            <div class="vc-protection" id="vcProtection" hidden></div>
+            <div class="gh-row">
+              <button class="btn ghost" type="button" id="vcDeployPreviewBtn">Deploy preview</button>
+              <button class="btn primary" type="button" id="vcDeployProdBtn">🚀 Deploy to production</button>
+            </div>
+            <div class="gh-status" id="vcStatus"></div>
+            <h4>Recent deployments</h4>
+            <ul class="gh-commits" id="vcDeployments"></ul>
+          </div>
+        </div>
+        <div class="empty" id="vcUnavailable">
+          <p><strong>Vercel deployment works with multi-file React projects.</strong></p>
+          <p style="margin-top:8px; max-width:420px;">Vercel builds your project from source, so it needs a real project to build. A single HTML file has nothing to build — start a React project and you can deploy it to your own Vercel account.</p>
+          <button class="btn primary" type="button" id="vcStartReactBtn" style="margin-top:14px;">⚛ Start a React project</button>
+          <p class="gh-meta" style="margin-top:10px;">This clears the current chat and versions.</p>
+        </div>
+      </div>
+
       <div class="panel" id="panel-versions">
         <div class="versions-split">
           <ul class="version-list" id="versionList"></ul>
@@ -280,5 +334,6 @@
   <script src="visualEditor.js"></script>
   <script src="buildStatus.js"></script>
   <script src="github.js"></script>
+  <script src="vercel.js"></script>
 </body>
 </html>

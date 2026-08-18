@@ -374,3 +374,40 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 }
 .btn.upgrade:hover { filter: brightness(1.08); }
 .btn.upgrade:disabled { filter: none; opacity: .6; cursor: default; }
+
+/* ---------------- Deploy panel (Phase 3A) ---------------- */
+
+.vc-howto {
+  background: var(--panel-2, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 12px 0;
+  max-width: 560px;
+}
+.vc-howto ol { margin: 8px 0 8px 18px; }
+.vc-howto li { margin: 4px 0; font-size: 13px; }
+
+/* Token scope and protection are stated in colour as well as words: whether the
+   thing you just connected can reach your whole account is worth noticing at a
+   glance, not only on a careful read. */
+.vc-scope,
+.vc-protection {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 560px;
+}
+.vc-scope.ok,
+.vc-protection.open {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.vc-scope.warn,
+.vc-protection.locked {
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+#vcToken { min-width: 260px; font-family: var(--mono, monospace); }

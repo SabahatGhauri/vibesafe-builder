@@ -95,6 +95,7 @@ const managed = {
       // GitHub status depends on this session, so re-check it whenever the
       // session changes rather than only at page load.
       if (window.gh) gh.refresh();
+      if (window.vercel) vercel.refresh();
     } else {
       signedOut.hidden = false;
       signedIn.hidden = true;
@@ -725,6 +726,7 @@ async function renderAll() {
   if (window.ve) ve.refreshAvailability();
   if (window.build) build.render();
   if (window.gh) gh.render();
+  if (window.vercel) vercel.render();
   renderVersions();
   runSecurityScan(code);
   renderLaunchCheck();
@@ -754,6 +756,7 @@ async function renderAllMulti() {
   $("codeView").textContent = state.activeFile ? currentFiles()[state.activeFile] : "No code yet.";
   if (window.ve) ve.refreshAvailability();
   if (window.gh) gh.render();
+  if (window.vercel) vercel.render();
   renderVersions();
   runSecurityScan(sourcesForScan());
   renderLaunchCheck();
@@ -1291,6 +1294,7 @@ function startReactProject() {
 
 $("startReactBtn")?.addEventListener("click", startReactProject);
 $("ghStartReactBtn")?.addEventListener("click", startReactProject);
+$("vcStartReactBtn")?.addEventListener("click", startReactProject);
 renderMeter();
 if (restored) {
   renderAll();
