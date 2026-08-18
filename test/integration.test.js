@@ -48,6 +48,7 @@ describe("integration", { skip: !configured }, () => {
     process.env.SUPABASE_ANON_KEY = ANON;
     process.env.SUPABASE_SERVICE_ROLE_KEY = SERVICE;
     process.env.APP_BACKEND_TOKEN_SECRET = "integration-test-secret";
+    process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_secret_for_local_verification";
     delete process.env.ISOLATED_APPS_HOST; // would 302 /p/* off localhost
 
     const app = require("../lib/app");
@@ -249,4 +250,87 @@ describe("integration", { skip: !configured }, () => {
       401
     );
   });
+
+  /* ---------------- Stripe webhook: subscription lifecycle ---------------- */
+
+  // This path only became reachable once customer.subscription.updated was added
+  // to the Stripe endpoint's event list. It is the difference between a customer
+  // whose card is declined losing access, and them keeping full Pro access on our
+  // Anthropic budget indefinitely — so it is worth a permanent guard.
+    describe("stripe webhook subscription lifecycle", () => {
+    const crypto = require("crypto");
+    const SECRET = "whsec_test_secret_for_local_verification";
+    const CUS = "cus_itest_" + Math.random().toString(36).slice(2, 8);
+    let uid;
+
+    before(async () => {
+      const { data } = await admin.auth.admin.createUser({
+        email: "wh-" + CUS + "@example.com",
+        email_confirm: true,
+      });
+      uid = data.user.id;
+      await admin.from("subscriptions").upsert({ user_id: uid, stripe_customer_id: CUS, status: "active" });
+    });
+
+    after(async () => {
+      if (uid) {
+        await admin.from("subscriptions").delete().eq("user_id", uid);
+        await admin.auth.admin.deleteUser(uid);
+      }
+    });
+
+    // Stripe signs as: t=<ts>,v1=HMAC_SHA256(secret, "<ts>.<rawBody>")
+    async function sendEvent(type, status) {
+      const body = JSON.stringify({ type, data: { object: { customer: CUS, status } } });
+      const ts = Math.floor(Date.now() / 1000);
+      const sig = crypto.createHmac("sha256", SECRET).update(ts + "." + body).digest("hex");
+      const r = await fetch(base + "/api/stripe-webhook", {
+        method: "POST",
+        headers: { "content-type": "application/json", "stripe-signature": `t=${ts},v1=${sig}` },
+        body,
+      });
+      const { data } = await admin.from("subscriptions").select("status").eq("user_id", uid).single();
+      return { http: r.status, status: data.status };
+    }
+
+    test("a failed payment (past_due) revokes access", async () => {
+      const r = await sendEvent("customer.subscription.updated", "past_due");
+      assert.strictEqual(r.http, 200);
+      assert.strictEqual(r.status, "canceled");
+    });
+
+    test("recovering payment restores access", async () => {
+      const r = await sendEvent("customer.subscription.updated", "active");
+      assert.strictEqual(r.status, "active");
+    });
+
+    test("trialing counts as active", async () => {
+      assert.strictEqual((await sendEvent("customer.subscription.updated", "trialing")).status, "active");
+    });
+
+    test("unpaid revokes access", async () => {
+      assert.strictEqual((await sendEvent("customer.subscription.updated", "unpaid")).status, "canceled");
+    });
+
+    test("deletion revokes access", async () => {
+      assert.strictEqual((await sendEvent("customer.subscription.deleted", "canceled")).status, "canceled");
+    });
+
+    test("a forged signature is rejected and changes nothing", async () => {
+      await sendEvent("customer.subscription.updated", "active"); // put it back to active
+      const body = JSON.stringify({
+        type: "customer.subscription.updated",
+        data: { object: { customer: CUS, status: "canceled" } },
+      });
+      const r = await fetch(base + "/api/stripe-webhook", {
+        method: "POST",
+        headers: { "content-type": "application/json", "stripe-signature": "t=1,v1=deadbeef" },
+        body,
+      });
+      assert.strictEqual(r.status, 400);
+      const { data } = await admin.from("subscriptions").select("status").eq("user_id", uid).single();
+      assert.strictEqual(data.status, "active", "a forged webhook changed the subscription");
+    });
+  });
+
 });
