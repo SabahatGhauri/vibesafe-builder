@@ -154,3 +154,30 @@ test("concatSources output does not contain the runtime loader", () => {
   const all = concatSources(APP);
   assert.ok(!all.includes("new Function"), "scan input must not include our loader");
 });
+
+/* ---------------- the runtime itself ---------------- */
+
+// Regression, and an important one: the runtime ships as a STRING inside this
+// module, so a syntax error in it is invisible to `node --check` on the file and
+// to every other test here — the module loads fine, assembly "succeeds", and the
+// breakage only appears as a blank preview in a browser. This happened: an
+// escaping slip turned /^\/+/ into /^/+/, an invalid regex, which killed the
+// whole IIFE and left the preview silently empty.
+test("the browser runtime embedded in the assembled page is valid JavaScript", () => {
+  const html = assembleProject(APP, {});
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  assert.ok(scripts.length >= 2, "expected inline runtime scripts");
+  for (const src of scripts) {
+    assert.doesNotThrow(() => new Function(src), "inline runtime script is not parseable:\n" + src.slice(0, 300));
+  }
+});
+
+test("the runtime's error-reporting helpers survive escaping", () => {
+  const html = assembleProject(APP, {});
+  const BS = String.fromCharCode(92); // a literal backslash, built by code point
+  // These regexes are the ones an escaping slip silently destroys.
+  assert.ok(html.includes("function fileFromMessage"), "fileFromMessage missing");
+  assert.ok(html.includes("(?:in|not found:)"+BS+"s+"), "fileFromMessage regex lost its escapes");
+  assert.ok(html.includes('report("build-ok"'), "build-ok reporting missing");
+  assert.ok(html.includes('report("build-error"'), "build-error reporting missing");
+});

@@ -115,7 +115,10 @@
           <span class="publish-url" id="publishUrl"></span>
         </div>
         <button class="btn ghost" type="button" id="visualEditBtn" hidden title="Click any element in the preview to edit it">✎ Edit visually</button>
+          <span class="build-status" id="buildStatus" hidden></span>
+          <button class="btn ghost" type="button" id="sharePreviewBtn" hidden title="Get a shareable link to this work-in-progress build">🔗 Share preview</button>
         <div class="empty" id="previewEmpty">Your app preview appears here.</div>
+        <div class="build-errors" id="buildErrors" hidden></div>
         <div class="preview-wrap">
           <iframe id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-popups" title="App preview" hidden></iframe>
           <aside class="props" id="propsPanel" hidden>
@@ -235,5 +238,6 @@
   <script src="templates.js"></script>
   <script src="app.js"></script>
   <script src="visualEditor.js"></script>
+  <script src="buildStatus.js"></script>
 </body>
 </html>

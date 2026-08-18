@@ -12,6 +12,7 @@ const state = {
   lastWasFixRequest: false,
   busy: false,
   publishId: null,
+  previewId: null,   // shareable work-in-progress preview, distinct from publish
   launchCheck: null, // { forVersion, result } — result is tied to a specific version, not persisted (screenshots are heavy)
   // Phase 2A: "single" keeps the original one-HTML-file behaviour untouched;
   // "multi" projects carry a file map per version instead of one code string.
@@ -317,6 +318,7 @@ function saveProject() {
     spend: state.spend,
     wasted: state.wasted,
     publishId: state.publishId,
+    previewId: state.previewId || null,
     kind: state.kind,
     chatHTML: messagesEl.innerHTML,
   };
@@ -342,6 +344,7 @@ function loadProject() {
     state.wasted = p.wasted || 0;
     state.publishId = p.publishId || null;
     state.kind = p.kind === "multi" ? "multi" : "single";
+    state.previewId = p.previewId || null;
     if (p.chatHTML) messagesEl.innerHTML = p.chatHTML;
     return true;
   } catch {
@@ -656,6 +659,7 @@ async function renderAll() {
   $("codeView").textContent = code || "No code yet.";
   $("fileTree").hidden = true;
   if (window.ve) ve.refreshAvailability();
+  if (window.build) build.render();
   renderVersions();
   runSecurityScan(code);
   renderLaunchCheck();
@@ -672,6 +676,9 @@ async function renderAllMulti() {
   $("previewEmpty").style.display = has ? "none" : "";
   $("previewFrame").hidden = !has;
   if (has) {
+    // Reset before swapping the document in, so errors from the previous build
+    // don't get attributed to the new one.
+    if (window.build) build.reset();
     state.assembled = await assembleCurrent();
     $("previewFrame").srcdoc = state.assembled;
   }
