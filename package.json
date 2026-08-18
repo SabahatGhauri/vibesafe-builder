@@ -11,7 +11,8 @@
     "start": "node server.js",
     "test": "node --test test/appBackend.test.js test/multifile.test.js test/visualEdit.test.js test/github.test.js test/deploy.test.js test/vercelRoutes.test.js",
     "test:integration": "node --test test/integration.test.js",
-    "test:smoke": "node test/smoke.js"
+    "test:smoke": "node test/smoke.js",
+    "test:roundtrip": "node test/vercelRoundTrip.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.114.0",
