@@ -209,7 +209,12 @@
             <ul class="gh-commits" id="ghCommits"></ul>
           </div>
         </div>
-        <div class="empty" id="ghUnavailable">GitHub sync is available for multi-file React projects.</div>
+        <div class="empty" id="ghUnavailable">
+          <p><strong>GitHub sync works with multi-file React projects.</strong></p>
+          <p style="margin-top:8px; max-width:420px;">This project is a single HTML file, which has no file tree to sync. Start a React project and you can push it to a repository, pull changes back, and browse its history here.</p>
+          <button class="btn primary" type="button" id="ghStartReactBtn" style="margin-top:14px;">⚛ Start a React project</button>
+          <p class="gh-meta" style="margin-top:10px;">This clears the current chat and versions.</p>
+        </div>
       </div>
 
       <div class="panel" id="panel-versions">

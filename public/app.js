@@ -1242,18 +1242,27 @@ renderTemplateGrid();
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
 // choice rather than something the AI infers: single-file apps stay the default
 // and the whole Phase 1 path is untouched for them.
-$("startReactBtn")?.addEventListener("click", () => {
+// Switching to multi-file mode clears the project, so it's offered from every
+// place a user can discover they need it — not just the chat panel. Otherwise
+// the GitHub tab is a dead end: it says "multi-file only" with no way to get one.
+function startReactProject() {
   if (state.versions.length && !confirm("Start a new React project? This clears the current chat and versions.")) return;
   localStorage.removeItem(PROJECT_KEY);
   state.kind = "multi";
   state.versions = [];
   state.currentVersion = -1;
   state.publishId = null;
+  state.previewId = null;
   state.activeFile = null;
   saveProject();
   addMsg("system", "⚛ <strong>React project mode.</strong> Describe what you want and I'll create a multi-file project — components, hooks and styles in separate files. Ask for changes and only the files that need editing get rewritten.");
+  document.querySelector('[data-tab="preview"]')?.click();
+  $("promptInput")?.focus();
   renderAll();
-});
+}
+
+$("startReactBtn")?.addEventListener("click", startReactProject);
+$("ghStartReactBtn")?.addEventListener("click", startReactProject);
 renderMeter();
 if (restored) {
   renderAll();
