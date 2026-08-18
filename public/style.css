@@ -289,3 +289,18 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .settings-actions { display: flex; gap: 10px; justify-content: flex-end; }
 .managed-box { background: var(--bg-panel); border: 1px solid var(--accent-dim); border-radius: 10px; padding: 14px; }
 .managed-box .btn { font-size: 12.5px; padding: 6px 12px; }
+
+/* ---- Phase 2A: multi-file project file tree ---- */
+.code-split { display: flex; gap: 0; height: 100%; min-height: 0; }
+.file-tree {
+  flex: 0 0 200px; overflow-y: auto; border-right: 1px solid var(--line);
+  background: var(--bg); padding: 8px 0;
+}
+.file-tree .file-item {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  color: var(--text-dim); font-family: var(--mono, ui-monospace, monospace); font-size: 12px;
+  padding: 5px 12px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-tree .file-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.file-tree .file-item.active { background: rgba(53,217,154,0.12); color: var(--accent); }
+.code-split .code { flex: 1; min-width: 0; overflow: auto; margin: 0; }

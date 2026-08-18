@@ -13,6 +13,11 @@ const state = {
   busy: false,
   publishId: null,
   launchCheck: null, // { forVersion, result } — result is tied to a specific version, not persisted (screenshots are heavy)
+  // Phase 2A: "single" keeps the original one-HTML-file behaviour untouched;
+  // "multi" projects carry a file map per version instead of one code string.
+  kind: "single",
+  activeFile: null,   // which file the Code tab is showing in multi mode
+  assembled: "",      // cached assembled preview HTML for the current version
 };
 
 const $ = (id) => document.getElementById(id);
@@ -312,6 +317,7 @@ function saveProject() {
     spend: state.spend,
     wasted: state.wasted,
     publishId: state.publishId,
+    kind: state.kind,
     chatHTML: messagesEl.innerHTML,
   };
   try {
@@ -335,6 +341,7 @@ function loadProject() {
     state.spend = p.spend || 0;
     state.wasted = p.wasted || 0;
     state.publishId = p.publishId || null;
+    state.kind = p.kind === "multi" ? "multi" : "single";
     if (p.chatHTML) messagesEl.innerHTML = p.chatHTML;
     return true;
   } catch {
@@ -413,7 +420,7 @@ async function refreshEstimate() {
     const r = await fetch("/api/estimate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode() }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles() }),
     });
     if (!r.ok) throw new Error((await r.json()).error || r.status);
     const est = await r.json();
@@ -440,7 +447,45 @@ async function refreshEstimate() {
 
 /* ---------------- generation ---------------- */
 const currentCode = () =>
-  state.currentVersion >= 0 ? state.versions[state.currentVersion].code : "";
+  state.currentVersion >= 0 ? state.versions[state.currentVersion].code || "" : "";
+
+// In multi mode a version stores { files } instead of { code }. Everything that
+// needs "the whole project as one document" (preview, publish, download) goes
+// through the server's assembler so there is only one implementation of it.
+const isMulti = () => state.kind === "multi";
+const currentFiles = () =>
+  state.currentVersion >= 0 ? state.versions[state.currentVersion].files || {} : {};
+const currentFilePaths = () => Object.keys(currentFiles()).sort();
+
+// Mirrors applyFileChanges() in lib/multifile.js: only the files the model
+// returned change, everything else is carried forward untouched. That merge is
+// what makes "edit 4 of 12 files" cost 4 files of output instead of 12.
+function applyChangesLocally(previous, changes) {
+  const next = { ...previous };
+  for (const [path, content] of Object.entries(changes)) {
+    if (String(content).trim() === "DELETE_FILE") delete next[path];
+    else next[path] = content;
+  }
+  return next;
+}
+
+async function assembleCurrent() {
+  const files = currentFiles();
+  if (!Object.keys(files).length) return "";
+  try {
+    const r = await fetch("/api/assemble", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ files }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Could not assemble the project");
+    return data.html;
+  } catch (err) {
+    return '<!DOCTYPE html><body style="margin:0;padding:16px;font:13px ui-monospace,monospace;color:#ff6b6b;background:#1a1114">' +
+      "Could not build the project: " + esc(err.message) + "</body>";
+  }
+}
 
 const FIX_WORDS = /\b(still|again|didn'?t|doesn'?t work|not work|broken|same (bug|issue|error|problem)|no change|nothing happen)/i;
 
@@ -477,7 +522,7 @@ $("composer").addEventListener("submit", async (e) => {
     const r = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles() }),
     });
     if (!r.ok && !r.headers.get("content-type")?.includes("event-stream")) {
       const errBody = await r.json();
@@ -495,8 +540,20 @@ $("composer").addEventListener("submit", async (e) => {
     });
     if (result.type === "error") throw new Error(result.message);
 
-    const { code, note } = extractCode(result.text);
-    if (!code) {
+    // In multi mode the server has already parsed the FILE blocks (one parser,
+    // unit-tested, shared with publish) and returns just the changed files.
+    let code = null, note = null, mergedFiles = null, changedPaths = [];
+    if (isMulti()) {
+      const changed = result.files || {};
+      changedPaths = Object.keys(changed);
+      note = (result.text.split("FILE:")[0] || "").trim().split(String.fromCharCode(10)).filter(Boolean)[0] || "Updated the project.";
+      if (changedPaths.length) mergedFiles = applyChangesLocally(currentFiles(), changed);
+    } else {
+      const ex = extractCode(result.text);
+      code = ex.code;
+      note = ex.note;
+    }
+    if (isMulti() ? !mergedFiles : !code) {
       // Failed generation → wasted, NOT build spend (fix #1)
       state.wasted += result.cost || 0;
       renderMeter();
@@ -513,7 +570,9 @@ $("composer").addEventListener("submit", async (e) => {
       id: state.versions.length + 1,
       time: new Date().toLocaleTimeString(),
       prompt,
-      code,
+      code: isMulti() ? null : code,
+      files: isMulti() ? mergedFiles : null,
+      changed: isMulti() ? changedPaths : null,
       cost: result.cost || 0,
       note: note || "Updated the app.",
     };
@@ -527,7 +586,7 @@ $("composer").addEventListener("submit", async (e) => {
       esc(version.note) +
       `<span class="cost-line">v${version.id} · ${fmt$(version.cost)} · ${result.usage.output_tokens.toLocaleString()} tokens out</span>`;
 
-    renderAll();
+    await renderAll();
   } catch (err) {
     workingMsg.className = "msg assistant failed";
     workingMsg.innerHTML = "⚠ " + esc(err.message) + `<span class="cost-line">no charge counted for failed request</span>`;
@@ -586,7 +645,8 @@ function extractCode(text) {
 }
 
 /* ---------------- render: preview / code / versions / security ---------------- */
-function renderAll() {
+async function renderAll() {
+  if (isMulti()) return renderAllMulti();
   const code = currentCode();
   // preview
   $("previewEmpty").style.display = code ? "none" : "";
@@ -594,11 +654,67 @@ function renderAll() {
   if (code) $("previewFrame").srcdoc = code;
   // code
   $("codeView").textContent = code || "No code yet.";
+  $("fileTree").hidden = true;
   renderVersions();
   runSecurityScan(code);
   renderLaunchCheck();
   renderBuildHealth();
   renderPublish();
+}
+
+// Multi-file rendering. The preview shows the ASSEMBLED project, while the Code
+// tab shows one source file at a time — the security scan and Build Health read
+// the sources, never the assembled bundle (which contains our module loader).
+async function renderAllMulti() {
+  const paths = currentFilePaths();
+  const has = paths.length > 0;
+  $("previewEmpty").style.display = has ? "none" : "";
+  $("previewFrame").hidden = !has;
+  if (has) {
+    state.assembled = await assembleCurrent();
+    $("previewFrame").srcdoc = state.assembled;
+  }
+  if (!state.activeFile || !paths.includes(state.activeFile)) {
+    state.activeFile = paths.find((f) => f.endsWith("App.jsx")) || paths[0] || null;
+  }
+  renderFileTree();
+  $("codeView").textContent = state.activeFile ? currentFiles()[state.activeFile] : "No code yet.";
+  renderVersions();
+  runSecurityScan(sourcesForScan());
+  renderLaunchCheck();
+  renderBuildHealth();
+  renderPublish();
+}
+
+// What the security scan and Build Health analyse in multi mode: the model's own
+// sources, concatenated. Mirrors concatSources() in lib/multifile.js.
+function sourcesForScan() {
+  const files = currentFiles();
+  const nl = String.fromCharCode(10);
+  return Object.keys(files)
+    .sort()
+    .map((path) => "/* " + path + " */" + nl + files[path])
+    .join(nl + nl);
+}
+
+function renderFileTree() {
+  const tree = $("fileTree");
+  if (!tree) return;
+  const paths = currentFilePaths();
+  tree.hidden = paths.length === 0;
+  tree.innerHTML = paths
+    .map((p) => {
+      const active = p === state.activeFile ? " active" : "";
+      return '<button type="button" class="file-item' + active + '" data-path="' + esc(p) + '">' + esc(p) + "</button>";
+    })
+    .join("");
+  tree.querySelectorAll(".file-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.activeFile = btn.dataset.path;
+      $("codeView").textContent = currentFiles()[state.activeFile] || "";
+      renderFileTree();
+    });
+  });
 }
 
 /* ---------------- publish (security-gated) ---------------- */
@@ -642,7 +758,7 @@ $("publishBtn").addEventListener("click", async () => {
     const r = await fetch("/api/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, id: state.publishId, publishKey: state.pendingPublishKey }),
+      body: JSON.stringify({ code, files: isMulti() ? currentFiles() : null, kind: state.kind, id: state.publishId, publishKey: state.pendingPublishKey }),
     });
     const data = await r.json();
     if (!r.ok) {
@@ -720,10 +836,10 @@ function renderVersions() {
       li.classList.add("selected");
       renderDiff(idx);
     });
-    li.querySelector("[data-restore]").addEventListener("click", () => {
+    li.querySelector("[data-restore]").addEventListener("click", async () => {
       state.currentVersion = idx;
       addMsg("system", `⏪ Restored v${v.id}. Nothing lost — later versions stay in the list.`);
-      renderAll();
+      await renderAll();
       saveProject();
     });
     list.appendChild(li);
@@ -1066,6 +1182,22 @@ function useTemplate(t) {
 // #templateGrid element currently exists and attaches a fresh listener to it.
 const restored = loadProject();
 renderTemplateGrid();
+
+// Switches the workspace into multi-file mode. Deliberately a separate, explicit
+// choice rather than something the AI infers: single-file apps stay the default
+// and the whole Phase 1 path is untouched for them.
+$("startReactBtn")?.addEventListener("click", () => {
+  if (state.versions.length && !confirm("Start a new React project? This clears the current chat and versions.")) return;
+  localStorage.removeItem(PROJECT_KEY);
+  state.kind = "multi";
+  state.versions = [];
+  state.currentVersion = -1;
+  state.publishId = null;
+  state.activeFile = null;
+  saveProject();
+  addMsg("system", "⚛ <strong>React project mode.</strong> Describe what you want and I'll create a multi-file project — components, hooks and styles in separate files. Ask for changes and only the files that need editing get rewritten.");
+  renderAll();
+});
 renderMeter();
 if (restored) {
   renderAll();
