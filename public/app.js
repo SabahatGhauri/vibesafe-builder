@@ -123,10 +123,52 @@ const managed = {
       if (settingsLine) {
         settingsLine.textContent = status.plan === "pro"
           ? `✓ Pro — active (${fmt$(status.spent)} of ${fmt$(status.budget)} used this month)`
-          : "⚠ Free — no active subscription. Pay for managed access to unlock Pro.";
+          : "⚠ Free — no active subscription. Upgrade to Pro to build without your own API key.";
       }
+      // Upgrade CTAs are only meaningful on Free; showing them to a paying
+      // customer would be worse than useless.
+      const onFree = status.plan !== "pro";
+      const headerBtn = $("upgradeBtn");
+      const settingsBtn = $("upgradeBtnSettings");
+      if (headerBtn) headerBtn.hidden = !onFree;
+      if (settingsBtn) settingsBtn.hidden = !onFree;
+      this.planEmail = status.email || null;
     } catch {
       // Non-fatal — badge just stays hidden/stale if this fails; sign-in itself is unaffected.
+    }
+  },
+
+  // Starts checkout using the SIGNED-IN email rather than one typed into a form.
+  // That matters: the earlier mix-up where a real payment attached itself to a
+  // stranger's customer record happened precisely because checkout was started
+  // without telling Stripe who the customer was. From inside the app we already
+  // know, authoritatively, whose session this is.
+  async startUpgrade(btn) {
+    const email = this.planEmail || this.session?.user?.email;
+    if (!email) {
+      addMsg("system", "🛑 Couldn't work out which account to upgrade — try signing out and back in.");
+      return;
+    }
+    const original = btn ? btn.textContent : null;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Opening checkout…";
+    }
+    try {
+      const r = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await r.json();
+      if (!r.ok || !data.url) throw new Error(data.error || "Could not start checkout");
+      location.href = data.url;
+    } catch (err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+      addMsg("system", "🛑 " + esc(err.message));
     }
   },
 
@@ -176,6 +218,9 @@ const managed = {
   },
 };
 managed.init();
+
+$("upgradeBtn")?.addEventListener("click", (e) => managed.startUpgrade(e.currentTarget));
+$("upgradeBtnSettings")?.addEventListener("click", (e) => managed.startUpgrade(e.currentTarget));
 
 $("signOutBtn")?.addEventListener("click", async () => {
   await managed.signOut();
