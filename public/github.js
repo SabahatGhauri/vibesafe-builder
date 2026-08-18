@@ -62,6 +62,13 @@ const gh = {
   },
 
   async refresh() {
+    // managed.init() is async — it fetches /api/config, builds the Supabase
+    // client, then restores the session. gh.init() runs at script load, well
+    // before that finishes, so without waiting the status call goes out with no
+    // x-vc-session header and the server correctly answers "not connected" for
+    // an account that IS connected. That's why a connected user was still shown
+    // the Connect button after a reload.
+    for (let i = 0; i < 60 && !managed.sb; i++) await new Promise((r) => setTimeout(r, 50));
     try {
       const s = await this.api("/api/github/status");
       this.connected = s.connected;
@@ -77,8 +84,14 @@ const gh = {
   render() {
     const panel = $("ghPanel");
     if (!panel) return;
-    // Only meaningful for multi-file projects.
-    panel.hidden = !isMulti() || !this.available;
+    // Only meaningful for multi-file projects. The two halves are mutually
+    // exclusive — previously only the panel was toggled, so the "this project is
+    // a single HTML file" empty state stayed on screen underneath a working
+    // panel, contradicting it.
+    const usable = isMulti() && this.available;
+    panel.hidden = !usable;
+    const unavailable = $("ghUnavailable");
+    if (unavailable) unavailable.hidden = usable;
     $("ghSignedOut").hidden = this.connected;
     $("ghSignedIn").hidden = !this.connected;
     if (this.connected) $("ghAccount").textContent = "@" + (this.login || "");

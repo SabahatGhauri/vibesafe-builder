@@ -92,6 +92,9 @@ const managed = {
       signedIn.hidden = false;
       $("managedSignedInAs").textContent = `Signed in as ${this.session.user.email}`;
       this.refreshPlanStatus();
+      // GitHub status depends on this session, so re-check it whenever the
+      // session changes rather than only at page load.
+      if (window.gh) gh.refresh();
     } else {
       signedOut.hidden = false;
       signedIn.hidden = true;
