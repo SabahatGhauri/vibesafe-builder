@@ -130,7 +130,10 @@ const vercel = {
     if (!p.protected) {
       el.hidden = false;
       el.className = "vc-protection open";
-      el.innerHTML = "🌐 <strong>This project is publicly visible.</strong> Anyone with the link can open it.";
+      el.innerHTML =
+        "🌐 <strong>This project is publicly visible.</strong> Anyone with the link can open it." +
+        '<div class="vc-protection-actions"><button class="btn ghost mini" type="button" id="vcMakePrivateBtn">Make private…</button></div>';
+      $("vcMakePrivateBtn").onclick = () => this.askConfirm("enable");
       return;
     }
     el.hidden = false;
@@ -140,7 +143,103 @@ const vercel = {
     el.innerHTML =
       "🔐 <strong>" +
       esc(p.explanation || "This project is protected.") +
-      "</strong><br><span class='gh-meta'>Deploying still works. To open it up, turn protection off in your Vercel project settings.</span>";
+      "</strong><br><span class='gh-meta'>Deploying still works — visitors just can't see the result yet.</span>" +
+      '<div class="vc-protection-actions"><button class="btn ghost mini" type="button" id="vcMakePublicBtn">Make public…</button></div>';
+    $("vcMakePublicBtn").onclick = () => this.askConfirm("disable");
+  },
+
+  /* ---------------- Phase 3B: changing protection ---------------- */
+
+  // Deliberately not a one-click action and deliberately not a confirm() the
+  // user can dismiss on autopilot. Turning protection off publishes the site to
+  // everyone, so it asks for the project name to be typed — which also means
+  // the person can see exactly which project they are about to change.
+  askConfirm(action) {
+    const el = $("vcConfirm");
+    if (!el) return;
+    const name = this.projectName || "";
+    const goingPublic = action === "disable";
+
+    el.hidden = false;
+    el.className = "vc-confirm " + (goingPublic ? "danger" : "safe");
+    el.innerHTML = goingPublic
+      ? `<p><strong>Make “${esc(name)}” public?</strong></p>
+         <p>Anyone with the link will be able to open this site — no Vercel account, no login. Search engines may index it.</p>
+         <p class="gh-meta">This changes Deployment Protection on <strong>${esc(name)}</strong> only. No other Vercel project is affected, and you can put it back at any time.</p>
+         <label class="gh-meta">Type <strong>${esc(name)}</strong> to confirm</label>
+         <div class="gh-row">
+           <input type="text" id="vcConfirmInput" autocomplete="off" spellcheck="false" placeholder="${esc(name)}" />
+           <button class="btn primary" type="button" id="vcConfirmBtn">Make public</button>
+           <button class="btn ghost" type="button" id="vcCancelBtn">Cancel</button>
+         </div>`
+      : `<p><strong>Make “${esc(name)}” private again?</strong></p>
+         <p>Visitors will be asked to log in to Vercel before they can see the site. Anyone you shared the link with will lose access.</p>
+         <p class="gh-meta">This restores the protection setting this project had before.</p>
+         <label class="gh-meta">Type <strong>${esc(name)}</strong> to confirm</label>
+         <div class="gh-row">
+           <input type="text" id="vcConfirmInput" autocomplete="off" spellcheck="false" placeholder="${esc(name)}" />
+           <button class="btn primary" type="button" id="vcConfirmBtn">Make private</button>
+           <button class="btn ghost" type="button" id="vcCancelBtn">Cancel</button>
+         </div>`;
+
+    const input = $("vcConfirmInput");
+    const go = $("vcConfirmBtn");
+    // The button stays dead until the name matches, so the confirmation cannot
+    // be clicked through without reading it.
+    const sync = () => (go.disabled = input.value.trim() !== name);
+    sync();
+    input.addEventListener("input", sync);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !go.disabled) this.applyProtection(action, input.value);
+    });
+    go.onclick = () => this.applyProtection(action, input.value);
+    $("vcCancelBtn").onclick = () => {
+      el.hidden = true;
+      el.innerHTML = "";
+    };
+    input.focus();
+  },
+
+  async applyProtection(action, confirmProjectName) {
+    const el = $("vcConfirm");
+    this.status(action === "disable" ? "Making the project public…" : "Restoring protection…");
+    try {
+      const r = await this.api("/api/vercel/protection", {
+        method: "POST",
+        body: JSON.stringify({ action, confirmProjectName }),
+      });
+
+      if (el) {
+        el.hidden = true;
+        el.innerHTML = "";
+      }
+
+      if (!r.applied) {
+        this.status(esc(r.error || "The change did not take effect."), "error");
+        await this.refresh();
+        return;
+      }
+
+      // Report what was actually observed, not what was requested. The setting
+      // changing and the site being reachable are two different facts.
+      if (action === "disable") {
+        if (r.access && r.access.public) {
+          this.status("✓ The site is public — " + esc(r.access.reason), "ok");
+          addMsg("system", "🌐 <strong>" + esc(this.projectName) + " is now public.</strong> Anyone with the link can open it.");
+        } else {
+          this.status(
+            "⚠ Protection is off, but " + esc((r.access && r.access.reason) || "the site still isn't reachable."),
+            "error"
+          );
+        }
+      } else {
+        this.status("🔐 Protection restored — visitors must log in to Vercel again.", "ok");
+        addMsg("system", "🔐 <strong>" + esc(this.projectName) + " is private again.</strong>");
+      }
+      await this.refresh();
+    } catch (err) {
+      this.status(esc(err.message), "error");
+    }
   },
 
   /* ---------------- connecting ---------------- */
