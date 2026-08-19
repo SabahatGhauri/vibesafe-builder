@@ -48,13 +48,14 @@
   <div class="doc-hero">
     <div class="doc-kicker"><span class="dot"></span> Legal &amp; Privacy</div>
     <h1>Legal &amp; Privacy</h1>
-    <div class="meta">Last updated: August 13, 2026 · VibeSafe Builder · a product of SG Digital Ventures LLC</div>
+    <div class="meta">Last updated: August 19, 2026 · VibeSafe Builder · a product of SG Digital Ventures LLC</div>
+    <div class="callout warn glass" style="margin-top:14px;"><strong>Draft — not yet reviewed.</strong> This revision is pending internal review before it's treated as final. It is not legal advice, and SG Digital Ventures LLC should have it reviewed by counsel before relying on it.</div>
     <p class="lead">This page covers our Privacy Policy, Terms of Service, and Cookie Policy in one place. We kept it as plain-English as a legal page can be — the same principle behind the product itself.</p>
   </div>
 
   <div class="callout summary glass">
     <div class="cal-label">Plain-English summary</div>
-    In <strong>Bring Your Own Key</strong> mode, your Anthropic API key and your app's chat history and version history stay in your browser (localStorage) — we never see or store your key, and we don't have a database of your projects. In <strong>Managed</strong> mode, we know your email (for sign-in) and your subscription status (via Stripe); we don't store your source code beyond what's needed to generate it. If you click <strong>Publish</strong>, that specific app's code becomes publicly viewable at its link until you ask us to take it down. We don't sell data, ever.
+    In <strong>Bring Your Own Key</strong> mode, your Anthropic API key and your app's chat history and version history stay in your browser (localStorage) — we never see or store your key, and we don't have a database of your projects. In <strong>Managed</strong> mode, we know your email and how you sign in (password, or Google/GitHub) and your subscription status (via Stripe); we don't store your source code beyond what's needed to generate it. If you click <strong>Publish</strong>, that specific app's code becomes publicly viewable at its link until you ask us to take it down. If you connect GitHub or Vercel, we hold an encrypted access token you can revoke at any time, used only for the actions you take — pushing code, deploying, changing a project's public/private state. If your app uses the built-in backend, its data (and, if you add end-user accounts, your app's own visitors' data) lives on our infrastructure too, separately from your own account. We don't sell data, ever.
   </div>
 
   <div class="toc glass">
@@ -64,7 +65,9 @@
       <li><a href="#data-we-collect">What data we collect</a></li>
       <li><a href="#byok">Bring Your Own Key mode</a></li>
       <li><a href="#managed">Managed plan mode</a></li>
+      <li><a href="#connected-accounts">Connected accounts — GitHub &amp; Vercel</a></li>
       <li><a href="#publishing">Publishing your app</a></li>
+      <li><a href="#app-data">Data inside the apps you build</a></li>
       <li><a href="#payments">Payments</a></li>
       <li><a href="#cookies">Cookie policy</a></li>
       <li><a href="#terms">Terms of Service</a></li>
@@ -88,16 +91,18 @@
       <h3>Information you provide directly</h3>
       <ul>
         <li><strong>Your Anthropic API key</strong> — only if you use Bring Your Own Key mode. See §3.</li>
-        <li><strong>Email address</strong> — only if you sign up for the Managed plan (via Stripe Checkout and Supabase magic-link sign-in).</li>
+        <li><strong>Email address and sign-in method</strong> — only if you sign up for the Managed plan (via Stripe Checkout and Supabase Auth — password, or Google/GitHub sign-in). See §4.</li>
+        <li><strong>GitHub and/or Vercel access tokens</strong> — only if you choose to connect one or both, encrypted at rest. See §5.</li>
         <li><strong>Prompts and app code</strong> — what you type in chat and the app it generates, sent to Anthropic's API to produce a response.</li>
         <li><strong>Messages</strong> — if you use the on-site chat assistant or email us directly.</li>
       </ul>
       <h3>Information collected automatically</h3>
       <ul>
         <li><strong>Usage data</strong> — for Managed-plan customers only: build count and dollars spent per billing period, used solely to enforce the monthly budget.</li>
+        <li><strong>An activity log for connected accounts</strong> — deployments and project visibility changes you make via a connected Vercel account, so you have a record of what happened and when. See §5.</li>
         <li><strong>Standard server logs</strong> — request timestamps and IP address, used for security and abuse prevention, retained briefly by our hosting provider (Vercel).</li>
       </ul>
-      <p>We do not run third-party analytics or advertising trackers on vibesafebuilder.com.</p>
+      <p>We do not run third-party analytics or advertising trackers on vibesafebuilder.com. Our subprocessors are: Anthropic (the AI model), Supabase (database and authentication), Stripe (payments), Vercel (our own hosting), and Resend (transactional email — account and billing notifications only, never marketing).</p>
     </section>
 
     <section id="byok">
@@ -114,14 +119,24 @@
       <h2><span class="num">04</span>Managed plan mode</h2>
       <p>If you subscribe to the $15/month Managed plan, we handle the Anthropic costs on our own key so you don't need one. This requires:</p>
       <ul>
-        <li><strong>An email address</strong>, used to create a Supabase-authenticated account and sign you in via a magic link (no password to store or leak).</li>
-        <li><strong>A Stripe subscription</strong>, so we know your subscription is active. We never see or store your card number — Stripe handles that entirely (see §6).</li>
+        <li><strong>An email address</strong>, and how you'd like to sign in: a password, or continuing with Google or GitHub. Authentication is handled by Supabase Auth — if you use a password, it's stored hashed; we never see or handle it in plaintext ourselves. If you sign in with Google or GitHub, that's an identity check only (confirming who you are) — it does not give us any access to your Google or GitHub account beyond your name and email, and is separate from the GitHub connection described in §5, which you set up independently and which does grant repository access.</li>
+        <li><strong>A Stripe subscription</strong>, so we know your subscription is active. We never see or store your card number — Stripe handles that entirely (see §8).</li>
         <li><strong>Usage tracking</strong> — we record the dollar cost and count of your generations per billing period, solely to enforce the $10/month usage budget included in the plan. We do not store the resulting app code server-side beyond generating the response; your project's version history still lives in your browser's localStorage, same as BYOK mode.</li>
       </ul>
     </section>
 
+    <section id="connected-accounts">
+      <h2><span class="num">05</span>Connected accounts — GitHub &amp; Vercel</h2>
+      <p>Two optional, per-account connections let you take a project out of the builder entirely. Both are opt-in, both can be disconnected at any time, and neither is required to use VibeSafe Builder.</p>
+      <h3>GitHub</h3>
+      <p>Connecting GitHub (from the GitHub tab, on a multi-file project) requests <code>repo</code> scope — the ability to create repositories and push code on your behalf — via GitHub's own OAuth consent screen, where GitHub tells you exactly what's being requested before you approve anything. We store the resulting access token encrypted; it is never sent back to your browser once saved. It's used only for actions you explicitly take — pushing your project as a commit, pulling changes back, listing your repositories and branches. Disconnecting removes the stored token; it does not affect anything already pushed to GitHub.</p>
+      <h3>Vercel</h3>
+      <p>Connecting Vercel (from the Deploy tab) means pasting a personal access token you create yourself in your own Vercel account — we recommend, and the product itself recommends, scoping it to a single project. We store it encrypted; it is never sent back to your browser, and the interface shows only a masked hint (like <code>vcp_••••1234</code>). It's used only for actions you explicitly take: deploying a build, checking a deployment's status, and — only after you type your project's name to confirm — changing whether that specific Vercel project is publicly accessible. Every such action is recorded in an activity log visible to you on the Deploy tab. Disconnecting removes the stored token; it does not affect anything already deployed to Vercel.</p>
+      <p>Neither connection is used for anything beyond what you directly ask the builder to do. We do not browse, read, or otherwise access your repositories or Vercel projects outside of the specific actions above.</p>
+    </section>
+
     <section id="publishing">
-      <h2><span class="num">05</span>Publishing your app</h2>
+      <h2><span class="num">06</span>Publishing your app</h2>
       <p>The Publish button is opt-in and per-app. If you click it:</p>
       <ul>
         <li>The app's full HTML/CSS/JS is uploaded to our database and served publicly at a link like <code>vibesafebuilder.com/p/xxxxxx</code> — anyone with the link can view and use it.</li>
@@ -129,26 +144,38 @@
         <li>Republishing the same app overwrites the content at that link. There is currently no self-service "unpublish" button — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> and we'll take a published app down.</li>
         <li>Don't publish an app containing anyone else's personal data, or data you weren't authorized to share — publishing makes it public on the internet.</li>
       </ul>
+      <p>If you deploy a multi-file project to your own Vercel account instead (see §5), making it public runs an additional automated scan for live credentials before the deployment can be made public, and a deployment made public that way is verified as actually reachable rather than just assumed to be.</p>
+    </section>
+
+    <section id="app-data">
+      <h2><span class="num">07</span>Data inside the apps you build</h2>
+      <p>Most apps you build store data only in the visitor's own browser (localStorage) and we never see it. Some requests ("a shared guestbook," "a leaderboard everyone can see," "a list my whole team edits") lead the builder to use a built-in backend instead, so that data can be shared across devices and visitors. This section covers what that means.</p>
+      <ul>
+        <li><strong>Shared app data</strong> is stored on our infrastructure, scoped to that specific app, capped in size, and used only to serve that app's own read/write requests. We do not read, analyze, or otherwise use it ourselves.</li>
+        <li><strong>Per-app end-user accounts</strong> — if your app's request implies each visitor should have their own private data ("each user has their own saved items," "log in to see your bookings"), the builder can add its own signup/login for that specific app, separate from your own VibeSafe account and separate from every other app's end-users. Those end-users' passwords are hashed server-side; the generated app's own code is instructed never to store a password in a plain data record.</li>
+        <li>This means: if you build an app with its own end-user accounts, people who never signed up for VibeSafe Builder and never visited vibesafebuilder.com may have their data (an email or username, whatever they entered, and records they created) stored on our infrastructure, as a result of using <em>your</em> app. As the person who built and operates that app, you are responsible for telling your own users what your app collects and why — this policy covers what SG Digital Ventures LLC does with the underlying infrastructure, not what your specific app promises its own visitors.</li>
+        <li>Deleting a published app does not automatically delete the data collected through its backend — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> to request deletion of a specific app's stored data.</li>
+      </ul>
     </section>
 
     <section id="payments">
-      <h2><span class="num">06</span>Payments</h2>
+      <h2><span class="num">08</span>Payments</h2>
       <p>Managed-plan payments are processed by Stripe, Inc. We receive a webhook confirming your subscription is active and your billing email — never your card number, CVC, or full payment details. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a> for how they handle payment data. BYOK mode has no platform fee, so no payment information passes through us at all — you pay Anthropic directly for token usage.</p>
     </section>
 
     <section id="cookies">
-      <h2><span class="num">07</span>Cookie policy</h2>
+      <h2><span class="num">09</span>Cookie policy</h2>
       <p>We don't use advertising or third-party tracking cookies. The site uses:</p>
       <ul>
         <li><strong>Browser localStorage</strong> (not a cookie, but similar in spirit) — stores your BYOK API key, spend cap, chat history, and version history locally so your project persists between visits.</li>
-        <li><strong>A session token</strong> (Managed plan only) — set after magic-link sign-in, used to authenticate your generation requests and check your subscription status.</li>
+        <li><strong>A session token</strong> (Managed plan only) — set after you sign in, used to authenticate your generation requests and check your subscription status.</li>
         <li><strong>Stripe's own cookies</strong> during checkout, governed by Stripe's cookie policy, not ours.</li>
       </ul>
       <p>You can clear localStorage at any time via your browser settings — this logs you out of BYOK mode and erases any unpublished, undownloaded project.</p>
     </section>
 
     <section id="terms">
-      <h2><span class="num">08</span>Terms of Service</h2>
+      <h2><span class="num">10</span>Terms of Service</h2>
       <h3>The service</h3>
       <p>VibeSafe Builder lets you generate single-file web apps by describing them in chat, using either your own Anthropic API key or our Managed plan. The service is provided "as is" — generated code is created by an AI model and may contain bugs or be incomplete; review it before relying on it for anything important.</p>
       <h3>Acceptable use</h3>
@@ -169,32 +196,34 @@
     </section>
 
     <section id="your-rights">
-      <h2><span class="num">09</span>Your rights</h2>
+      <h2><span class="num">11</span>Your rights</h2>
       <ul>
         <li><strong>Access &amp; deletion (BYOK):</strong> your data is already local to your device — clear your browser's localStorage for vibesafebuilder.com to delete it entirely.</li>
         <li><strong>Access &amp; deletion (Managed):</strong> email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> to request a copy of or delete your account data (email, subscription record, usage totals). We'll respond within 30 days.</li>
         <li><strong>Published apps:</strong> email us with the link to have it taken down.</li>
+        <li><strong>Connected accounts:</strong> disconnect GitHub or Vercel any time from their respective tabs in the builder — this removes the stored token immediately and does not affect anything already pushed or deployed.</li>
+        <li><strong>Data inside an app's own backend:</strong> email us with the app's link to request deletion of the shared data and any end-user accounts it collected. See §7.</li>
         <li><strong>Opt out of emails:</strong> Managed-plan account emails are transactional (billing, sign-in); we don't send marketing email at this time.</li>
       </ul>
     </section>
 
     <section id="children">
-      <h2><span class="num">10</span>Children's privacy (COPPA)</h2>
+      <h2><span class="num">12</span>Children's privacy (COPPA)</h2>
       <p>VibeSafe Builder is not directed at children under 13, and we do not knowingly collect personal information from children under 13. If you believe a child has provided us data, contact us and we'll delete it.</p>
     </section>
 
     <section id="us-privacy">
-      <h2><span class="num">11</span>California &amp; US state privacy rights</h2>
-      <p>If you're a California resident, the CCPA/CPRA gives you the right to know, delete, and opt out of the "sale" of personal information. We don't sell personal information. Other US states with comparable privacy laws (Virginia, Colorado, Connecticut, Utah, and others) have similar rights — the same contact process in §9 applies regardless of state.</p>
+      <h2><span class="num">13</span>California &amp; US state privacy rights</h2>
+      <p>If you're a California resident, the CCPA/CPRA gives you the right to know, delete, and opt out of the "sale" of personal information. We don't sell personal information. Other US states with comparable privacy laws (Virginia, Colorado, Connecticut, Utah, and others) have similar rights — the same contact process in §11 applies regardless of state.</p>
     </section>
 
     <section id="changes">
-      <h2><span class="num">12</span>Changes to this policy</h2>
+      <h2><span class="num">14</span>Changes to this policy</h2>
       <p>We'll update the "Last updated" date at the top of this page when we make material changes, and for Managed-plan customers, notify by email if a change materially affects how we handle your data.</p>
     </section>
 
     <section id="contact">
-      <h2><span class="num">13</span>Contact us</h2>
+      <h2><span class="num">15</span>Contact us</h2>
       <p>Questions about this policy, a data request, or a takedown request for a published app: <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a>. For legal correspondence, contact SG Digital Ventures LLC via its Wyoming registered agent, or the same email address.</p>
     </section>
   </article>
