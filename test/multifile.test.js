@@ -223,6 +223,46 @@ test("hasScaffold detects a complete project", () => {
   assert.strictEqual(hasScaffold(withScaffold({ "src/main.jsx": "x" })), true);
 });
 
+/* ---------------- scaffold's default index.html title ---------------- */
+// QUALITY RULES tells the model to never leave a generic placeholder title —
+// the scaffold's own default index.html was doing exactly that
+// ("<title>My App</title>") until fixed, since the model is separately told
+// not to touch index.html at all, so no prompt instruction alone could fix it.
+
+test("the scaffold title reflects the project name, not a placeholder", () => {
+  const html = scaffold("Build me a habit tracker with streaks")["index.html"];
+  assert.match(html, /<title>Build me a habit tracker with streaks<\/title>/);
+  assert.ok(!html.includes("My App"), "the old generic placeholder should be gone");
+});
+
+// A naive `name = "vibesafe-app"` default PARAMETER would make the title
+// fallback's `name && ...` check always truthy, silently showing the
+// lowercase package-name-style slug as the title instead of a properly cased
+// one — this is exactly the bug that shipped first and was only caught by
+// actually calling scaffold() with no argument, not by reading the code.
+test("with no name at all, the title is properly cased, not the lowercase package slug", () => {
+  const html = scaffold()["index.html"];
+  assert.match(html, /<title>VibeSafe App<\/title>/);
+  assert.ok(!html.includes("<title>vibesafe-app</title>"), "title leaked the lowercase package-name slug");
+});
+
+test("an empty string name falls back the same way as no name", () => {
+  const html = scaffold("")["index.html"];
+  assert.match(html, /<title>VibeSafe App<\/title>/);
+});
+
+test("the scaffold title is HTML-escaped", () => {
+  const html = scaffold("<script>alert(1)</script> & \"quotes\"")["index.html"];
+  assert.ok(!html.includes("<script>alert(1)</script>"), "unescaped script tag reached the title");
+  assert.match(html, /&lt;script&gt;alert\(1\)&lt;\/script&gt; &amp; &quot;quotes&quot;/);
+});
+
+test("the title and the package.json name are independently derived", () => {
+  const files = scaffold("Build me a habit tracker with streaks");
+  assert.strictEqual(JSON.parse(files["package.json"]).name, "build-me-a-habit-tracker-with-streaks");
+  assert.match(files["index.html"], /<title>Build me a habit tracker with streaks<\/title>/);
+});
+
 test("scaffold files are not treated as runtime modules", () => {
   for (const f of SCAFFOLD_FILES) assert.strictEqual(isRuntimeModule(f), false, f + " should not be a runtime module");
   assert.strictEqual(isRuntimeModule("src/App.jsx"), true);
