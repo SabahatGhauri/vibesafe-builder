@@ -361,8 +361,10 @@ document.querySelectorAll("#authGate input").forEach((input) => {
 /* ---------------- persistence (survives reloads) ---------------- */
 const PROJECT_KEY = "vc_project";
 
-function saveProject() {
-  const payload = {
+// Shared by saveProject() (the one active slot) and archiveCurrentProject()
+// (the saved-apps list) — same shape, one place that defines it.
+function buildSavePayload() {
+  return {
     versions: state.versions.slice(-20), // cap for localStorage quota
     currentVersion: Math.min(state.currentVersion, 19),
     spend: state.spend,
@@ -373,6 +375,10 @@ function saveProject() {
     palette: state.palette,
     chatHTML: messagesEl.innerHTML,
   };
+}
+
+function saveProject() {
+  const payload = buildSavePayload();
   try {
     localStorage.setItem(PROJECT_KEY, JSON.stringify(payload));
   } catch {
@@ -406,6 +412,136 @@ function loadProject() {
     return false;
   }
 }
+
+/* ---------------- My Apps ---------------- */
+// Before this, starting a new project DESTROYED whatever was active —
+// "New project" and "New React project" both did localStorage.removeItem on
+// the one and only project slot, with the confirm dialog's only advice being
+// "download it first if you want to keep it." This is the actual fix: a
+// second, separate slot holding every project you've moved away from, so
+// starting fresh is never destructive. BYOK stays fully local-only — this is
+// just more localStorage, not a server-side account feature.
+const SAVED_APPS_KEY = "vc_saved_apps";
+const MAX_SAVED_APPS = 20; // mirrors the existing 20-version cap's reasoning: bound worst-case quota use
+
+function loadSavedApps() {
+  try {
+    const raw = localStorage.getItem(SAVED_APPS_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return []; // corrupted data must never break the app — just means nothing to show
+  }
+}
+
+function writeSavedApps(list) {
+  try {
+    localStorage.setItem(SAVED_APPS_KEY, JSON.stringify(list));
+    return true;
+  } catch {
+    // Quota hit — same fallback shape as saveProject(): drop the oldest
+    // entries (they're at the end, newest-first) and retry once.
+    const trimmed = list.slice(0, Math.max(1, Math.floor(list.length / 2)));
+    try {
+      localStorage.setItem(SAVED_APPS_KEY, JSON.stringify(trimmed));
+      return true;
+    } catch {
+      return false; // give up quietly, same as saveProject()
+    }
+  }
+}
+
+// A short, human name for the list — the same "first prompt, truncated" idea
+// already used server-side for the multi-file scaffold's <title> (lib/multifile.js).
+function deriveAppName() {
+  const first = state.versions[0];
+  const raw = (first && first.prompt) || "";
+  const trimmed = raw.trim().slice(0, 48);
+  return trimmed || "Untitled app";
+}
+
+// Called right before either "destroy the active slot" path runs. A no-op if
+// there's nothing worth saving (no versions yet — an empty chat isn't an app).
+function archiveCurrentProject() {
+  if (!state.versions.length) return;
+  const entry = {
+    id: "app_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name: deriveAppName(),
+    kind: state.kind,
+    versionCount: state.versions.length,
+    lastModified: Date.now(),
+    savedState: buildSavePayload(),
+  };
+  const list = loadSavedApps();
+  list.unshift(entry);
+  writeSavedApps(list.slice(0, MAX_SAVED_APPS));
+}
+
+function deleteSavedApp(id) {
+  writeSavedApps(loadSavedApps().filter((a) => a.id !== id));
+  renderMyAppsList();
+}
+
+// Swaps a saved app into the one active slot. The CURRENTLY active project is
+// archived first (if it has anything in it) — opening a saved app must never
+// be how you silently lose whatever you were just working on.
+function openSavedApp(id) {
+  const entry = loadSavedApps().find((a) => a.id === id);
+  if (!entry) return;
+
+  // archiveCurrentProject() reads-modifies-writes the saved list itself (to
+  // prepend whatever was active). The list must be re-read AFTER that call,
+  // not reused from before it — using a list captured earlier here would
+  // overwrite the entry archiveCurrentProject() just wrote, silently
+  // discarding whatever the user was previously working on. Caught by
+  // actually opening a saved app while a different one was active, not by
+  // reading the code: the active project vanished instead of being archived.
+  archiveCurrentProject();
+  writeSavedApps(loadSavedApps().filter((a) => a.id !== id)); // it's moving TO active, not staying saved too
+
+  localStorage.setItem(PROJECT_KEY, JSON.stringify(entry.savedState));
+  $("myAppsModal").close();
+  location.reload(); // simplest correct way to re-init every tab/panel against the newly-active project
+}
+
+function renderMyAppsList() {
+  const el = $("myAppsList");
+  if (!el) return;
+  const list = loadSavedApps();
+  if (!list.length) {
+    el.innerHTML = '<p class="hint">Nothing saved yet — start a new project from your current one and it\'ll show up here.</p>';
+    return;
+  }
+  el.innerHTML = list
+    .map(
+      (a) => `
+      <div class="saved-app-card">
+        <div class="saved-app-info">
+          <div class="saved-app-name">${esc(a.name)}</div>
+          <div class="hint">${a.kind === "multi" ? "⚛ React project" : "Single file"} · ${a.versionCount} version${a.versionCount === 1 ? "" : "s"} · ${esc(new Date(a.lastModified).toLocaleDateString())}</div>
+        </div>
+        <div class="saved-app-actions">
+          <button type="button" class="btn ghost mini" data-open="${a.id}">Open</button>
+          <button type="button" class="btn ghost mini" data-delete="${a.id}">Delete</button>
+        </div>
+      </div>`
+    )
+    .join("");
+}
+
+$("myAppsBtn")?.addEventListener("click", () => {
+  renderMyAppsList();
+  $("myAppsModal").showModal();
+});
+
+$("myAppsList")?.addEventListener("click", (e) => {
+  const openBtn = e.target.closest("[data-open]");
+  if (openBtn) { openSavedApp(openBtn.dataset.open); return; }
+  const delBtn = e.target.closest("[data-delete]");
+  if (delBtn) {
+    if (confirm("Delete this saved app? This can't be undone.")) deleteSavedApp(delBtn.dataset.delete);
+  }
+});
 
 /* ---------------- settings ---------------- */
 $("settingsBtn").addEventListener("click", () => {
@@ -673,7 +809,8 @@ $("composer").addEventListener("submit", async (e) => {
 
 /* ---------------- new project ---------------- */
 $("newProjectBtn").addEventListener("click", () => {
-  if (state.versions.length && !confirm("Start a new project? Current chat, versions and spend meter will be cleared. (Download your app first if you want to keep it.)")) return;
+  if (state.versions.length && !confirm("Start a new project? The current one will be saved to My Apps — you can reopen it any time.")) return;
+  archiveCurrentProject();
   localStorage.removeItem(PROJECT_KEY);
   location.reload();
 });
@@ -1376,7 +1513,8 @@ initPalettePicker();
 // place a user can discover they need it — not just the chat panel. Otherwise
 // the GitHub tab is a dead end: it says "multi-file only" with no way to get one.
 function startReactProject() {
-  if (state.versions.length && !confirm("Start a new React project? This clears the current chat and versions.")) return;
+  if (state.versions.length && !confirm("Start a new React project? The current one will be saved to My Apps — you can reopen it any time.")) return;
+  archiveCurrentProject();
   localStorage.removeItem(PROJECT_KEY);
   state.kind = "multi";
   state.versions = [];

@@ -538,3 +538,18 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
   background: none;
   cursor: pointer;
 }
+
+/* ---------------- My Apps ---------------- */
+.my-apps-form { max-width: 440px; max-height: 70vh; overflow-y: auto; }
+#myAppsList { display: flex; flex-direction: column; gap: 8px; }
+.saved-app-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line, #2a2f36);
+  border-radius: 10px;
+}
+.saved-app-name { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+.saved-app-actions { display: flex; gap: 6px; flex-shrink: 0; }

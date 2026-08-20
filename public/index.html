@@ -68,7 +68,8 @@
       <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
       <div class="meter-wasted" id="meterWasted" hidden>failed (not counted): <span id="wastedVal">$0.00</span></div>
     </div>
-    <button class="btn ghost" id="newProjectBtn" title="Start over — clears chat, versions and spend for this project">✦ New project</button>
+    <button class="btn ghost" id="myAppsBtn" title="Every app you've built, saved and ready to reopen">📂 My Apps</button>
+    <button class="btn ghost" id="newProjectBtn" title="Start a new app — the current one is saved automatically, not lost">✦ New project</button>
     <button class="btn ghost" id="settingsBtn">⚙ Settings</button>
   </header>
 
@@ -314,6 +315,15 @@
       </div>
     </section>
   </main>
+
+  <dialog id="myAppsModal">
+    <form method="dialog" class="settings my-apps-form">
+      <h2>My Apps</h2>
+      <p class="hint" style="margin-bottom:14px;">Every app you've built here, saved automatically whenever you start a new one — nothing is lost by switching. Saved locally to this browser, same as everything else in BYOK mode.</p>
+      <div id="myAppsList"></div>
+      <button class="btn ghost" type="submit" style="margin-top:14px; width:100%;">Close</button>
+    </form>
+  </dialog>
 
   <dialog id="settingsModal">
     <form method="dialog" class="settings">
