@@ -14,6 +14,13 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* The browser's own [hidden] rule is display:none, but any author rule that sets an
+   explicit display (e.g. .auth-gate-card label, .auth-gate-forgot) beats it on equal
+   specificity and silently re-shows the element — which left the Name and Confirm
+   password fields visible on the Log in screen. Every `hidden` toggle in app.js
+   depends on this holding, so enforce it once, globally. */
+[hidden] { display: none !important; }
+
 /* ---------- auth gate (blocks everything, BYOK included, until signed in) ---------- */
 .auth-gate {
   position: fixed; inset: 0; z-index: 1000; background: var(--bg);
