@@ -54,8 +54,10 @@
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark">◆</span>
-      <span class="brand-name">VibeSafe Builder</span>
-      <span class="brand-tag">doesn't waste your credits or leak your data</span>
+      <span class="brand-text">
+        <span class="brand-name">VibeSafe Builder</span>
+        <span class="brand-tag">Build fast. Ship safe.</span>
+      </span>
     </div>
     <span class="plan-badge" id="planBadge" hidden></span>
     <button class="btn upgrade" type="button" id="upgradeBtn" hidden title="Build without your own API key — we cover the key and the budget">⬆ Upgrade to Pro</button>
@@ -69,11 +71,21 @@
       <div class="meter-wasted" id="meterWasted" hidden>failed (not counted): <span id="wastedVal">$0.00</span></div>
     </div>
     <button class="btn ghost" id="myAppsBtn" title="Every app you've built, saved and ready to reopen">📂 My Apps</button>
-    <button class="btn ghost" id="newProjectBtn" title="Start a new app — the current one is saved automatically, not lost">✦ New project</button>
+    <button class="btn primary" id="newProjectBtn" title="Start a new app — the current one is saved automatically, not lost">＋ New Project</button>
     <button class="btn ghost" id="settingsBtn">⚙ Settings</button>
   </header>
 
   <main class="layout">
+    <nav class="rail" aria-label="Sections">
+      <button class="rail-btn active" type="button" data-rail="preview" title="Preview">✦</button>
+      <button class="rail-btn" type="button" data-rail="code" title="Code">&lt;/&gt;</button>
+      <button class="rail-btn" type="button" data-rail="health" title="Build Health">☷</button>
+      <button class="rail-btn" type="button" data-rail="security" title="Security">⛨</button>
+      <button class="rail-btn" type="button" data-rail="versions" title="Versions">◴</button>
+      <button class="rail-btn" type="button" data-rail="deploy" title="Deploy">☁</button>
+      <span class="rail-spacer"></span>
+      <button class="rail-btn" type="button" id="railSettings" title="Settings">⚙</button>
+    </nav>
     <aside class="chat">
       <div class="messages" id="messages">
         <div class="msg system">
@@ -145,6 +157,10 @@
         </div>
         <div class="empty" id="previewEmpty">Your app preview appears here.</div>
         <div class="build-errors" id="buildErrors" hidden></div>
+        <div class="stat-bar" id="statBar" hidden>
+          <div class="stat"><span class="stat-ico code">&lt;/&gt;</span><span class="stat-text"><b id="statLoc">0</b><span>Lines of code</span></span></div>
+          <div class="stat"><span class="stat-ico sec">⛨</span><span class="stat-text"><b id="statScore">—</b><span>Security score</span></span></div>
+        </div>
         <div class="preview-wrap">
           <iframe id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-popups" title="App preview" hidden></iframe>
           <aside class="props" id="propsPanel" hidden>

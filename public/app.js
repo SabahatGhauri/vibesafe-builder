@@ -560,14 +560,26 @@ $("settingsModal").addEventListener("close", () => {
 });
 
 /* ---------------- tabs ---------------- */
+// The tab strip and the left icon rail are two views of the same selection, so
+// both go through here rather than each tracking its own idea of what is open.
+function activateTab(name) {
+  const panel = $("panel-" + name);
+  if (!panel) return;
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+  panel.classList.add("active");
+  // The rail only covers the main sections; leave every rail button unlit for a
+  // tab it has no icon for rather than showing a stale one as still selected.
+  document.querySelectorAll(".rail-btn[data-rail]").forEach((b) => b.classList.toggle("active", b.dataset.rail === name));
+}
+
 document.querySelectorAll(".tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-    tab.classList.add("active");
-    $("panel-" + tab.dataset.tab).classList.add("active");
-  });
+  tab.addEventListener("click", () => activateTab(tab.dataset.tab));
 });
+document.querySelectorAll(".rail-btn[data-rail]").forEach((btn) => {
+  btn.addEventListener("click", () => activateTab(btn.dataset.rail));
+});
+$("railSettings")?.addEventListener("click", () => $("settingsBtn")?.click());
 
 /* ---------------- chat helpers ---------------- */
 function addMsg(cls, html) {
@@ -875,6 +887,7 @@ async function renderAll() {
   renderLaunchCheck();
   renderBuildHealth();
   renderPublish();
+  renderStatBar();
 }
 
 // Multi-file rendering. The preview shows the ASSEMBLED project, while the Code
@@ -905,6 +918,7 @@ async function renderAllMulti() {
   renderLaunchCheck();
   renderBuildHealth();
   renderPublish();
+  renderStatBar();
 }
 
 // What the security scan and Build Health analyse in multi mode: the model's own
@@ -1009,7 +1023,7 @@ $("copyBtn").addEventListener("click", () => {
 // it's already fully local). Runs on a copy at download time only; the stored
 // version/diff history stays exactly what the model generated.
 const PWA_ICON_HREF =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0d11'/%3E%3Cpath d='M32 10 L50 32 L32 54 L14 32 Z' fill='%2335d99a'/%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0d11'/%3E%3Cpath d='M32 10 L50 32 L32 54 L14 32 Z' fill='%238b5cf6'/%3E%3C/svg%3E";
 function addPWATags(html) {
   const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
   const name = (titleMatch ? titleMatch[1].trim() : "") || "My App";
@@ -1019,7 +1033,7 @@ function addPWATags(html) {
     start_url: ".",
     display: "standalone",
     background_color: "#0a0d11",
-    theme_color: "#35d99a",
+    theme_color: "#8b5cf6",
     icons: [{ src: PWA_ICON_HREF, sizes: "512x512", type: "image/svg+xml", purpose: "any" }],
   };
   const manifestHref = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
@@ -1206,6 +1220,21 @@ function versionScore(v) {
 
 function scoreClass(score) {
   return score >= 90 ? "good" : score >= 70 ? "warn" : "bad";
+}
+
+// Only genuinely measured numbers belong here. Build time and deployment count
+// from the design are intentionally not shown until they are really tracked.
+function renderStatBar() {
+  const bar = $("statBar");
+  if (!bar) return;
+  const src = hasProject() ? analysisSource() : "";
+  if (!src) { bar.hidden = true; return; }
+  bar.hidden = false;
+  $("statLoc").textContent = src.split(String.fromCharCode(10)).length.toLocaleString();
+  const score = scoreFromFindings(scanCode(src));
+  const el = $("statScore");
+  el.textContent = score + "/100";
+  el.className = scoreClass(score);
 }
 
 function runSecurityScan(code) {

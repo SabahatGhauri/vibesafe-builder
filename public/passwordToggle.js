@@ -29,7 +29,7 @@
       "  color: var(--text-dim, #8d9aa8); line-height: 0;",
       "}",
       ".pw-eye:hover { color: var(--text, #eef3f7); }",
-      ".pw-eye:focus-visible { outline: 2px solid var(--accent, #35d99a); outline-offset: -2px; border-radius: 6px; }",
+      ".pw-eye:focus-visible { outline: 2px solid var(--accent, #8b5cf6); outline-offset: -2px; border-radius: 6px; }",
       ".pw-eye svg { width: 17px; height: 17px; display: block; }",
     ].join("\n");
     document.head.appendChild(style);
