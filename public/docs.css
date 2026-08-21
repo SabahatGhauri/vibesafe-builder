@@ -4,7 +4,7 @@
   --bg: #0a0d11; --bg-raise: #0f1318; --bg-panel: #141a21;
   --glass: rgba(255,255,255,0.035); --glass-border: rgba(255,255,255,0.09);
   --line: #232b34; --text: #eef3f7; --dim: #8d9aa8; --dim2: #5f6b78;
-  --accent: #35d99a; --accent2: #4fc3ff; --warn: #f0b84e; --danger: #ff6b6b;
+  --accent: #8b5cf6; --accent2: #4fc3ff; --warn: #f0b84e; --danger: #ff6b6b;
   --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +27,7 @@ nav.topnav .inner { display: flex; align-items: center; gap: 28px; width: 100%; 
 nav .cta { margin-left: auto; }
 .btn { display: inline-block; padding: 10px 20px; border-radius: 11px; font-size: 13.5px; font-weight: 600; text-decoration: none; border: 1px solid var(--glass-border); color: var(--text); background: var(--glass); transition: transform 0.2s, border-color 0.2s; white-space: nowrap; }
 .btn:hover { transform: translateY(-2px); border-color: rgba(53,217,154,0.4); }
-.btn.primary { background: linear-gradient(135deg, var(--accent), #22b88a); border-color: transparent; color: #04180f; font-weight: 700; }
+.btn.primary { background: linear-gradient(135deg, var(--accent), #6d4aec); border-color: transparent; color: #fff; font-weight: 700; }
 
 /* ---------- doc header ---------- */
 .doc-hero { padding: 48px 0 12px; }
