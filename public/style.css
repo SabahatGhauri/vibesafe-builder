@@ -560,3 +560,10 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 }
 .saved-app-name { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
 .saved-app-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* Per-version security score. Colour carries the same meaning as the tab badges:
+   green safe, amber worth a look, red blocking. */
+.v-score { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 100px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.2px; }
+.v-score.good { background: rgba(53,217,154,0.14); color: var(--accent); }
+.v-score.warn { background: rgba(232,176,75,0.15); color: var(--warn); }
+.v-score.bad  { background: rgba(224,100,89,0.15); color: var(--danger); }

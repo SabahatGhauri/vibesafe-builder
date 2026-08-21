@@ -1058,7 +1058,7 @@ function renderVersions() {
     li.className = "version-item" + (idx === state.currentVersion ? " current" : "");
     li.innerHTML =
       `<div class="v-title">v${v.id} — ${esc(v.prompt.slice(0, 48))}${v.prompt.length > 48 ? "…" : ""}</div>` +
-      `<div class="v-meta">${v.time} · ${fmt$(v.cost)}</div>` +
+      `<div class="v-meta">${v.time} · ${fmt$(v.cost)} <span class="v-score ${scoreClass(versionScore(v))}" title="Security score for this version">&#128737; ${versionScore(v)}</span></div>` +
       `<div class="v-actions"><button class="btn small" data-restore="${idx}">Restore</button></div>`;
     li.addEventListener("click", (e) => {
       if (e.target.dataset.restore !== undefined) return;
@@ -1172,6 +1172,40 @@ const SEC_CHECKS = [
 
 function scanCode(code) {
   return SEC_CHECKS.filter((c) => c.re.test(code));
+}
+
+// Same weighting the server-side Launch Check uses (lib/launchCheck.js), so a
+// version's badge and its Launch Check score can't tell the user two different
+// stories about the same code.
+function scoreFromFindings(findings) {
+  const critical = findings.filter((f) => f.severity === "bad").length;
+  const warn = findings.length - critical;
+  return Math.max(0, 100 - critical * 35 - warn * 10);
+}
+
+// A version stores either single-file `code` or multi-file `files`; scan whichever
+// it actually has rather than assuming the project is still in the mode it was in
+// when this version was created.
+function versionSource(v) {
+  if (v.files) {
+    const nl = String.fromCharCode(10);
+    return Object.keys(v.files).sort().map((path) => "/* " + path + " */" + nl + v.files[path]).join(nl + nl);
+  }
+  return v.code || "";
+}
+
+function versionScore(v) {
+  // Cached on the version: versions are immutable once created, and re-scanning
+  // on every render would rerun every regex over every version in the list.
+  if (typeof v.score !== "number") {
+    const src = versionSource(v);
+    v.score = src ? scoreFromFindings(scanCode(src)) : 100;
+  }
+  return v.score;
+}
+
+function scoreClass(score) {
+  return score >= 90 ? "good" : score >= 70 ? "warn" : "bad";
 }
 
 function runSecurityScan(code) {
