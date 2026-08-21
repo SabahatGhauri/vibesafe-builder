@@ -179,20 +179,42 @@ body {
 }
 
 .composer { padding: 12px 14px; border-top: 1px solid var(--line); }
+/* One rounded surface holding the textarea and its controls, so the composer
+   reads as a single input rather than a box with a button parked underneath. */
+.composer-box {
+  background: var(--bg-panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 10px 10px 8px; transition: border-color .15s;
+}
+.composer-box:focus-within { border-color: var(--accent); }
 .composer textarea {
   width: 100%;
   resize: vertical;
-  background: var(--bg-panel);
+  background: none;
   color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px;
+  border: none;
+  padding: 2px 4px 0;
   font-size: 13.5px;
   font-family: inherit;
+  min-height: 62px;
 }
-.composer textarea:focus { outline: 1px solid var(--accent); }
-.composer-row { display: flex; align-items: center; margin-top: 8px; gap: 10px; }
+.composer textarea:focus { outline: none; }
+.composer-row { display: flex; align-items: center; margin-top: 6px; gap: 8px; }
 .estimate { font-size: 12px; color: var(--text-dim); font-family: var(--mono); flex: 1; }
+.composer-state { font-size: 12px; color: var(--accent); font-weight: 600; }
+.composer-icon {
+  width: 30px; height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 8px; background: none; cursor: pointer;
+  color: var(--text-dim); font-size: 14px; line-height: 1;
+}
+.composer-icon:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.composer-icon.on { color: var(--accent); background: rgba(139,92,246,0.16); }
+.btn.send-btn {
+  width: 38px; height: 34px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  padding: 0; border-radius: 10px; font-size: 15px;
+}
+.btn.send-btn:disabled { opacity: 0.5; }
+.composer-hint { margin-top: 7px; text-align: center; font-size: 11px; color: var(--text-dim); }
+.composer-hint b { color: var(--text-dim); font-weight: 700; }
 .estimate.blocked { color: var(--danger); }
 
 /* ---------- buttons ---------- */

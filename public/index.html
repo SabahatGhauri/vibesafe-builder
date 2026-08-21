@@ -127,11 +127,16 @@
         </div>
       </div>
       <form class="composer" id="composer">
-        <textarea id="promptInput" rows="3" placeholder="Describe your app, or ask for a change…"></textarea>
-        <div class="composer-row">
-          <span class="estimate" id="estimate">est. —</span>
-          <button type="submit" class="btn primary" id="sendBtn">Build it</button>
+        <div class="composer-box">
+          <textarea id="promptInput" rows="3" placeholder="Describe your app, or ask for a change…"></textarea>
+          <div class="composer-row">
+            <button type="button" class="composer-icon" id="micBtn" hidden title="Dictate your prompt" aria-label="Dictate your prompt">🎤</button>
+            <span class="estimate" id="estimate">est. —</span>
+            <span class="composer-state" id="composerState"></span>
+            <button type="submit" class="btn primary send-btn" id="sendBtn" title="Build it" aria-label="Build it">➤</button>
+          </div>
         </div>
+        <div class="composer-hint"><b>Shift + Enter</b> for new line, <b>Enter</b> to send</div>
       </form>
     </aside>
 

@@ -830,8 +830,57 @@ $("newProjectBtn").addEventListener("click", () => {
 function setBusy(b) {
   state.busy = b;
   $("sendBtn").disabled = b;
-  $("sendBtn").textContent = b ? "Building…" : state.versions.length ? "Make the change" : "Build it";
+  // The send button is an icon now, so the label it used to carry moves to the
+  // tooltip/aria-label (for screen readers and hover) and to a visible state
+  // chip next to the estimate - the wording still tells you whether this is a
+  // first build or a change, which the icon alone cannot.
+  const label = b ? "Building…" : state.versions.length ? "Make the change" : "Build it";
+  const btn = $("sendBtn");
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+  const chip = $("composerState");
+  if (chip) chip.textContent = b ? "Building…" : "";
 }
+
+// The composer hint promises Enter sends and Shift+Enter makes a new line, so
+// that has to actually be true.
+$("promptInput")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
+    if (!state.busy) $("composer").requestSubmit();
+  }
+});
+
+// Dictation, wired to the browser's own speech recognition. Feature-detected and
+// left hidden where it is unavailable rather than shown as a button that does
+// nothing (Chrome and Edge support it; Firefox does not).
+(function setupMic() {
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btn = $("micBtn");
+  if (!Rec || !btn) return;
+  btn.hidden = false;
+  let rec = null;
+  btn.addEventListener("click", () => {
+    if (rec) { rec.stop(); return; }
+    rec = new Rec();
+    rec.continuous = true;
+    rec.interimResults = false;
+    rec.onresult = (ev) => {
+      const input = $("promptInput");
+      let said = "";
+      for (let i = ev.resultIndex; i < ev.results.length; i++) said += ev.results[i][0].transcript;
+      input.value = (input.value ? input.value.trimEnd() + " " : "") + said.trim();
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+    // Any end - stopped by the user, a timeout, or an error - has to clear both
+    // the handle and the lit state, or the button gets stuck looking active.
+    const done = () => { rec = null; btn.classList.remove("on"); };
+    rec.onend = done;
+    rec.onerror = done;
+    btn.classList.add("on");
+    rec.start();
+  });
+})();
 
 async function readSSE(response, onProgress) {
   const reader = response.body.getReader();
