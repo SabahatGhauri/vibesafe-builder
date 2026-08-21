@@ -137,12 +137,12 @@
 
       <div class="panel active" id="panel-preview">
         <div class="panel-toolbar">
-          <button class="btn primary" id="publishBtn" disabled>🚀 Publish</button>
+          <button class="btn ghost" type="button" id="visualEditBtn" hidden title="Click any element in the preview to edit it">✎ Edit visually</button>
+          <button class="btn ghost" type="button" id="sharePreviewBtn" hidden title="Get a shareable link to this work-in-progress build">🔗 Share preview</button>
+          <span class="build-status" id="buildStatus" hidden></span>
+          <button class="btn primary" id="publishBtn" disabled style="margin-left:auto;">🚀 Publish</button>
           <span class="publish-url" id="publishUrl"></span>
         </div>
-        <button class="btn ghost" type="button" id="visualEditBtn" hidden title="Click any element in the preview to edit it">✎ Edit visually</button>
-          <span class="build-status" id="buildStatus" hidden></span>
-          <button class="btn ghost" type="button" id="sharePreviewBtn" hidden title="Get a shareable link to this work-in-progress build">🔗 Share preview</button>
         <div class="empty" id="previewEmpty">Your app preview appears here.</div>
         <div class="build-errors" id="buildErrors" hidden></div>
         <div class="preview-wrap">
