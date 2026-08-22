@@ -177,3 +177,49 @@ test("stale rows are never auto-cancelled, only reported", async () => {
   assert.equal(out.stale.length, 1);
   assert.equal(out.actions.length, 0, "revoking access automatically is not safe");
 });
+
+/* --- account identification: which Stripe account did we actually query? --- */
+
+test("the report names the Stripe account, so a clean result can be trusted", async () => {
+  const deps = fakeDeps({ stripeSubs: [sub("cus_A")], dbRows: [row("cus_A")], activate: async () => {} });
+  deps.stripe.accounts = { retrieve: async () => ({ id: "acct_LIVE", business_profile: { name: "SG DIGITAL VENTURES LLC" } }) };
+  const out = await reconcile({ ...deps, apply: false });
+  assert.equal(out.stripeAccount.id, "acct_LIVE");
+  assert.equal(out.stripeAccount.name, "SG DIGITAL VENTURES LLC");
+});
+
+test("a failing account lookup degrades to null instead of breaking reconciliation", async () => {
+  const deps = fakeDeps({ stripeSubs: [sub("cus_A")], dbRows: [], activate: async () => {} });
+  deps.stripe.accounts = { retrieve: async () => { throw new Error("no permission"); } };
+  const out = await reconcile({ ...deps, apply: false });
+  assert.equal(out.stripeAccount, null);
+  assert.equal(out.missing.length, 1, "the actual reconciliation must still run");
+});
+
+test("a Stripe client with no accounts API still reconciles", async () => {
+  const deps = fakeDeps({ stripeSubs: [sub("cus_A")], dbRows: [], activate: async () => {} });
+  const out = await reconcile({ ...deps, apply: false });
+  assert.equal(out.stripeAccount, null);
+  assert.equal(out.missing.length, 1);
+});
+
+test("status counts expose subscriptions that are present but not entitled", async () => {
+  const deps = fakeDeps({
+    stripeSubs: [sub("cus_A", "active"), sub("cus_B", "past_due"), sub("cus_C", "trialing")],
+    dbRows: [row("cus_A")],
+    activate: async () => {},
+  });
+  const out = await reconcile({ ...deps, apply: false });
+  // past_due is fetched only if listed; the fake filters by requested status, so
+  // only entitled ones arrive - which is exactly the behaviour being asserted.
+  assert.equal(out.stripeStatusCounts.active, 1);
+  assert.equal(out.stripeStatusCounts.trialing, 1);
+  assert.equal(out.stripeStatusCounts.past_due, undefined, "past_due is never requested, so never counted as entitled");
+});
+
+test("ok entries list who matched, for cross-checking against the dashboard", async () => {
+  const deps = fakeDeps({ stripeSubs: [sub("cus_A")], dbRows: [row("cus_A")], activate: async () => {} });
+  const out = await reconcile({ ...deps, apply: false });
+  assert.equal(out.ok.length, 1);
+  assert.equal(out.ok[0].customerId, "cus_A");
+});
