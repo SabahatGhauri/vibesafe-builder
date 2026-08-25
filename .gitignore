@@ -1,3 +1,7 @@
 .vercel
 .env*
 node_modules
+
+# Marketing drafts and launch material. The repo is public; unlaunched copy,
+# pricing experiments and candid strategy notes do not belong in it.
+drafts/
