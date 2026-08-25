@@ -369,7 +369,11 @@
 
       <label>Anthropic API key
         <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off" />
-        <span class="hint">Stored only in this browser (localStorage). Sent directly to your own local server — never anywhere else. Get one at platform.claude.com. Not needed if you're signed in to the managed plan above.</span>
+        <div class="key-check">
+          <button class="btn ghost small" type="button" id="checkKeyBtn">Check key</button>
+          <span class="key-status" id="keyStatus"></span>
+        </div>
+        <span class="hint">Stored only in this browser (localStorage), and sent with each build so it can reach Anthropic — never stored on our servers. Get one at console.anthropic.com. Not needed if you're signed in to the managed plan above.</span>
       </label>
       <label>Session spend cap (USD)
         <input type="number" id="capInput" min="0.5" step="0.5" value="5" />

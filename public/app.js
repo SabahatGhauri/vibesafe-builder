@@ -551,12 +551,70 @@ $("settingsBtn").addEventListener("click", () => {
 });
 $("settingsModal").addEventListener("close", () => {
   if ($("settingsModal").returnValue !== "save") return;
+  const previousKey = state.apiKey;
   state.apiKey = $("apiKeyInput").value.trim();
   state.cap = Math.max(0.5, parseFloat($("capInput").value) || 5);
   localStorage.setItem("vc_apiKey", state.apiKey);
   localStorage.setItem("vc_cap", String(state.cap));
   renderMeter();
   refreshEstimate();
+  // Saving still happens immediately - a key we cannot verify is better kept
+  // than silently discarded - but the user is told the outcome either way,
+  // rather than discovering it from a failed build later.
+  if (state.apiKey && state.apiKey !== previousKey) reportKeyCheck(state.apiKey);
+});
+
+/* Verifies a key against Anthropic and reports the result. Deliberately three
+   outcomes, not two: "could not check" (rate limit, outage, no network) must
+   never be shown as "your key is wrong", or the user goes and regenerates a key
+   that was working. */
+async function checkKey(key) {
+  const r = await fetch("/api/validate-key", { method: "POST", headers: { "x-anthropic-key": key } });
+  return r.json();
+}
+
+function paintKeyStatus(el, result, prefix) {
+  if (!el) return;
+  const cls = result.valid === true ? "ok" : result.valid === false ? "bad" : "unknown";
+  const icon = result.valid === true ? "✓" : result.valid === false ? "✗" : "⚠";
+  el.className = "key-status " + cls;
+  el.textContent = `${icon} ${prefix || ""}${result.message}`;
+}
+
+// After the dialog has closed there is no status line left to write to, so the
+// verdict goes to the chat - the one place the user is definitely looking.
+async function reportKeyCheck(key) {
+  try {
+    const result = await checkKey(key);
+    if (result.valid === true) addMsg("system", "✓ API key verified — you're ready to build.");
+    else if (result.valid === false) addMsg("system", "✗ " + esc(result.message) + " Open <b>Settings</b> to fix it.");
+    else addMsg("system", "⚠ " + esc(result.message));
+  } catch {
+    // Never let a failed check block anything; the key is already saved.
+  }
+}
+
+$("checkKeyBtn")?.addEventListener("click", async () => {
+  const el = $("keyStatus");
+  const key = $("apiKeyInput").value.trim();
+  const btn = $("checkKeyBtn");
+  if (!key) { el.className = "key-status bad"; el.textContent = "✗ Paste a key first."; return; }
+  btn.disabled = true;
+  el.className = "key-status checking";
+  el.textContent = "Checking with Anthropic…";
+  try {
+    paintKeyStatus(el, await checkKey(key));
+  } catch {
+    paintKeyStatus(el, { valid: null, message: "Couldn't reach the server to check the key." });
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// A stale verdict beside a freshly-edited key is worse than none.
+$("apiKeyInput")?.addEventListener("input", () => {
+  const el = $("keyStatus");
+  if (el) { el.textContent = ""; el.className = "key-status"; }
 });
 
 /* ---------------- tabs ---------------- */

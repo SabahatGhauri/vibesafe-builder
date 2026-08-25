@@ -626,3 +626,12 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .stat-text b.good { color: var(--ok); }
 .stat-text b.warn { color: var(--warn); }
 .stat-text b.bad { color: var(--danger); }
+
+/* API-key validation feedback. Three states, because "we couldn't check" is a
+   genuinely different answer from "your key is wrong" and must not look the same. */
+.key-check { display: flex; align-items: center; gap: 9px; margin-top: 7px; flex-wrap: wrap; }
+.key-status { font-size: 12px; line-height: 1.45; flex: 1; min-width: 180px; }
+.key-status.ok { color: var(--ok); }
+.key-status.bad { color: var(--danger); }
+.key-status.unknown { color: var(--warn); }
+.key-status.checking { color: var(--text-dim); }
