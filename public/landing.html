@@ -114,10 +114,27 @@
   }
   .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
   .kinetic h1 { font-size: clamp(32px, 4.2vw, 52px); line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; }
-  .kinetic .word { display: inline-block; opacity: 0; transform: translateY(24px) rotateX(-40deg); animation: rise 0.7s cubic-bezier(.2,.8,.2,1) forwards; transform-origin: bottom; }
+  .kinetic .word {
+    display: inline-block; opacity: 0; transform: translateY(24px) rotateX(-40deg); transform-origin: bottom;
+    animation-name: rise; animation-duration: 0.4s; animation-timing-function: cubic-bezier(.2,.8,.2,1); animation-fill-mode: forwards;
+  }
   @keyframes rise { to { opacity: 1; transform: translateY(0) rotateX(0); } }
-  .kinetic .grad { background: linear-gradient(100deg, var(--accent), var(--accent2), var(--accent)); background-size: 200% auto;
-    -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 5s linear infinite; }
+  /* Longhand animation-* properties, not the shorthand: .word and .grad have equal
+     selector specificity, and .grad comes later in source order, so a shorthand
+     "animation: sheen ..." here completely replaced .word's "animation: rise ...".
+     The rise reveal never ran on these words - they sat at opacity:0 permanently,
+     which is the real mechanism behind "H1 text cuts off mid-sentence": the entire
+     second, gradient-coloured line ("Without the credit burn.") was invisible in
+     every real browser, not just before an animation finished. Longhand properties
+     each cascade independently, so this declares both animations explicitly rather
+     than relying on one shorthand to carry both. */
+  .kinetic .grad {
+    background: linear-gradient(100deg, var(--accent), var(--accent2), var(--accent)); background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation-name: rise, sheen; animation-duration: 0.4s, 5s;
+    animation-timing-function: cubic-bezier(.2,.8,.2,1), linear; animation-fill-mode: forwards, none;
+    animation-iteration-count: 1, infinite;
+  }
   @keyframes sheen { to { background-position: 200% center; } }
   .hero p.sub { color: var(--dim); font-size: 17px; max-width: 520px; margin: 22px 0 0; }
   .hero .actions { margin-top: 30px; display: flex; gap: 14px; }
@@ -386,13 +403,13 @@
         <div class="kinetic">
           <h1>
             <span class="word" style="animation-delay:0.02s">Build</span>
-            <span class="word" style="animation-delay:0.08s">apps</span>
-            <span class="word" style="animation-delay:0.14s">by</span>
-            <span class="word" style="animation-delay:0.20s">chatting.</span><br/>
-            <span class="word grad" style="animation-delay:0.30s">Without</span>
-            <span class="word grad" style="animation-delay:0.36s">the</span>
-            <span class="word grad" style="animation-delay:0.42s">credit</span>
-            <span class="word grad" style="animation-delay:0.48s">burn.</span>
+            <span class="word" style="animation-delay:0.04s">apps</span>
+            <span class="word" style="animation-delay:0.06s">by</span>
+            <span class="word" style="animation-delay:0.08s">chatting.</span><br/>
+            <span class="word grad" style="animation-delay:0.10s">Without</span>
+            <span class="word grad" style="animation-delay:0.12s">the</span>
+            <span class="word grad" style="animation-delay:0.14s">credit</span>
+            <span class="word grad" style="animation-delay:0.16s">burn.</span>
           </h1>
         </div>
         <p class="sub">Other AI app builders bill you for their mistakes — failed generations, doom loops, silent rewrites of working code. VibeSafe Builder shows every cost before you spend, every change before you keep it, and scans every build before you share it.</p>
