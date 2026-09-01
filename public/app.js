@@ -199,10 +199,19 @@ const managed = {
     if (error) throw error;
   },
 
+  // Routed through our own /api/request-password-reset (Resend, branded, and
+  // verified working this session) rather than calling Supabase's
+  // resetPasswordForEmail() directly - that uses Supabase's own auth-email
+  // configuration, which nothing here has ever checked.
   async resetPassword(email) {
-    if (!this.sb) throw new Error("Sign-in isn't available right now.");
-    const { error } = await this.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/app" });
-    if (error) throw error;
+    const r = await fetch("/api/request-password-reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || "Couldn't send reset link.");
+    return data;
   },
 
   // Google/GitHub both go through Supabase's OAuth flow — this always redirects the
