@@ -14,7 +14,7 @@
 <meta property="og:image:height" content="630" />
 <meta name="twitter:image" content="https://vibesafebuilder.com/og-image.png" />
 <meta property="og:url" content="https://vibesafebuilder.com/" />
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="VibeSafe Builder — build apps by vibe, safely" />
 <meta name="twitter:description" content="VibeSafe Builder turns a chat into a working web app — cost estimate before every build, rollback on every change, security scan before you publish." />
 <link rel="canonical" href="https://vibesafebuilder.com/" />
@@ -46,6 +46,86 @@
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Web",
   "description": "VibeSafe Builder turns a chat into a working web app — cost estimate before every build, rollback on every change, security scan before you publish."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What happens if I go over the $10/month Managed budget?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Generation pauses until your next billing cycle — you're never silently charged more. Switch to your own API key in Settings to keep going immediately."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does a typical build actually cost on my own key?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most single-file app generations run $0.05–$0.20 depending on complexity, billed by Anthropic at their standard per-token rates. We add no markup on top."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I switch between Bring Your Own Key and Managed?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, any time in Settings — add a key or sign in to Managed, nothing about your project or version history changes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do failed generations ever cost me anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You're never charged extra — the $15/month Managed fee is flat, and BYOK failures never count toward your session's build-spend meter or cap. One nuance on Managed: a failed attempt still draws from your $10/mo included usage, since that's real Anthropic cost we absorb either way — it just never counts against your visible \"builds this month.\""
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a free way to try it first?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — all 15 templates are free and cost zero tokens on either plan, no API key or card needed to start there."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can it build more than one page?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — start a multi-file React project instead of a single page, and the AI works across a real, multi-file codebase: components, hooks, and styles in separate files, only the files that need a change get touched."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get my code onto GitHub?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, for multi-file projects — connect your GitHub account and push to a repository you own with one click, as a real commit. It's ordinary code the moment it lands there, not something specific to this builder."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I deploy to my own domain?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — connect a project-scoped Vercel token and deploy a multi-file project directly to your own Vercel account, your own domain, your own bill. It builds from real source, the same as if you'd pushed it yourself."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What stops an app going public with a leaked API key in it?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every generation is scanned for hardcoded credentials before you can publish. Deploying to your own Vercel account runs an additional Publish Security Check at the moment you make something public — a live credential blocks the change outright, with no way to override it."
+      }
+    }
+  ]
 }
 </script>
 <style>
