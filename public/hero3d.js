@@ -81,9 +81,9 @@ function buildGeometry() {
   // Brand palette (see :root in landing.html) cycled per facet, so the gem
   // reads as multi-color and jewel-like rather than one flat tint.
   const PALETTE = [
-    [0.208, 0.851, 0.604], // --accent  #35d99a
+    [0.545, 0.361, 0.965], // --accent  #8b5cf6
+    [0.427, 0.290, 0.925], // deep violet #6d4aec (matches the primary button gradient)
     [0.310, 0.765, 1.0], //   --accent2 #4fc3ff
-    [0.941, 0.722, 0.306], // --warn    #f0b84e
   ];
 
   // Non-indexed, one normal per face (flat shading = the faceted look) —
@@ -200,7 +200,7 @@ fn fs_main(input: VertexOut) -> @location(0) vec4<f32> {
 
   let ambient = vec3<f32>(0.05, 0.06, 0.065);
   var col = ambient * input.color + input.color * diffuse * 0.85 + vec3<f32>(1.0, 1.0, 1.0) * spec * 0.9;
-  col = col + vec3<f32>(0.55, 0.92, 0.82) * fresnel * 0.55; // teal rim glow, ties to --accent
+  col = col + vec3<f32>(0.55, 0.36, 0.97) * fresnel * 0.55; // violet rim glow, ties to --accent
   return vec4<f32>(col, 1.0);
 }
 `;
