@@ -31,7 +31,10 @@
     background: var(--bg-panel); color: var(--text); font-family: var(--mono); font-size: 13.5px; margin-bottom: 12px;
   }
   #gate input:focus { outline: none; border-color: var(--accent); }
-  #gate button, .refresh-btn {
+  /* #unlockBtn, not "#gate button": passwordToggle.js injects an eye button into the
+     gate, and an id-level rule for every button there out-ranked its own .pw-eye
+     styles, stretching it into a full-width bar that covered the key field. */
+  #unlockBtn, .refresh-btn {
     width: 100%; padding: 11px; border-radius: 10px; border: none; cursor: pointer;
     background: linear-gradient(135deg, var(--accent), #6d4aec); color: #fff; font-weight: 700; font-size: 14px;
   }
@@ -66,6 +69,45 @@
   .empty, .error-box { text-align: center; padding: 50px 20px; color: var(--dim); }
   .error-box { color: var(--danger); }
   .loading { text-align: center; padding: 50px 20px; color: var(--dim); font-size: 13px; }
+
+  /* ---------- sections ---------- */
+  :root { --series-byok: #2b9fe0; --series-managed: #8b5cf6; } /* validated pair, dark surface */
+  section.block { margin-bottom: 40px; }
+  section.block h2 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  section.block .block-sub { color: var(--dim); font-size: 12.5px; margin-bottom: 14px; }
+  .unavailable { padding: 16px 18px; color: var(--dim); font-size: 13px; }
+  .unavailable.err { color: var(--danger); }
+  .muted-row { color: var(--dim); font-size: 12px; margin-top: 10px; }
+  .muted-row code { font-family: var(--mono); font-size: 11.5px; }
+
+  .chart-card { padding: 18px 20px 14px; margin-bottom: 14px; }
+  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--dim); margin-bottom: 12px; }
+  .legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .bars { position: relative; display: flex; align-items: flex-end; gap: 3px; height: 140px;
+          border-bottom: 1px solid var(--line); }
+  .bar-col { flex: 1; height: 100%; display: flex; flex-direction: column-reverse; gap: 2px; cursor: default; }
+  .bar-col:hover { background: rgba(255,255,255,0.03); }
+  .seg { width: 100%; min-height: 0; }
+  .seg:last-child { border-radius: 4px 4px 0 0; }
+  .seg.byok { background: var(--series-byok); }
+  .seg.managed { background: var(--series-managed); }
+  .axis { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--dim2); margin-top: 6px; font-family: var(--mono); }
+  #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--bg-panel); border: 1px solid var(--glass-border);
+         border-radius: 8px; padding: 8px 10px; font-size: 12px; line-height: 1.5; white-space: nowrap; display: none; }
+  #tip b { font-family: var(--mono); }
+  details.table-view { margin-top: 10px; font-size: 12px; color: var(--dim); }
+  details.table-view summary { cursor: pointer; }
+  details.table-view table { min-width: 0; margin-top: 8px; font-size: 12px; }
+  details.table-view th, details.table-view td { padding: 6px 12px; }
+
+  .app-list { list-style: none; }
+  .app-list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .app-list li:last-child { border-bottom: none; }
+  .app-list a { color: var(--accent2); font-family: var(--mono); text-decoration: none; }
+  .app-list a:hover { text-decoration: underline; }
+  .app-list .when { color: var(--dim); font-size: 12px; }
+
+  @media (max-width: 760px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -81,12 +123,33 @@
 <div id="dashboard" class="wrap">
   <header class="top">
     <div>
-      <h1>Managed-plan users</h1>
+      <h1>Dashboard</h1>
       <div class="sub" id="periodLabel">—</div>
     </div>
     <button class="refresh-btn" id="refreshBtn">Refresh</button>
   </header>
 
+  <section class="block">
+    <h2>Activity · last 30 days</h2>
+    <div class="block-sub">Every build on the site, including free users on their own API key, who never create an account. Anonymous daily totals only.</div>
+    <div id="activityBody"><div class="loading">Loading…</div></div>
+  </section>
+
+  <section class="block">
+    <h2>Revenue · Stripe</h2>
+    <div class="block-sub">Live from Stripe, for the account this server's key belongs to.</div>
+    <div id="revenueBody"><div class="loading">Loading…</div></div>
+  </section>
+
+  <section class="block">
+    <h2>Published apps</h2>
+    <div class="block-sub">Apps customers have published to a shareable link.</div>
+    <div id="appsBody"><div class="loading">Loading…</div></div>
+  </section>
+
+  <section class="block">
+    <h2>Signed-up users</h2>
+    <div class="block-sub">Everyone who has created an account. Free users on their own key only appear here if they signed in.</div>
   <div class="summary-grid">
     <div class="stat glass">
       <div class="stat-label">Total signed-up users</div>
@@ -124,7 +187,9 @@
       </tbody>
     </table>
   </div>
+  </section>
 </div>
+<div id="tip" role="tooltip"></div>
 
 <script>
 (function () {
@@ -145,7 +210,132 @@
       " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
   }
 
+  function fmtCents(list) {
+    if (!list || !list.length) return "$0.00";
+    return list.map((m) => {
+      const amount = (m.cents / 100).toFixed(2);
+      return m.currency === "usd" ? "$" + amount : amount + " " + m.currency.toUpperCase();
+    }).join(" + ");
+  }
+  function fmtDay(day) {
+    return new Date(day + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" });
+  }
+  function tile(label, value, note) {
+    return '<div class="stat glass"><div class="stat-label">' + label + '</div><div class="stat-value">' + value +
+      "</div>" + (note ? '<div class="stat-note">' + note + "</div>" : "") + "</div>";
+  }
+  function unavailable(section) {
+    const msg = section.reason || ("Couldn't load: " + (section.error || "unknown error"));
+    return '<div class="unavailable glass' + (section.reason ? "" : " err") + '">' + escapeHtml(msg) + "</div>";
+  }
+
+  function renderActivity(a) {
+    const el = document.getElementById("activityBody");
+    if (!a || !a.available) { el.innerHTML = unavailable(a || {}); return; }
+    const t = a.totals;
+    const failures = t.byok.failures + t.managed.failures;
+    const max = Math.max(1, ...a.series.map((p) => p.byok + p.managed));
+    const cols = a.series.map((p, i) => {
+      const h = (n) => (n / max * 100).toFixed(2) + "%";
+      return '<div class="bar-col" data-i="' + i + '">' +
+        (p.byok ? '<div class="seg byok" style="height:' + h(p.byok) + '"></div>' : "") +
+        (p.managed ? '<div class="seg managed" style="height:' + h(p.managed) + '"></div>' : "") +
+        "</div>";
+    }).join("");
+    const tableRows = a.series.slice().reverse().filter((p) => p.byok + p.managed + p.failures)
+      .map((p) => "<tr><td>" + fmtDay(p.day) + "</td><td>" + p.byok + "</td><td>" + p.managed + "</td><td>" + p.failures + "</td></tr>").join("");
+    el.innerHTML =
+      '<div class="summary-grid">' +
+        tile("Free-key builds", t.byok.builds, "est. $" + t.byok.cost.toFixed(2) + " paid by users to Anthropic") +
+        tile("Managed builds", t.managed.builds, "$" + t.managed.cost.toFixed(2) + " on your key") +
+        tile("Failed builds", failures, "never counted against users") +
+        tile("Active days", a.activeDays + " / " + a.days) +
+      "</div>" +
+      '<div class="chart-card glass">' +
+        '<div class="legend"><span><span class="sw" style="background:var(--series-byok)"></span>Free (own key)</span>' +
+        '<span><span class="sw" style="background:var(--series-managed)"></span>Managed</span></div>' +
+        '<div class="bars" id="bars">' + cols + "</div>" +
+        '<div class="axis"><span>' + fmtDay(a.series[0].day) + "</span><span>" + fmtDay(a.series[a.series.length - 1].day) + "</span></div>" +
+        '<details class="table-view"><summary>View as table</summary>' +
+          (tableRows
+            ? "<table><thead><tr><th>Day</th><th>Free builds</th><th>Managed builds</th><th>Failed</th></tr></thead><tbody>" + tableRows + "</tbody></table>"
+            : '<div class="muted-row">No builds recorded in this window yet.</div>') +
+        "</details>" +
+      "</div>";
+
+    const tip = document.getElementById("tip");
+    const bars = document.getElementById("bars");
+    bars.addEventListener("mousemove", (e) => {
+      const col = e.target.closest(".bar-col");
+      if (!col) { tip.style.display = "none"; return; }
+      const p = a.series[+col.dataset.i];
+      tip.innerHTML = fmtDay(p.day) + "<br>Free: <b>" + p.byok + "</b> · Managed: <b>" + p.managed + "</b>" +
+        (p.failures ? "<br>Failed: <b>" + p.failures + "</b>" : "");
+      tip.style.display = "block";
+      const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+      tip.style.left = x + "px";
+      tip.style.top = (e.clientY - tip.offsetHeight - 10) + "px";
+    });
+    bars.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+    // The tip is position:fixed, so scrolling moves the page out from under it
+    // without firing mouseleave; without this it floats over unrelated sections.
+    window.addEventListener("scroll", () => { tip.style.display = "none"; }, { passive: true });
+  }
+
+  function renderRevenue(r) {
+    const el = document.getElementById("revenueBody");
+    if (!r || !r.available) { el.innerHTML = unavailable(r || {}); return; }
+    const acct = r.account
+      ? "Stripe account: <b>" + escapeHtml(r.account.name || "(unnamed)") + "</b> <code>" + escapeHtml(r.account.id) + "</code>"
+      : "Stripe account: couldn't be read with this key.";
+    el.innerHTML =
+      '<div class="summary-grid">' +
+        tile("Monthly recurring", fmtCents(r.mrr), "list price, before discounts") +
+        tile("Paying subscriptions", r.paying, r.pastDue ? r.pastDue + " past due" : (r.trialing ? r.trialing + " trialing" : "")) +
+        tile("Paid · last 30 days", fmtCents(r.paidLast30), "actual invoices collected") +
+        tile("Cancelled · last 30 days", r.canceledRecently) +
+      "</div>" +
+      '<div class="muted-row">' + acct + ". Other Stripe accounts you own are not included." +
+        (r.truncated ? " Showing the first 2,000 records only." : "") + "</div>";
+  }
+
+  function renderApps(p) {
+    const el = document.getElementById("appsBody");
+    if (!p || !p.available) { el.innerHTML = unavailable(p || {}); return; }
+    const list = p.recent.length
+      ? '<div class="table-wrap glass"><ul class="app-list">' + p.recent.map((a) =>
+          '<li><a href="/p/' + encodeURIComponent(a.id) + '" target="_blank" rel="noopener">/p/' + escapeHtml(a.id) +
+          '</a><span class="when">updated ' + fmtDate(a.updatedAt) + "</span></li>").join("") + "</ul></div>"
+      : '<div class="unavailable glass">No apps published yet.</div>';
+    el.innerHTML =
+      '<div class="summary-grid">' +
+        tile("Total published", p.total) +
+        tile("New · last 7 days", p.last7) +
+        tile("New · last 30 days", p.last30) +
+        tile("Shown below", p.recent.length, "most recently updated") +
+      "</div>" + list;
+  }
+
+  async function loadStats(key) {
+    for (const id of ["activityBody", "revenueBody", "appsBody"]) {
+      document.getElementById(id).innerHTML = '<div class="loading">Loading…</div>';
+    }
+    let body;
+    try {
+      const res = await fetch("/api/admin/stats", { headers: { "x-admin-key": key } });
+      if (res.status === 401) return; // loadData() handles the wrong-key path
+      body = await res.json().catch(() => ({}));
+      if (!res.ok) body = { activity: { error: body.error }, revenue: { error: body.error }, apps: { error: body.error } };
+    } catch (e) {
+      body = { activity: { error: e.message }, revenue: { error: e.message }, apps: { error: e.message } };
+    }
+    renderActivity(body.activity);
+    renderRevenue(body.revenue);
+    renderApps(body.apps);
+  }
+
   async function loadData(key) {
+    loadStats(key);
     rowsEl.innerHTML = '<tr><td colspan="6" class="loading">Loading…</td></tr>';
     let res;
     try {
@@ -180,7 +370,7 @@
 
   function renderRows(users, budget) {
     if (!users.length) {
-      rowsEl.innerHTML = '<tr><td colspan="6" class="empty">No managed-plan users yet.</td></tr>';
+      rowsEl.innerHTML = '<tr><td colspan="6" class="empty">No signed-up users yet.</td></tr>';
       return;
     }
     rowsEl.innerHTML = users.map((u) => {

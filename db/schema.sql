@@ -165,3 +165,42 @@ create table if not exists github_repo_links (
 );
 alter table github_repo_links enable row level security;
 -- No policies: service-role only.
+
+/* ======================== owner dashboard stats ======================== */
+
+-- Anonymous daily generation counts, one row per UTC day per plan mode. Holds no
+-- user id, IP, key or prompt. Incremented only through record_generation_stat(),
+-- which is atomic. Full definition and rationale: db/migrations/004_generation_stats.sql.
+create table if not exists generation_stats (
+  day        date not null,
+  mode       text not null check (mode in ('byok', 'managed')),
+  builds     integer not null default 0,
+  failures   integer not null default 0,
+  cost       numeric not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (day, mode)
+);
+alter table generation_stats enable row level security;
+-- No policies: service-role only.
+
+create or replace function record_generation_stat(p_mode text, p_cost numeric, p_succeeded boolean)
+returns void
+language sql
+set search_path = public
+as $$
+  insert into generation_stats (day, mode, builds, failures, cost)
+  values (
+    (now() at time zone 'utc')::date,
+    p_mode,
+    case when p_succeeded then 1 else 0 end,
+    case when p_succeeded then 0 else 1 end,
+    greatest(coalesce(p_cost, 0), 0)
+  )
+  on conflict (day, mode) do update set
+    builds     = generation_stats.builds + excluded.builds,
+    failures   = generation_stats.failures + excluded.failures,
+    cost       = generation_stats.cost + excluded.cost,
+    updated_at = now();
+$$;
+revoke execute on function record_generation_stat(text, numeric, boolean) from public, anon, authenticated;
+grant execute on function record_generation_stat(text, numeric, boolean) to service_role;
