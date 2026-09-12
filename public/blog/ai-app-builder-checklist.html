@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The AI App Pre-Launch Checklist: 25 Checks | VibeSafe Builder</title>
+<meta name="description" content="A tool-neutral checklist for building with AI: control what you spend, stop fix loops burning credits, and catch leaked keys before you publish." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="VibeSafe Builder" />
+<meta property="og:title" content="The Pre-Launch Checklist for AI-Built Apps: 25 Checks Before You Publish" />
+<meta property="og:description" content="A tool-neutral checklist for building with AI: control what you spend, stop fix loops burning credits, and catch leaked keys before you publish." />
+<meta property="og:image" content="https://vibesafebuilder.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:image" content="https://vibesafebuilder.com/og-image.png" />
+<meta property="og:url" content="https://vibesafebuilder.com/blog/ai-app-builder-checklist.html" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="The Pre-Launch Checklist for AI-Built Apps: 25 Checks Before You Publish" />
+<meta name="twitter:description" content="A tool-neutral checklist for building with AI: control what you spend, stop fix loops burning credits, and catch leaked keys before you publish." />
+<link rel="canonical" href="https://vibesafebuilder.com/blog/ai-app-builder-checklist.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The Pre-Launch Checklist for AI-Built Apps: 25 Checks Before You Publish",
+  "description": "A tool-neutral checklist for building with AI: control what you spend, stop fix loops burning credits, and catch leaked keys before you publish.",
+  "url": "https://vibesafebuilder.com/blog/ai-app-builder-checklist.html",
+  "datePublished": "2026-09-12",
+  "author": { "@type": "Organization", "name": "VibeSafe Builder" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "VibeSafe Builder",
+    "logo": { "@type": "ImageObject", "url": "https://vibesafebuilder.com/favicon.svg" }
+  },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://vibesafebuilder.com/blog/ai-app-builder-checklist.html" }
+}
+</script>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#8b5cf6"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/demo.html">Demo</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/blog.html" class="active">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Launch</div>
+    <h1>The Pre-Launch Checklist for AI-Built Apps: 25 Checks Before You Publish</h1>
+    <div class="post-meta">Published September 2026 · 8 min read</div>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <p>Building an app with AI has three expensive failure points, and they arrive in a predictable order: you spend more than you meant to, you lose a working version chasing a bug, and you publish something with a key or a database left open. None of them are exotic. They are the same three mistakes almost everyone makes on their first AI-built app, and all three are avoidable with a short list of checks.</p>
+      <p>What follows is that list, grouped by when it matters. It is deliberately tool-neutral — it applies whether you build with Lovable, Bolt, Replit, v0, Cursor, or <a href="/">VibeSafe Builder</a>. The full version lives in a <a href="https://github.com/SabahatGhauri/ai-app-builder-checklist" target="_blank" rel="noopener">free, MIT-licensed repo on GitHub</a> you can copy into your own project.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">01</span>Before you build: know what a generation costs</h2>
+      <p>Credits hide the thing you actually need to know: what this specific request will cost, and whether it produced anything. Seven checks before your first prompt:</p>
+      <ul>
+        <li><strong>You know the cost of one generation</strong> — either your tool estimates it before you send, or you have done the arithmetic once from its pricing page.</li>
+        <li><strong>You have set a hard limit</strong> — a cap in the tool, or a spend limit on your API key with the model provider. "I'll keep an eye on it" is not a limit.</li>
+        <li><strong>You know whether failed generations cost the same as good ones.</strong> On most credit systems they do, which is what makes fix loops so expensive.</li>
+        <li><strong>Your first prompt describes one app, not a platform.</strong> "A habit tracker with streaks and a weekly chart" builds. "An Airbnb for dog walkers" produces a demo that breaks.</li>
+        <li><strong>You started from a template if one fits</strong> — regenerating a standard layout from scratch spends money for no gain.</li>
+        <li><strong>You know where the app will live</strong> — can you download and host it anywhere, or does it only run on the builder's servers?</li>
+        <li><strong>You know where the data will live</strong> — the visitor's own browser, the platform's database, or yours. This decides what can leak later.</li>
+      </ul>
+      <p>For reference, a single-file app generation on your own Anthropic key runs roughly $0.05–$0.20. The expensive part is never one build. It is thirty builds you did not intend, which is the subject of the next section.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">02</span>While you build: progress, not loops</h2>
+      <p>The classic credit-burner is the fix loop — the AI fixes A, breaks B, then fixes B and reintroduces A. It happens because the model re-reads the code fresh each turn with no memory of why earlier choices were made, and because its own failed attempt sits in the conversation as a pattern to repeat. We wrote about the mechanism in detail in <a href="/blog/ai-doom-loop.html">the AI doom loop</a>.</p>
+      <ul>
+        <li><strong>Save a working version before every significant change.</strong> If your tool has version history, confirm it is on. If not, download a copy.</li>
+        <li><strong>Change one thing per prompt.</strong> Three requests in one message make it impossible to tell which broke what.</li>
+        <li><strong>Stop after two failed fixes on the same problem.</strong> Roll back and change approach instead of asking a third time.</li>
+        <li><strong>Roll back rather than re-prompt</strong> when a change makes things worse. Rolling back is free; asking the AI to undo its own change is another paid generation that often does not fully undo.</li>
+        <li><strong>Read what changed, not just whether it runs.</strong> Unexpected edits to parts you never mentioned are an early warning.</li>
+        <li><strong>Test at phone size.</strong> Most first versions are desktop-only by accident.</li>
+        <li><strong>Check your spend at the halfway point</strong> and rethink scope if you are past half the budget and less than half done.</li>
+      </ul>
+      <p>This is the reasoning behind two specific behaviours in VibeSafe Builder: failed generations are tracked separately and never counted against your build spend, and after two failed fix attempts on the same issue the next generation switches to re-diagnosing the root cause instead of retrying the same fix.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">03</span>Before you publish: the checks that prevent incidents</h2>
+      <p>This is the group people skip, and it is the group that produces the headlines. In January 2026 an AI-built social network shipped a database key in client-side JavaScript with no row-level security, and researchers pulled 1.5 million auth tokens out of it within three days. The full story is in <a href="/blog/ai-app-security-database-leaks.html">why AI-built apps leak databases</a>. Eleven checks:</p>
+      <ul>
+        <li><strong>No secret keys in the code.</strong> Search for <code>sk-</code>, <code>sk_live_</code>, <code>AKIA</code>, <code>service_role</code>, and long <code>eyJ…</code> tokens. Anything running in the browser is readable by every visitor.</li>
+        <li><strong>Publishable and secret keys are the right way round.</strong> A Stripe <code>pk_</code> and a Supabase anon key are designed to be public. A Stripe <code>sk_</code> and a Supabase service-role key must never be.</li>
+        <li><strong>Database access is restricted</strong> — Row Level Security on every Supabase table; Firebase rules that are not <code>allow read, write: if true</code>.</li>
+        <li><strong>You have asked "if someone found this URL, what could they see?"</strong> and then actually checked, logged out, in a private window.</li>
+        <li><strong>The app only talks to services you chose.</strong> Unexpected outbound requests are invisible in a normal demo.</li>
+        <li><strong>No <code>eval()</code> or code built from user input.</strong></li>
+        <li><strong>No passwords in browser storage.</strong> <code>localStorage</code> is readable by any script on the page.</li>
+        <li><strong>HTTPS with no certificate warnings</strong>, on both the plain domain and the www version.</li>
+        <li><strong>You have run it as a visitor would</strong>, not only in the builder's preview. Previews hide errors that appear once published.</li>
+        <li><strong>You have a copy you control</strong> — a downloaded file or a repo you have actually tested running elsewhere.</li>
+        <li><strong>You know what happens if the builder disappears or you stop paying.</strong> Write the answer down. The four separate kinds of lock-in are covered in <a href="/blog/ai-app-builder-lock-in.html">this post</a>.</li>
+      </ul>
+      <p>In VibeSafe Builder these run automatically: every generation is scanned server-side for hardcoded keys, <code>eval()</code>, and unexpected outbound requests, publishing is blocked outright on a critical finding, and Launch Check opens the finished app in a real browser to catch what a code scan alone would miss. Neither replaces a professional security review for anything handling real user data at scale — they catch the specific class of mistake that took that social network down.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">04</span>If you only do five things</h2>
+      <ol>
+        <li>Know the cost before you hit send, or set a hard budget yourself.</li>
+        <li>Save a working version before every big change.</li>
+        <li>Stop after two failed fixes and change approach.</li>
+        <li>Search your code for keys before publishing.</li>
+        <li>Ask what a stranger with the URL could see — then check.</li>
+      </ol>
+      <p>Those five prevent most of the money and most of the incidents. The remaining twenty are refinements.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">05</span>Take the checklist with you</h2>
+      <p>The complete 25-check list, a cost guide, and copy-paste prompts for the common failures — a fix loop, a leaked key, an open database, an app you cannot get out of the builder — are in the <a href="https://github.com/SabahatGhauri/ai-app-builder-checklist" target="_blank" rel="noopener">AI App Builder Checklist repo</a>. It is MIT licensed, so copy it into your own docs freely.</p>
+      <p>If you would rather the checks ran on their own, that is what VibeSafe Builder is: an AI app builder that shows the cost before every build, keeps every version reversible, and scans each build before you publish. You can <a href="/demo.html">try the demo without an account</a>, or <a href="/pricing.html">see the pricing</a> — there is no platform fee on your own API key.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">06</span>Related reading</h2>
+      <p class="post-sources">
+        <a href="/blog/where-your-ai-credits-go.html">Where your AI credits actually go</a><br>
+        <a href="/blog/ai-doom-loop.html">The AI doom loop, and what breaks it</a><br>
+        <a href="/blog/ai-app-security-database-leaks.html">Why your AI-built app might already be exposing its database</a><br>
+        <a href="/blog/ai-app-builder-lock-in.html">AI app builder lock-in: the four kinds</a>
+      </p>
+    </section>
+  </article>
+
+  <a class="back-to-blog" href="/blog.html">← Back to the blog</a>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+</body>
+</html>
