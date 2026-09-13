@@ -1,5 +1,31 @@
 {
   "functions": {
-    "server.js": { "maxDuration": 300 }
-  }
+    "server.js": {
+      "maxDuration": 300
+    }
+  },
+  "redirects": [
+    {
+      "source": "/((?!p/|api/backend|favicon\\.ico|__lc-blank|_vercel/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.vibesafebuilder.com"
+        }
+      ],
+      "destination": "https://vibesafebuilder.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/((?!api/|_vercel/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "vibesafe-builder.vercel.app"
+        }
+      ],
+      "destination": "https://vibesafebuilder.com/$1",
+      "permanent": true
+    }
+  ]
 }
