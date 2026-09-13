@@ -143,7 +143,7 @@
 
   <section class="block">
     <h2>Published apps</h2>
-    <div class="block-sub">Apps customers have published to a shareable link.</div>
+    <div class="block-sub">Apps customers have published to a shareable link. Automated test apps are excluded.</div>
     <div id="appsBody"><div class="loading">Loading…</div></div>
   </section>
 
@@ -312,7 +312,7 @@
         tile("Total published", p.total) +
         tile("New · last 7 days", p.last7) +
         tile("New · last 30 days", p.last30) +
-        tile("Shown below", p.recent.length, "most recently updated") +
+        tile("Test apps hidden", p.testAppsHidden || 0, "automated health checks, not customers") +
       "</div>" + list;
   }
 

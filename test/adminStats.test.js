@@ -9,6 +9,7 @@ const {
   computeRevenue,
   fetchRevenue,
   loadAdminStats,
+  fetchPublishedApps,
 } = require("../lib/adminStats");
 
 const NOW = new Date("2026-09-11T15:00:00Z");
@@ -184,4 +185,41 @@ test("one section failing never blanks the others", async () => {
   assert.equal(s.apps.available, false);
   assert.equal(s.revenue.available, true, "Stripe data still shows while the database is down");
   assert.equal(s.revenue.paying, 1);
+});
+
+/* ---------------- published apps ---------------- */
+
+// Records every filter applied, and answers counts as a real query would: test apps
+// match "like smoke%", customer apps match "not like smoke%".
+function appsClient(ids) {
+  const calls = [];
+  return {
+    calls,
+    from: () => {
+      const f = { like: null, notLike: null, head: false };
+      const q = {
+        select: (_cols, opts) => { f.head = !!(opts && opts.head); return q; },
+        like: (col, pat) => { calls.push(["like", col, pat]); f.like = pat; return q; },
+        not: (col, op, pat) => { calls.push(["not", col, op, pat]); f.notLike = pat; return q; },
+        gte: () => q,
+        order: () => q,
+        limit: () => q,
+        then: (resolve) => {
+          const isTest = (id) => id.startsWith("smoke");
+          const rows = ids.filter((id) => (f.like ? isTest(id) : f.notLike ? !isTest(id) : true));
+          resolve(f.head ? { count: rows.length, error: null } : { data: rows.map((id) => ({ id })), error: null });
+        },
+      };
+      return q;
+    },
+  };
+}
+
+test("automated smoke-test apps are excluded from customer figures and counted separately", async () => {
+  const client = appsClient(["smoke4t7rs4", "smokezlcvi4", "smokedzaslc", "pviLpCqhYl", "realApp002"]);
+  const r = await fetchPublishedApps(client, { now: NOW });
+  assert.equal(r.total, 2, "only the two real customer apps");
+  assert.equal(r.testAppsHidden, 3);
+  assert.deepEqual(r.recent.map((a) => a.id), ["pviLpCqhYl", "realApp002"]);
+  assert.ok(client.calls.some((c) => c[0] === "not" && c[3] === "smoke%"), "customer queries use NOT LIKE smoke%");
 });
