@@ -25,6 +25,22 @@ const state = {
 const $ = (id) => document.getElementById(id);
 const messagesEl = $("messages");
 
+// The first-run message depends on plan status, which only arrives after sign-in
+// is checked - so it is shown from there, once, and only on an empty project.
+let firstRunNoticeShown = false;
+function showFirstRunNotice(kind, starter) {
+  if (firstRunNoticeShown || state.versions.length) return;
+  firstRunNoticeShown = true;
+  if (kind === "trial") {
+    addMsg(
+      "system",
+      `🎁 <b>Your first build is free.</b> Free trial builds use a lighter AI model (${esc(starter.model)}), so the result will be less polished than builds on Pro or with your own API key, which use our most capable model (${esc(starter.paidModel)}). Describe your app below to try it.`
+    );
+  } else {
+    addMsg("system", `🔑 First run: add your Anthropic API key in <b>Settings</b> (top right). It stays in this browser and is only used to call the Claude API from your own machine.`);
+  }
+}
+
 /* ---------------- managed plan (Supabase magic-link sign-in) ---------------- */
 const managed = {
   sb: null,
@@ -34,7 +50,7 @@ const managed = {
   async init() {
     try {
       const cfg = await (await fetch("/api/config")).json();
-      if (!cfg.managedPlanAvailable) return;
+      if (!cfg.managedPlanAvailable) { if (!state.apiKey) showFirstRunNotice("key"); return; }
       this.budget = cfg.managedBudget || 10;
       this.sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
       const { data } = await this.sb.auth.getSession();
@@ -118,7 +134,8 @@ const managed = {
       const r = await fetch("/api/managed/status", { headers: { "x-vc-session": token } });
       const status = await r.json();
       if (!status.signedIn) return;
-      const label = status.plan === "pro" ? "Pro" : "Free";
+      const trial = status.plan !== "pro" && status.starter && status.starter.available ? status.starter : null;
+      const label = status.plan === "pro" ? "Pro" : trial ? "Free trial" : "Free";
       const who = status.name || status.email;
       if (badge) {
         badge.hidden = false;
@@ -128,8 +145,13 @@ const managed = {
       if (settingsLine) {
         settingsLine.textContent = status.plan === "pro"
           ? `✓ Pro — active (${fmt$(status.spent)} of ${fmt$(status.budget)} used this month)`
-          : "⚠ Free — no active subscription. Upgrade to Pro to build without your own API key.";
+          : trial
+            ? `🎁 Free trial — ${trial.buildsLeft} free build left. It uses a lighter model (${trial.model}), so results are less polished than Pro or your own API key (${trial.paidModel}).`
+            : status.starter && status.starter.reason === "used"
+              ? `⚠ Free — your free trial build is used. Add your own API key or upgrade to Pro to keep building with ${status.starter.paidModel}.`
+              : "⚠ Free — no active subscription. Upgrade to Pro to build without your own API key.";
       }
+      if (status.plan !== "pro" && !state.apiKey) showFirstRunNotice(trial ? "trial" : "key", trial);
       // Upgrade CTAs are only meaningful on Free; showing them to a paying
       // customer would be worse than useless.
       const onFree = status.plan !== "pro";
@@ -698,7 +720,10 @@ async function refreshEstimate() {
     if (!r.ok) throw new Error((await r.json()).error || r.status);
     const est = await r.json();
     lastEstimate = est;
-    if (est.mode === "managed") {
+    if (est.mode === "starter") {
+      estEl.textContent = `free trial build · lighter model (${est.starter.model}) · less polished than Pro`;
+      estEl.classList.remove("blocked");
+    } else if (est.mode === "managed") {
       // Managed plan: show builds used, not raw dollars — that's a flat-fee
       // subscription, not a pass-through bill like BYOK.
       const remaining = Math.max(0, est.budget - est.spent);
@@ -815,6 +840,12 @@ $("composer").addEventListener("submit", async (e) => {
     });
     if (!r.ok && !r.headers.get("content-type")?.includes("event-stream")) {
       const errBody = await r.json();
+      if (errBody.reason && errBody.reason.startsWith("starter_")) {
+        workingMsg.remove();
+        addMsg("system", `🎁 ${esc(errBody.error)}`);
+        managed.refreshPlanStatus();
+        return;
+      }
       if (errBody.capReached) {
         // Managed-plan cap: this is a pause, not a failure — say so plainly, no bill-shock framing.
         workingMsg.remove();
@@ -876,6 +907,13 @@ $("composer").addEventListener("submit", async (e) => {
       `<span class="cost-line">v${version.id} · ${fmt$(version.cost)} · ${result.usage.output_tokens.toLocaleString()} tokens out</span>`;
 
     await renderAll();
+    if (result.mode === "starter") {
+      addMsg(
+        "system",
+        "🎁 That was your free trial build, made with a lighter AI model (Claude Sonnet 5). For more polished results, add your own Anthropic API key in <b>Settings</b> or upgrade to Pro — both use our most capable model, Claude Opus 5."
+      );
+      managed.refreshPlanStatus();
+    }
   } catch (err) {
     workingMsg.className = "msg assistant failed";
     workingMsg.innerHTML = "⚠ " + esc(err.message) + `<span class="cost-line">no charge counted for failed request</span>`;
@@ -1715,6 +1753,6 @@ renderMeter();
 if (restored) {
   renderAll();
   addMsg("system", `📂 Project restored — v${state.versions[state.currentVersion].id} of ${state.versions.length} version${state.versions.length > 1 ? "s" : ""}, ${fmt$(state.spend)} spent. Pick up where you left off.`);
-} else if (!state.apiKey) {
-  addMsg("system", `🔑 First run: add your Anthropic API key in <b>Settings</b> (top right). It stays in this browser and is only used to call the Claude API from your own machine.`);
 }
+// No-restore first-run notice: shown by showFirstRunNotice() once plan status is known,
+// so a new free account is told about its free build instead of being asked for a key.
