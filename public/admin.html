@@ -136,6 +136,12 @@
   </section>
 
   <section class="block">
+    <h2>Free trial · this month</h2>
+    <div class="block-sub">Free builds on your Anthropic key, using the lighter model. Pauses automatically at the monthly cap.</div>
+    <div id="starterBody"><div class="loading">Loading…</div></div>
+  </section>
+
+  <section class="block">
     <h2>Revenue · Stripe</h2>
     <div class="block-sub">Live from Stripe, for the account this server's key belongs to.</div>
     <div id="revenueBody"><div class="loading">Loading…</div></div>
@@ -316,8 +322,22 @@
       "</div>" + list;
   }
 
+  function renderStarter(t) {
+    const el = document.getElementById("starterBody");
+    if (!t || !t.available) { el.innerHTML = unavailable(t || {}); return; }
+    const capText = t.monthlyCap ? "of $" + Number(t.monthlyCap).toFixed(2) + " cap" : "trial is switched off";
+    const pct = t.monthlyCap ? Math.min(100, Math.round((t.spent / t.monthlyCap) * 100)) : 0;
+    el.innerHTML =
+      '<div class="summary-grid">' +
+        tile("Spent", "$" + t.spent.toFixed(2), capText) +
+        tile("Cap used", t.monthlyCap ? pct + "%" : "—", pct >= 100 ? "paused until next month" : "") +
+        tile("Free builds", t.builds, "successful builds") +
+        tile("Accounts", t.accounts, "tried the free build") +
+      "</div>";
+  }
+
   async function loadStats(key) {
-    for (const id of ["activityBody", "revenueBody", "appsBody"]) {
+    for (const id of ["activityBody", "revenueBody", "appsBody", "starterBody"]) {
       document.getElementById(id).innerHTML = '<div class="loading">Loading…</div>';
     }
     let body;
@@ -325,10 +345,11 @@
       const res = await fetch("/api/admin/stats", { headers: { "x-admin-key": key } });
       if (res.status === 401) return; // loadData() handles the wrong-key path
       body = await res.json().catch(() => ({}));
-      if (!res.ok) body = { activity: { error: body.error }, revenue: { error: body.error }, apps: { error: body.error } };
+      if (!res.ok) body = { activity: { error: body.error }, revenue: { error: body.error }, apps: { error: body.error }, starter: { error: body.error } };
     } catch (e) {
-      body = { activity: { error: e.message }, revenue: { error: e.message }, apps: { error: e.message } };
+      body = { activity: { error: e.message }, revenue: { error: e.message }, apps: { error: e.message }, starter: { error: e.message } };
     }
+    renderStarter(body.starter);
     renderActivity(body.activity);
     renderRevenue(body.revenue);
     renderApps(body.apps);

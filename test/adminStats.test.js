@@ -10,6 +10,7 @@ const {
   fetchRevenue,
   loadAdminStats,
   fetchPublishedApps,
+  fetchStarter,
 } = require("../lib/adminStats");
 
 const NOW = new Date("2026-09-11T15:00:00Z");
@@ -222,4 +223,32 @@ test("automated smoke-test apps are excluded from customer figures and counted s
   assert.equal(r.testAppsHidden, 3);
   assert.deepEqual(r.recent.map((a) => a.id), ["pviLpCqhYl", "realApp002"]);
   assert.ok(client.calls.some((c) => c[0] === "not" && c[3] === "smoke%"), "customer queries use NOT LIKE smoke%");
+});
+
+/* ---------------- free trial ---------------- */
+
+test("free trial figures sum this month's trial rows only", async () => {
+  let asked = null;
+  const client = {
+    from: () => {
+      const q = {
+        select: () => q,
+        eq: (col, val) => { asked = [col, val]; return q; },
+        then: (resolve) => resolve({
+          data: [
+            { dollars_spent: "0.04", build_count: 1 },
+            { dollars_spent: 0.02, build_count: 0 },
+          ],
+          error: null,
+        }),
+      };
+      return q;
+    },
+  };
+  const t = await fetchStarter(client, { now: NOW, monthlyCap: 2 });
+  assert.deepEqual(asked, ["period", "starter-2026-09"]);
+  assert.equal(t.accounts, 2);
+  assert.equal(t.builds, 1);
+  assert.equal(Number(t.spent.toFixed(2)), 0.06);
+  assert.equal(t.monthlyCap, 2);
 });
