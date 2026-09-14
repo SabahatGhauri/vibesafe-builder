@@ -26,6 +26,121 @@
       ],
       "destination": "https://vibesafebuilder.com/$1",
       "permanent": true
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/about-us",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/team",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/company",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/leadership",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/people",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/staff",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/imprint",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/impressum",
+      "destination": "/about.html",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/legal.html#contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact/",
+      "destination": "/legal.html#contact",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/legal.html#contact",
+      "permanent": true
+    },
+    {
+      "source": "/contacts",
+      "destination": "/legal.html#contact",
+      "permanent": true
+    },
+    {
+      "source": "/privacy",
+      "destination": "/legal.html",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/legal.html",
+      "permanent": true
+    },
+    {
+      "source": "/terms",
+      "destination": "/legal.html#terms",
+      "permanent": true
+    },
+    {
+      "source": "/support",
+      "destination": "/user-guide.html",
+      "permanent": true
+    },
+    {
+      "source": "/help",
+      "destination": "/user-guide.html",
+      "permanent": true
+    },
+    {
+      "source": "/pricing",
+      "destination": "/pricing.html",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html",
+      "permanent": true
+    },
+    {
+      "source": "/demo",
+      "destination": "/demo.html",
+      "permanent": true
+    },
+    {
+      "source": "/security",
+      "destination": "/security.html",
+      "permanent": true
+    },
+    {
+      "source": "/security.txt",
+      "destination": "/.well-known/security.txt",
+      "permanent": true
     }
   ]
 }
