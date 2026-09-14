@@ -1,0 +1,6 @@
+# Security contact for VibeSafe Builder (vibesafebuilder.com). Format: RFC 9116.
+Contact: mailto:security@vibesafebuilder.com
+Expires: 2027-09-14T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://vibesafebuilder.com/.well-known/security.txt
+Policy: https://vibesafebuilder.com/security.html
