@@ -57,6 +57,13 @@
   .tpl-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin-bottom: 44px; }
   .tpl { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; scroll-margin-top: 90px; }
   .tpl:target { border-color: rgba(139,92,246,0.6); box-shadow: 0 0 0 1px rgba(139,92,246,0.25); }
+  .tpl-shot { position: relative; display: block; width: calc(100% + 44px); margin: -22px -22px 18px; padding: 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 16px 16px 0 0; overflow: hidden; background: #0a0d11; cursor: zoom-in; aspect-ratio: 8 / 5; max-width: none; }
+  .tpl-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.35s ease; }
+  .tpl-shot:hover img, .tpl-shot:focus-visible img { transform: scale(1.03); }
+  .tpl-shot:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .tpl-shot-label { position: absolute; right: 10px; bottom: 10px; padding: 5px 10px; border-radius: 100px; font-size: 11.5px; font-weight: 600; color: #fff; background: rgba(10,13,17,0.78); border: 1px solid rgba(255,255,255,0.14); opacity: 0; transform: translateY(4px); transition: opacity 0.2s, transform 0.2s; }
+  .tpl-shot:hover .tpl-shot-label, .tpl-shot:focus-visible .tpl-shot-label { opacity: 1; transform: none; }
+  @media (hover: none) { .tpl-shot-label { opacity: 1; transform: none; } }
   .tpl-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
   .tpl-icon { font-size: 26px; line-height: 1; }
   .tpl h2 { font-size: 17px; margin: 0; }
@@ -92,14 +99,19 @@
     <div class="nav-links">
       <a href="/demo.html">Demo</a>
       <a href="/how-it-works.html">How it works</a>
-      <a href="/user-guide.html">User guide</a>
-      <a href="/security.html">Security</a>
-      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/templates.html" class="active" aria-current="page">Templates</a>
       <a href="/pricing.html">Pricing</a>
-      <a href="/templates.html" class="active">Templates</a>
       <a href="/blog.html">Blog</a>
-      <a href="/about.html">About</a>
-      <a href="/legal.html">Legal</a>
+      <details class="nav-more">
+        <summary>More</summary>
+        <div class="nav-more-menu">
+          <a href="/user-guide.html">User guide</a>
+          <a href="/security.html">Security</a>
+          <a href="/deploy-guide.html">Deploy</a>
+          <a href="/about.html">About</a>
+          <a href="/legal.html">Legal</a>
+        </div>
+      </details>
     </div>
     <a class="btn primary cta" href="/app">Open the builder</a>
   </div>
@@ -110,7 +122,7 @@
 
   <div class="tpl-hero">
     <h1>15 free app templates. Zero tokens to start.</h1>
-    <p>Every template is a complete, working web app, not a mockup. Preview it here, open it in VibeSafe Builder in one click, then change anything by describing what you want. Opening a template costs nothing; only the AI changes you ask for use your build budget.</p>
+    <p>Every template is a complete, working web app, not a mockup. The screenshots show each one with sample data. Preview it here, open it in VibeSafe Builder in one click, then change anything by describing what you want. Opening a template costs nothing; only the AI changes you ask for use your build budget.</p>
   </div>
 
   <div class="tpl-steps">
@@ -122,6 +134,7 @@
   <div class="tpl-list">
 
     <article class="tpl" id="habit-tracker">
+      <button type="button" class="tpl-shot" data-preview="habit-tracker" aria-label="Open a live preview of the Habit Tracker template"><img src="/img/templates/habit-tracker.webp" alt="Habit Tracker template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🔥</span><h2>Habit Tracker</h2></div>
       <p class="tpl-desc">Build daily habits and keep your streaks going.</p>
       <ul>
@@ -134,6 +147,7 @@
     </article>
 
     <article class="tpl" id="invoice-generator">
+      <button type="button" class="tpl-shot" data-preview="invoice-generator" aria-label="Open a live preview of the Invoice Generator template"><img src="/img/templates/invoice-generator.webp" alt="Invoice Generator template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🧾</span><h2>Invoice Generator</h2></div>
       <p class="tpl-desc">Create a clean invoice and print it or save it as a PDF.</p>
       <ul>
@@ -146,6 +160,7 @@
     </article>
 
     <article class="tpl" id="flashcards">
+      <button type="button" class="tpl-shot" data-preview="flashcards" aria-label="Open a live preview of the Flashcards template"><img src="/img/templates/flashcards.webp" alt="Flashcards template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🗂️</span><h2>Flashcards</h2></div>
       <p class="tpl-desc">Study any subject with self-graded flashcards.</p>
       <ul>
@@ -158,6 +173,7 @@
     </article>
 
     <article class="tpl" id="quiz-maker">
+      <button type="button" class="tpl-shot" data-preview="quiz-maker" aria-label="Open a live preview of the Quiz Maker template"><img src="/img/templates/quiz-maker.webp" alt="Quiz Maker template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">❓</span><h2>Quiz Maker</h2></div>
       <p class="tpl-desc">A multiple-choice quiz with instant feedback and a final score.</p>
       <ul>
@@ -170,6 +186,7 @@
     </article>
 
     <article class="tpl" id="landing-page">
+      <button type="button" class="tpl-shot" data-preview="landing-page" aria-label="Open a live preview of the Landing Page template"><img src="/img/templates/landing-page.webp" alt="Landing Page template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🚀</span><h2>Landing Page</h2></div>
       <p class="tpl-desc">A one-page site for a product or service.</p>
       <ul>
@@ -182,6 +199,7 @@
     </article>
 
     <article class="tpl" id="booking-form">
+      <button type="button" class="tpl-shot" data-preview="booking-form" aria-label="Open a live preview of the Booking Form template"><img src="/img/templates/booking-form.webp" alt="Booking Form template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">📅</span><h2>Booking Form</h2></div>
       <p class="tpl-desc">Let people request an appointment.</p>
       <ul>
@@ -194,6 +212,7 @@
     </article>
 
     <article class="tpl" id="focus-timer">
+      <button type="button" class="tpl-shot" data-preview="focus-timer" aria-label="Open a live preview of the Focus Timer template"><img src="/img/templates/focus-timer.webp" alt="Focus Timer template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">⏱️</span><h2>Focus Timer</h2></div>
       <p class="tpl-desc">A Pomodoro-style timer for focused work sessions.</p>
       <ul>
@@ -206,6 +225,7 @@
     </article>
 
     <article class="tpl" id="expense-tracker">
+      <button type="button" class="tpl-shot" data-preview="expense-tracker" aria-label="Open a live preview of the Expense Tracker template"><img src="/img/templates/expense-tracker.webp" alt="Expense Tracker template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">💰</span><h2>Expense Tracker</h2></div>
       <p class="tpl-desc">Log spending and see where your money goes.</p>
       <ul>
@@ -218,6 +238,7 @@
     </article>
 
     <article class="tpl" id="recipe-box">
+      <button type="button" class="tpl-shot" data-preview="recipe-box" aria-label="Open a live preview of the Recipe Box template"><img src="/img/templates/recipe-box.webp" alt="Recipe Box template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🍳</span><h2>Recipe Box</h2></div>
       <p class="tpl-desc">Keep your recipes in one place.</p>
       <ul>
@@ -230,6 +251,7 @@
     </article>
 
     <article class="tpl" id="todo-list">
+      <button type="button" class="tpl-shot" data-preview="todo-list" aria-label="Open a live preview of the To-Do List template"><img src="/img/templates/todo-list.webp" alt="To-Do List template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">✅</span><h2>To-Do List</h2></div>
       <p class="tpl-desc">Tasks with priorities and due dates.</p>
       <ul>
@@ -242,6 +264,7 @@
     </article>
 
     <article class="tpl" id="password-generator">
+      <button type="button" class="tpl-shot" data-preview="password-generator" aria-label="Open a live preview of the Password Generator template"><img src="/img/templates/password-generator.webp" alt="Password Generator template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🔐</span><h2>Password Generator</h2></div>
       <p class="tpl-desc">Strong random passwords, copied in one click.</p>
       <ul>
@@ -254,6 +277,7 @@
     </article>
 
     <article class="tpl" id="unit-converter">
+      <button type="button" class="tpl-shot" data-preview="unit-converter" aria-label="Open a live preview of the Unit Converter template"><img src="/img/templates/unit-converter.webp" alt="Unit Converter template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">📐</span><h2>Unit Converter</h2></div>
       <p class="tpl-desc">Convert length, weight and temperature instantly.</p>
       <ul>
@@ -266,6 +290,7 @@
     </article>
 
     <article class="tpl" id="countdown-timer">
+      <button type="button" class="tpl-shot" data-preview="countdown-timer" aria-label="Open a live preview of the Countdown Timer template"><img src="/img/templates/countdown-timer.webp" alt="Countdown Timer template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">🎉</span><h2>Countdown Timer</h2></div>
       <p class="tpl-desc">Count down to any date or event.</p>
       <ul>
@@ -278,6 +303,7 @@
     </article>
 
     <article class="tpl" id="budget-planner">
+      <button type="button" class="tpl-shot" data-preview="budget-planner" aria-label="Open a live preview of the Budget Planner template"><img src="/img/templates/budget-planner.webp" alt="Budget Planner template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">📊</span><h2>Budget Planner</h2></div>
       <p class="tpl-desc">Plan monthly income against expenses.</p>
       <ul>
@@ -290,6 +316,7 @@
     </article>
 
     <article class="tpl" id="contact-book">
+      <button type="button" class="tpl-shot" data-preview="contact-book" aria-label="Open a live preview of the Contact Book template"><img src="/img/templates/contact-book.webp" alt="Contact Book template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-shot-label">Live preview</span></button>
       <div class="tpl-head"><span class="tpl-icon" aria-hidden="true">📇</span><h2>Contact Book</h2></div>
       <p class="tpl-desc">Names, numbers and notes for the people you deal with.</p>
       <ul>
@@ -395,9 +422,11 @@
     var btn = e.target.closest("[data-preview]");
     if (!btn) return;
     var id = btn.getAttribute("data-preview");
+    // Image thumbnails keep their picture; only text buttons show "Loading…".
+    var isText = !btn.classList.contains("tpl-shot");
     var label = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Loading…";
+    if (isText) btn.textContent = "Loading…";
     loadTemplates().then(function () {
       var t = (window.TEMPLATES || []).filter(function (x) { return x.id === id; })[0];
       if (!t) throw new Error("Template not found");
@@ -409,7 +438,7 @@
       alert(err.message);
     }).then(function () {
       btn.disabled = false;
-      btn.textContent = label;
+      if (isText) btn.textContent = label;
     });
   });
 
@@ -425,5 +454,6 @@
   window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
+<script src="/nav.js" defer></script>
 </body>
 </html>

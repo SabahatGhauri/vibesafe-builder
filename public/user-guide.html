@@ -32,14 +32,19 @@
     <div class="nav-links">
       <a href="/demo.html">Demo</a>
       <a href="/how-it-works.html">How it works</a>
-      <a href="/user-guide.html" class="active">User guide</a>
-      <a href="/security.html">Security</a>
-      <a href="/deploy-guide.html">Deploy</a>
-      <a href="/pricing.html">Pricing</a>
       <a href="/templates.html">Templates</a>
+      <a href="/pricing.html">Pricing</a>
       <a href="/blog.html">Blog</a>
-      <a href="/about.html">About</a>
-      <a href="/legal.html">Legal</a>
+      <details class="nav-more">
+        <summary class="active">More</summary>
+        <div class="nav-more-menu">
+          <a href="/user-guide.html" class="active" aria-current="page">User guide</a>
+          <a href="/security.html">Security</a>
+          <a href="/deploy-guide.html">Deploy</a>
+          <a href="/about.html">About</a>
+          <a href="/legal.html">Legal</a>
+        </div>
+      </details>
     </div>
     <a class="btn primary cta" href="/app">Open the builder</a>
   </div>
@@ -262,5 +267,6 @@
   window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
+<script src="/nav.js" defer></script>
 </body>
 </html>
