@@ -218,10 +218,22 @@
   .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; letter-spacing: 0.2px; }
   .logo .mark { width: 22px; height: 22px; display: inline-block; }
   .logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 22px; font-size: 13.5px; }
   .nav-links a { color: var(--dim); text-decoration: none; transition: color 0.2s; }
   .nav-links a:hover { color: var(--text); }
-  nav .cta { margin-left: auto; }
+  /* Top nav: main links, a "More" dropdown, and a normal-sized button that never wraps. */
+  .nav-links { display: flex; align-items: center; gap: 22px; font-size: 13.5px; flex-wrap: nowrap; }
+  .nav-links a { white-space: nowrap; }
+  nav .cta { margin-left: auto; padding: 8px 16px; font-size: 13.5px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  .nav-more { position: relative; }
+  .nav-more summary { list-style: none; cursor: pointer; color: var(--dim); white-space: nowrap; transition: color 0.2s; user-select: none; }
+  .nav-more summary::-webkit-details-marker { display: none; }
+  .nav-more summary::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform 0.2s; }
+  .nav-more[open] summary::after { transform: translateY(0) rotate(-135deg); }
+  .nav-more summary:hover, .nav-more[open] summary, .nav-more summary.active { color: var(--text); }
+  .nav-more summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+  .nav-more-menu { position: absolute; top: calc(100% + 14px); right: -12px; min-width: 170px; display: flex; flex-direction: column; padding: 6px; border-radius: 12px; background: #141a21; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 18px 40px -12px rgba(0,0,0,0.6); z-index: 60; }
+  .nav-more-menu a { padding: 9px 12px; border-radius: 8px; color: var(--dim); }
+  .nav-more-menu a:hover, .nav-more-menu a.active { color: var(--text); background: rgba(255,255,255,0.06); }
 
   .btn {
     display: inline-block; padding: 12px 24px; border-radius: 11px; font-size: 14.5px; font-weight: 600;
@@ -315,16 +327,25 @@
   .b-narrow { grid-column: span 2; }
   .b-half { grid-column: span 3; }
   @media (max-width: 760px) { .bcard, .b-wide, .b-narrow, .b-half { grid-column: span 6; } .hero { grid-template-columns: 1fr; } .hero-3d { height: 260px; } }
-  @media (max-width: 640px) { .nav-links { display: none; } }
+  @media (max-width: 900px) {
+    nav.topnav { padding: 10px 12px; }
+    nav.topnav .inner { flex-wrap: wrap; gap: 10px 12px; padding: 10px 14px; }
+    nav.topnav .logo { order: 1; }
+    nav.topnav .cta { order: 2; padding: 7px 13px; font-size: 13px; }
+    nav.topnav .nav-links { order: 3; width: 100%; flex-wrap: wrap; gap: 8px 18px; }
+    nav.topnav .nav-more-menu { left: -6px; right: auto; }
+  }
 
   /* ---------- templates grid ---------- */
-  .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .tpl-card .tpl-thumb { display: block; width: calc(100% + 2 * var(--tpl-pad, 14px)); max-width: none; height: auto; aspect-ratio: 8 / 5; object-fit: cover; object-position: top; margin: calc(-1 * var(--tpl-pad, 14px)) calc(-1 * var(--tpl-pad, 14px)) 10px; border-bottom: 1px solid var(--glass-border); background: #0a0d11; }
   .tpl-card {
+    --tpl-pad: 16px; overflow: hidden;
     display: flex; flex-direction: column; gap: 4px; border-radius: 14px; padding: 16px;
     text-decoration: none; color: var(--text); transition: transform 0.25s cubic-bezier(.2,.8,.2,1), border-color 0.25s;
   }
   .tpl-card:hover { transform: translateY(-3px); border-color: rgba(139,92,246,0.4); }
-  .tpl-card .tpl-ic { font-size: 22px; }
+  .tpl-card .tpl-ic { display: none; } /* the screenshot replaces the emoji */
   .tpl-card .tpl-name { font-weight: 700; font-size: 13.5px; margin-top: 4px; }
   .tpl-card .tpl-desc { color: var(--dim); font-size: 11.5px; }
 
@@ -518,14 +539,19 @@
       <div class="nav-links">
         <a href="/demo.html">Demo</a>
         <a href="/how-it-works.html">How it works</a>
-        <a href="/user-guide.html">User guide</a>
-        <a href="/security.html">Security</a>
-        <a href="/deploy-guide.html">Deploy</a>
-        <a href="/pricing.html">Pricing</a>
         <a href="/templates.html">Templates</a>
+        <a href="/pricing.html">Pricing</a>
         <a href="/blog.html">Blog</a>
-        <a href="/about.html">About</a>
-        <a href="/legal.html">Legal</a>
+        <details class="nav-more">
+          <summary>More</summary>
+          <div class="nav-more-menu">
+            <a href="/user-guide.html">User guide</a>
+            <a href="/security.html">Security</a>
+            <a href="/deploy-guide.html">Deploy</a>
+            <a href="/about.html">About</a>
+            <a href="/legal.html">Legal</a>
+          </div>
+        </details>
       </div>
       <a class="btn primary cta" href="/app">Open the builder</a>
     </div>
@@ -706,21 +732,21 @@ Public reports and user complaints about other AI app builders describe <b>large
       <h2 class="section-title reveal">Or skip the blank page — 15 free templates</h2>
       <p class="section-sub reveal">Instant v1, zero generation cost. Pick one, then keep chatting to make it yours.</p>
       <div class="tpl-grid reveal">
-        <a class="tpl-card glass" href="/templates.html#habit-tracker"><span class="tpl-ic">🔥</span><span class="tpl-name">Habit Tracker</span><span class="tpl-desc">Daily habits with streaks</span></a>
-        <a class="tpl-card glass" href="/templates.html#invoice-generator"><span class="tpl-ic">🧾</span><span class="tpl-name">Invoice Generator</span><span class="tpl-desc">Line items, totals, printable</span></a>
-        <a class="tpl-card glass" href="/templates.html#flashcards"><span class="tpl-ic">🗂️</span><span class="tpl-name">Flashcards</span><span class="tpl-desc">Study any subject, self-graded</span></a>
-        <a class="tpl-card glass" href="/templates.html#quiz-maker"><span class="tpl-ic">❓</span><span class="tpl-name">Quiz Maker</span><span class="tpl-desc">Multiple-choice quiz with scoring</span></a>
-        <a class="tpl-card glass" href="/templates.html#landing-page"><span class="tpl-ic">🚀</span><span class="tpl-name">Landing Page</span><span class="tpl-desc">One-page site for a product</span></a>
-        <a class="tpl-card glass" href="/templates.html#booking-form"><span class="tpl-ic">📅</span><span class="tpl-name">Booking Form</span><span class="tpl-desc">Appointment requests, saved locally</span></a>
-        <a class="tpl-card glass" href="/templates.html#focus-timer"><span class="tpl-ic">⏱️</span><span class="tpl-name">Focus Timer</span><span class="tpl-desc">Pomodoro-style work/break sessions</span></a>
-        <a class="tpl-card glass" href="/templates.html#expense-tracker"><span class="tpl-ic">💰</span><span class="tpl-name">Expense Tracker</span><span class="tpl-desc">Log spending, totals by category</span></a>
-        <a class="tpl-card glass" href="/templates.html#recipe-box"><span class="tpl-ic">🍳</span><span class="tpl-name">Recipe Box</span><span class="tpl-desc">Save recipes with ingredients &amp; steps</span></a>
-        <a class="tpl-card glass" href="/templates.html#todo-list"><span class="tpl-ic">✅</span><span class="tpl-name">To-Do List</span><span class="tpl-desc">Tasks with priorities and due dates</span></a>
-        <a class="tpl-card glass" href="/templates.html#password-generator"><span class="tpl-ic">🔐</span><span class="tpl-name">Password Generator</span><span class="tpl-desc">Strong random passwords, copy to clipboard</span></a>
-        <a class="tpl-card glass" href="/templates.html#unit-converter"><span class="tpl-ic">📐</span><span class="tpl-name">Unit Converter</span><span class="tpl-desc">Length, weight, and temperature</span></a>
-        <a class="tpl-card glass" href="/templates.html#countdown-timer"><span class="tpl-ic">🎉</span><span class="tpl-name">Countdown Timer</span><span class="tpl-desc">Count down to any date or event</span></a>
-        <a class="tpl-card glass" href="/templates.html#budget-planner"><span class="tpl-ic">📊</span><span class="tpl-name">Budget Planner</span><span class="tpl-desc">Plan monthly income vs. expenses</span></a>
-        <a class="tpl-card glass" href="/templates.html#contact-book"><span class="tpl-ic">📇</span><span class="tpl-name">Contact Book</span><span class="tpl-desc">Save names, numbers, and notes</span></a>
+        <a class="tpl-card glass" href="/templates.html#habit-tracker"><img class="tpl-thumb" src="/img/templates/habit-tracker.webp" alt="Habit Tracker template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🔥</span><span class="tpl-name">Habit Tracker</span><span class="tpl-desc">Daily habits with streaks</span></a>
+        <a class="tpl-card glass" href="/templates.html#invoice-generator"><img class="tpl-thumb" src="/img/templates/invoice-generator.webp" alt="Invoice Generator template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🧾</span><span class="tpl-name">Invoice Generator</span><span class="tpl-desc">Line items, totals, printable</span></a>
+        <a class="tpl-card glass" href="/templates.html#flashcards"><img class="tpl-thumb" src="/img/templates/flashcards.webp" alt="Flashcards template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🗂️</span><span class="tpl-name">Flashcards</span><span class="tpl-desc">Study any subject, self-graded</span></a>
+        <a class="tpl-card glass" href="/templates.html#quiz-maker"><img class="tpl-thumb" src="/img/templates/quiz-maker.webp" alt="Quiz Maker template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">❓</span><span class="tpl-name">Quiz Maker</span><span class="tpl-desc">Multiple-choice quiz with scoring</span></a>
+        <a class="tpl-card glass" href="/templates.html#landing-page"><img class="tpl-thumb" src="/img/templates/landing-page.webp" alt="Landing Page template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🚀</span><span class="tpl-name">Landing Page</span><span class="tpl-desc">One-page site for a product</span></a>
+        <a class="tpl-card glass" href="/templates.html#booking-form"><img class="tpl-thumb" src="/img/templates/booking-form.webp" alt="Booking Form template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">📅</span><span class="tpl-name">Booking Form</span><span class="tpl-desc">Appointment requests, saved locally</span></a>
+        <a class="tpl-card glass" href="/templates.html#focus-timer"><img class="tpl-thumb" src="/img/templates/focus-timer.webp" alt="Focus Timer template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">⏱️</span><span class="tpl-name">Focus Timer</span><span class="tpl-desc">Pomodoro-style work/break sessions</span></a>
+        <a class="tpl-card glass" href="/templates.html#expense-tracker"><img class="tpl-thumb" src="/img/templates/expense-tracker.webp" alt="Expense Tracker template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">💰</span><span class="tpl-name">Expense Tracker</span><span class="tpl-desc">Log spending, totals by category</span></a>
+        <a class="tpl-card glass" href="/templates.html#recipe-box"><img class="tpl-thumb" src="/img/templates/recipe-box.webp" alt="Recipe Box template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🍳</span><span class="tpl-name">Recipe Box</span><span class="tpl-desc">Save recipes with ingredients &amp; steps</span></a>
+        <a class="tpl-card glass" href="/templates.html#todo-list"><img class="tpl-thumb" src="/img/templates/todo-list.webp" alt="To-Do List template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">✅</span><span class="tpl-name">To-Do List</span><span class="tpl-desc">Tasks with priorities and due dates</span></a>
+        <a class="tpl-card glass" href="/templates.html#password-generator"><img class="tpl-thumb" src="/img/templates/password-generator.webp" alt="Password Generator template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🔐</span><span class="tpl-name">Password Generator</span><span class="tpl-desc">Strong random passwords, copy to clipboard</span></a>
+        <a class="tpl-card glass" href="/templates.html#unit-converter"><img class="tpl-thumb" src="/img/templates/unit-converter.webp" alt="Unit Converter template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">📐</span><span class="tpl-name">Unit Converter</span><span class="tpl-desc">Length, weight, and temperature</span></a>
+        <a class="tpl-card glass" href="/templates.html#countdown-timer"><img class="tpl-thumb" src="/img/templates/countdown-timer.webp" alt="Countdown Timer template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">🎉</span><span class="tpl-name">Countdown Timer</span><span class="tpl-desc">Count down to any date or event</span></a>
+        <a class="tpl-card glass" href="/templates.html#budget-planner"><img class="tpl-thumb" src="/img/templates/budget-planner.webp" alt="Budget Planner template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">📊</span><span class="tpl-name">Budget Planner</span><span class="tpl-desc">Plan monthly income vs. expenses</span></a>
+        <a class="tpl-card glass" href="/templates.html#contact-book"><img class="tpl-thumb" src="/img/templates/contact-book.webp" alt="Contact Book template with sample data" width="800" height="500" loading="lazy" decoding="async"><span class="tpl-ic">📇</span><span class="tpl-name">Contact Book</span><span class="tpl-desc">Save names, numbers, and notes</span></a>
       </div>
       <p class="section-sub reveal" style="margin-top:22px;"><a href="/templates.html">Preview all 15 templates →</a></p>
     </section>
@@ -1060,5 +1086,6 @@ Public reports and user complaints about other AI app builders describe <b>large
   window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
+<script src="/nav.js" defer></script>
 </body>
 </html>
