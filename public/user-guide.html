@@ -84,7 +84,7 @@
       <ul>
         <li><strong>Email and password</strong> — enter your name, email, and a password (at least 8 characters).</li>
         <li><strong>Continue with Google</strong></li>
-        <li><strong>Continue with GitHub</strong> — this is a sign-in only. It just confirms who you are; it does not give VibeSafe access to your repositories. Pushing code to GitHub is a separate connection you make later, with its own explicit permission screen — see §11.</li>
+        <li><strong>Continue with GitHub</strong> — this is a sign-in only. It just confirms who you are; it does not give VibeSafe Builder access to your repositories. Pushing code to GitHub is a separate connection you make later, with its own explicit permission screen — see §11.</li>
       </ul>
       <p>Your password is handled by Supabase Auth, our authentication provider — it's stored hashed, and we never see or handle it in plaintext ourselves.</p>
     </section>
@@ -187,7 +187,7 @@
       <h2><span class="num">12</span>Deploying to your own Vercel account</h2>
       <p>The Deploy tab puts a multi-file project live on <strong>your own</strong> Vercel account — your domain, your bill, and it keeps working whether or not you ever open this builder again. This is different from the built-in <strong>Publish</strong> button (§13): Vercel builds your project from real source with <code>npm install</code> and a real Vite build, the same as if you'd pushed it yourself.</p>
       <div class="steps">
-        <div class="step glass"><div class="stepnum">1</div><div><h3>Get a Vercel token</h3><p>In Vercel, go to <strong>Settings → Tokens → Create Token</strong>. Under <strong>Scope</strong>, choose the single project you want to deploy to — not your whole account. A project-scoped token can only ever touch that one project; VibeSafe never sees your other projects or their environment variables.</p></div></div>
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Get a Vercel token</h3><p>In Vercel, go to <strong>Settings → Tokens → Create Token</strong>. Under <strong>Scope</strong>, choose the single project you want to deploy to — not your whole account. A project-scoped token can only ever touch that one project; VibeSafe Builder never sees your other projects or their environment variables.</p></div></div>
         <div class="step glass"><div class="stepnum">2</div><div><h3>Connect it</h3><p>Paste the token into the Deploy tab. It's encrypted before it's stored and never sent back to your browser — even the connection status only shows a masked hint like <code>vcp_••••1234</code>.</p></div></div>
         <div class="step glass"><div class="stepnum">3</div><div><h3>Deploy a preview, or deploy to production</h3><p><strong>Deploy preview</strong> creates a new, unlisted deployment you can check before anyone sees it. <strong>Deploy to production</strong> replaces what's live at your project's main URL — you're asked to confirm before it runs.</p></div></div>
       </div>
@@ -248,9 +248,9 @@
       <a href="/blog.html">Blog</a>
       <a href="/about.html">About</a>
       <a href="/legal.html">Legal</a>
-      <a href="https://vibesafe.info" target="_blank" rel="noopener">VibeSafe</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">vibesafe.info</a>
     </div>
-    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to VibeSafe</div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to vibesafe.info</div>
   </div>
 </footer>
 
