@@ -123,6 +123,11 @@
       "permanent": true
     },
     {
+      "source": "/templates",
+      "destination": "/templates.html",
+      "permanent": true
+    },
+    {
       "source": "/blog",
       "destination": "/blog.html",
       "permanent": true

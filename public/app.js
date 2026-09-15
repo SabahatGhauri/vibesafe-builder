@@ -1750,7 +1750,52 @@ $("startReactBtn")?.addEventListener("click", startReactProject);
 $("ghStartReactBtn")?.addEventListener("click", startReactProject);
 $("vcStartReactBtn")?.addEventListener("click", startReactProject);
 renderMeter();
-if (restored) {
+
+// Links like /app?template=habit-tracker (from /templates.html and the landing
+// page) open that template directly. Existing work is never overwritten: it is
+// archived to My Apps first, then the page reloads onto a clean project, since
+// resetting every piece of in-memory state by hand is easy to get wrong.
+const PENDING_TEMPLATE_KEY = "vc_pendingTemplate";
+function takeTemplateRequest() {
+  const params = new URLSearchParams(location.search);
+  const fromUrl = params.get("template");
+  if (fromUrl) {
+    params.delete("template");
+    const qs = params.toString();
+    history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    return { id: fromUrl, archived: false };
+  }
+  try {
+    const pending = sessionStorage.getItem(PENDING_TEMPLATE_KEY);
+    sessionStorage.removeItem(PENDING_TEMPLATE_KEY);
+    if (pending) return { id: pending, archived: true };
+  } catch {}
+  return null;
+}
+const templateRequest = takeTemplateRequest();
+const requestedTemplate = templateRequest && (window.TEMPLATES || []).find((t) => t.id === templateRequest.id);
+let reloadingForTemplate = false;
+if (requestedTemplate && state.versions.length) {
+  try {
+    sessionStorage.setItem(PENDING_TEMPLATE_KEY, requestedTemplate.id);
+    archiveCurrentProject();
+    localStorage.removeItem(PROJECT_KEY);
+    reloadingForTemplate = true;
+    location.reload();
+  } catch {
+    // sessionStorage unavailable: keep the current project rather than lose the template silently.
+    addMsg("system", `Couldn't open the <b>${esc(requestedTemplate.name)}</b> template automatically. Start a new project, then pick it from the template list.`);
+  }
+} else if (requestedTemplate) {
+  useTemplate(requestedTemplate);
+  if (templateRequest.archived) {
+    addMsg("system", "📁 Your previous project was saved to <b>My Apps</b> — you can reopen it any time.");
+  }
+} else if (templateRequest) {
+  addMsg("system", "That template link doesn't match any of our templates. Pick one from the list below.");
+}
+
+if (restored && !reloadingForTemplate) {
   renderAll();
   addMsg("system", `📂 Project restored — v${state.versions[state.currentVersion].id} of ${state.versions.length} version${state.versions.length > 1 ? "s" : ""}, ${fmt$(state.spend)} spent. Pick up where you left off.`);
 }
