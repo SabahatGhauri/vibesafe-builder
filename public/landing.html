@@ -55,17 +55,41 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "@id": "https://vibesafebuilder.com/#software",
-  "publisher": { "@id": "https://vibesafebuilder.com/#organization" },
+  "publisher": {
+    "@id": "https://vibesafebuilder.com/#organization"
+  },
   "name": "VibeSafe Builder",
-  "alternateName": ["Vibe Safe Builder", "VibeSafeBuilder"],
+  "alternateName": [
+    "Vibe Safe Builder",
+    "VibeSafeBuilder"
+  ],
   "disambiguatingDescription": "An AI app builder: describe an app in plain English and it writes a working web app. Not a security scanner - it includes one, but generating the app is what it does.",
   "applicationSubCategory": "AI app builder",
-  "sameAs": ["https://github.com/SabahatGhauri/vibesafe-builder", "https://www.indiehackers.com/product/vibesafe-builder"],
+  "sameAs": [
+    "https://github.com/SabahatGhauri/vibesafe-builder",
+    "https://www.indiehackers.com/product/vibesafe-builder"
+  ],
   "codeRepository": "https://github.com/SabahatGhauri/vibesafe-builder",
   "url": "https://vibesafebuilder.com/",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Web",
-  "description": "VibeSafe Builder turns a chat into a working web app — cost estimate before every build, rollback on every change, security scan before you publish."
+  "description": "VibeSafe Builder turns a chat into a working web app — cost estimate before every build, rollback on every change, security scan before you publish.",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Bring your own key",
+      "price": "0",
+      "priceCurrency": "USD",
+      "url": "https://vibesafebuilder.com/pricing.html"
+    },
+    {
+      "@type": "Offer",
+      "name": "Managed plan",
+      "price": "15",
+      "priceCurrency": "USD",
+      "url": "https://vibesafebuilder.com/pricing.html"
+    }
+  ]
 }
 </script>
 <script type="application/ld+json">
@@ -110,7 +134,7 @@
       "name": "Is there a free way to try it first?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes — all 15 templates are free and cost zero tokens on either plan, no API key or card needed to start there."
+        "text": "Yes — every new account gets one free AI build with no API key or card. It runs on a lighter AI model (Claude Sonnet 5), so the result is less polished than paid builds, which use Claude Opus 5. All 15 templates are also free and cost zero tokens."
       }
     },
     {
@@ -522,8 +546,8 @@
             <span class="word grad" style="animation-delay:0.16s">burn.</span>
           </h1>
         </div>
-        <p class="sub">VibeSafe Builder is an AI app builder — describe an app in plain English and it writes a working one. The difference: other AI app builders bill you for their mistakes. This one shows every cost before you spend it, makes every change reversible, and scans every build before you publish.</p>
-        <p class="sub" style="font-size:14px; margin-top:14px;">For founders, indie hackers, and anyone building an app who wants control over cost, code, and security — not just speed. Prototypes, internal tools, MVPs, landing pages, small SaaS apps.</p>
+        <p class="sub">VibeSafe Builder is an AI app builder for founders and solo builders — describe an app in plain English and it writes a working one. The difference: other AI app builders bill you for their mistakes. This one shows every cost before you spend it, makes every change reversible, and scans every build before you publish.</p>
+        <p class="sub" style="font-size:14px; margin-top:14px;">For anyone who wants control over cost, code, and security — not just speed. Prototypes, internal tools, MVPs, landing pages, small SaaS apps. <b>Your first AI build is free</b>, no API key or card needed.</p>
         <div class="actions">
           <a class="btn primary" href="/app">Start building — free</a>
           <a class="btn" href="/demo.html">Try the demo — no account</a>
@@ -701,7 +725,7 @@ Public reports and user complaints about other AI app builders describe <b>large
 
     <section class="pricing" id="pricing">
       <h2 class="section-title reveal">Pricing</h2>
-      <p class="section-sub reveal">Bring your own key: no subscription, no markup, you pay Anthropic directly. Or go Managed: one flat monthly fee, no key required.</p>
+      <p class="section-sub reveal"><b>Your first AI build is free</b> — no API key or card needed (it runs on a lighter AI model). After that, bring your own key with no subscription and no markup, or go Managed for one flat monthly fee with no key required.</p>
 
       <div class="cost-calc glass reveal">
         <div class="cc-head">
@@ -803,7 +827,7 @@ Public reports and user complaints about other AI app builders describe <b>large
         </div>
         <div class="faq-item">
           <button type="button" class="faq-q">Is there a free way to try it first?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Yes — all 15 templates are free and cost zero tokens on either plan, no API key or card needed to start there.</div>
+          <div class="faq-a">Yes — every new account gets one free AI build with no API key or card. It runs on a lighter AI model (Claude Sonnet 5), so the result is less polished than paid builds, which use Claude Opus 5. All 15 templates are also free and cost zero tokens.</div>
         </div>
         <div class="faq-item">
           <button type="button" class="faq-q">Can it build more than one page?<span class="faq-chevron">›</span></button>
@@ -838,7 +862,8 @@ Public reports and user complaints about other AI app builders describe <b>large
         <a href="/deploy-guide.html">Deploy</a>
         <a href="/blog.html">Blog</a>
         <a href="/about.html">About</a>
-        <a href="/legal.html">Legal</a>
+        <a href="/blog/what-is-vibesafe-builder.html">What is VibeSafe Builder?</a>
+      <a href="/legal.html">Legal</a>
         <a href="https://vibesafe.info" target="_blank" rel="noopener">vibesafe.info</a>
       </div>
       <div class="foot-legal">
