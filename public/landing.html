@@ -262,6 +262,9 @@
   }
   .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
   .kinetic h1 { font-size: clamp(32px, 4.2vw, 52px); line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; }
+  /* The product name leads the H1 so the page states its own name in its
+     most prominent heading, without shouting it at the same size. */
+  .kinetic h1 .h1-brand { font-size: 0.46em; letter-spacing: 0.01em; color: var(--dim); display: inline-block; margin-bottom: 6px; }
   .kinetic .word {
     display: inline-block; opacity: 0; transform: translateY(24px) rotateX(-40deg); transform-origin: bottom;
     animation-name: rise; animation-duration: 0.4s; animation-timing-function: cubic-bezier(.2,.8,.2,1); animation-fill-mode: forwards;
@@ -599,9 +602,10 @@
   <div class="wrap">
     <div class="hero">
       <div>
-        <div class="hero-eyebrow glass"><span class="dot"></span> VibeSafe Builder · AI app builder</div>
+        <div class="hero-eyebrow glass"><span class="dot"></span> AI app builder · first build free</div>
         <div class="kinetic">
           <h1>
+            <span class="word h1-brand" style="animation-delay:0.01s">VibeSafe Builder</span><br/>
             <span class="word" style="animation-delay:0.02s">Build</span>
             <span class="word" style="animation-delay:0.04s">apps</span>
             <span class="word" style="animation-delay:0.06s">by</span>
