@@ -949,6 +949,14 @@ Public reports and user complaints about other AI app builders describe <b>large
     }, { threshold: 0.15, rootMargin: "0px 0px 200% 0px" });
     document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 
+    // Safety net: anything still hidden after a few seconds is shown anyway.
+    // An observer only fires against a real viewport, and a renderer that
+    // reports no viewport height (crawlers, screenshot tools) would otherwise
+    // capture the page with most of its text still at opacity 0. Real visitors
+    // have normally scrolled by then, so the animation still plays for them.
+    const revealAll = () => document.querySelectorAll(".reveal").forEach(el => el.classList.add("in"));
+    if (!window.innerHeight) revealAll(); else setTimeout(revealAll, 3000);
+
     // 3D hero card parallax on mouse move
     const heroArea = document.getElementById("heroCards");
     const stack = document.getElementById("cardStack");
