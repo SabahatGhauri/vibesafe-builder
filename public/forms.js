@@ -39,6 +39,32 @@ ${form.kind === 'contact' ? '  <label>Message <textarea name="message" maxlength
         p.textContent = `${key}: ${value}`;
         card.append(p);
       }
+      const actions = document.createElement('div');
+      actions.className = 'forms-actions';
+      // Only offer a resend where it can do something: notifications on, and
+      // this one is not already accepted by the provider.
+      if(row.notification_status === 'failed' || row.notification_status === 'pending') {
+        const resend = document.createElement('button');
+        resend.type = 'button'; resend.className = 'btn ghost';
+        resend.textContent = 'Send email again';
+        resend.addEventListener('click',()=>run(async()=>{
+          resend.disabled = true;
+          try { await api(`/${form.id}/submissions/${row.id}/notify`,{method:'POST'}); status('Email sent.'); await inbox(); }
+          finally { resend.disabled = false; }
+        }));
+        actions.append(resend);
+      }
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'btn ghost danger';
+      del.textContent = 'Delete';
+      del.addEventListener('click',()=>run(async()=>{
+        if(!confirm('Delete this submission? This cannot be undone.')) return;
+        await api(`/${form.id}/submissions/${row.id}`,{method:'DELETE'});
+        status('Submission deleted.');
+        await inbox();
+      }));
+      actions.append(del);
+      card.append(actions);
       box.append(card);
     }
   }
@@ -92,6 +118,31 @@ ${form.kind === 'contact' ? '  <label>Message <textarea name="message" maxlength
       form.enabled = enabled;
       if (selected?.id === form.id) await choose(form);
     } finally { button.disabled = false; }
+  }));
+  // The export goes through fetch rather than a plain link: the route needs the
+  // session header, which a link cannot carry.
+  byId('nativeFormExport').addEventListener('click',()=>run(async()=>{
+    if(!selected) return;
+    const r = await fetch(`/api/forms/${selected.id}/submissions.csv`,{headers:await managed.headers()});
+    if(!r.ok) throw new Error('Could not export these submissions.');
+    const url = URL.createObjectURL(await r.blob());
+    const link = document.createElement('a');
+    link.href = url; link.download = `${selected.name.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}-submissions.csv`;
+    document.body.append(link); link.click(); link.remove();
+    URL.revokeObjectURL(url);
+    status('CSV downloaded.');
+  }));
+  byId('nativeFormClear').addEventListener('click',()=>run(async()=>{
+    if(!selected || !confirm(`Delete every submission for "${selected.name}"? This cannot be undone.`)) return;
+    await api(`/${selected.id}/submissions`,{method:'DELETE'});
+    status('All submissions deleted.');
+    await inbox();
+  }));
+  byId('nativeFormDelete').addEventListener('click',()=>run(async()=>{
+    if(!selected || !confirm(`Delete the form "${selected.name}" and all of its submissions? Any page already using it will stop working.`)) return;
+    await api(`/${selected.id}`,{method:'DELETE'});
+    status('Form deleted.');
+    await refresh();
   }));
   byId('nativeFormCopy').addEventListener('click',()=>run(async()=>{
     await navigator.clipboard.writeText(snippet(selected)); status('HTML copied. Plain HTML submission displays a confirmation page.');

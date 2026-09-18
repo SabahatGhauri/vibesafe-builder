@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const express = require('express');
 const {registerFormsRoutes,validateSubmission} = require('../lib/forms');
 const ID = '11111111-1111-4111-8111-111111111111';
+const SUB = '22222222-2222-4222-8222-222222222222';
 const OWNER = {id:'owner',email:'owner@example.com',email_confirmed_at:'2026-09-17'};
 function fixture({user=OWNER,notify=true,dbError=false,sendError=false,saveError=null}={}) {
   const rows = {
@@ -13,13 +14,15 @@ function fixture({user=OWNER,notify=true,dbError=false,sendError=false,saveError
   const db={
     from(table){
       let filters=[],patch=null;
-      const result=()=>{
+      let removing=false;
+      const result2=()=>{
         if(dbError) return {data:null,error:{message:'internal database credentials should not leak'}};
         const found=rows[table].filter(r=>filters.every(([k,v])=>r[k]===v));
-        if(patch) found.forEach(r=>Object.assign(r,patch));
+        if(removing) rows[table]=rows[table].filter(r=>!found.includes(r));
+        else if(patch) found.forEach(r=>Object.assign(r,patch));
         return {data:found,error:null};
       };
-      const q={select(){return q;},eq(k,v){filters.push([k,v]);return q;},order(){return q;},limit(){return q;},update(p){patch=p;return q;},maybeSingle(){const r=result();return Promise.resolve({...r,data:r.data?.[0]||null});},then(ok,bad){return Promise.resolve(result()).then(ok,bad);}};
+      const q={select(){return q;},eq(k,v){filters.push([k,v]);return q;},order(){return q;},limit(){return q;},update(p){patch=p;return q;},delete(){removing=true;return q;},maybeSingle(){const r=result2();return Promise.resolve({...r,data:r.data?.[0]||null});},then(ok,bad){return Promise.resolve(result2()).then(ok,bad);}};
       return q;
     },
     async rpc(fn,p){
@@ -29,7 +32,7 @@ function fixture({user=OWNER,notify=true,dbError=false,sendError=false,saveError
         rows.native_forms.push(row); return {data:row,error:null};
       }
       const f=rows.native_forms.find(r=>r.id===p.p_form);
-      const row={id:'saved',form_id:ID,owner_id:f.owner_id,data:p.p_data,notification_status:notify?'pending':'disabled'};
+      const row={id:SUB,form_id:ID,owner_id:f.owner_id,data:p.p_data,notification_status:notify?'pending':'disabled'};
       rows.native_form_submissions.push(row);
       return {data:{id:row.id,notify,email:f.notification_email,name:f.name},error:null};
     },
@@ -113,4 +116,59 @@ test('HTML form submission returns a readable confirmation and CORS is scoped',a
   const f=fixture();const r=await request(f,path,{method:'POST',body:submission,encoded:true});assert.equal(r.status,201);assert.ok(r.text.includes('Thank you'));
   assert.equal(r.headers.get('access-control-allow-origin'),'*');
   assert.equal((await request(f,'/api/forms/')).headers.get('access-control-allow-origin'),null);
+});
+
+/* ---- owning the data: delete, export, resend ---- */
+
+const stored = async f => { await request(f,path,{method:'POST',body:submission}); return f; };
+
+test('an owner can delete one submission, and only their own',async()=>{
+  const f=await stored(fixture());
+  assert.equal((await request(f,`/api/forms/${ID}/submissions/${SUB}`,{method:'DELETE'})).status,200);
+  assert.equal(f.rows.native_form_submissions.length,0);
+  assert.equal((await request(fixture({user:{...OWNER,id:'other'}}),`/api/forms/${ID}/submissions/${SUB}`,{method:'DELETE'})).status,404);
+});
+
+test('clearing an inbox removes every submission for that form',async()=>{
+  const f=await stored(fixture());
+  await request(f,path,{method:'POST',body:submission});
+  assert.equal((await request(f,`/api/forms/${ID}/submissions`,{method:'DELETE'})).status,200);
+  assert.equal(f.rows.native_form_submissions.length,0);
+});
+
+test('deleting a form is owner-scoped',async()=>{
+  const f=await stored(fixture());
+  assert.equal((await request(fixture({user:{...OWNER,id:'other'}}),`/api/forms/${ID}`,{method:'DELETE'})).status,404);
+  assert.equal((await request(f,`/api/forms/${ID}`,{method:'DELETE'})).status,200);
+  assert.equal(f.rows.native_forms.length,0);
+});
+
+test('CSV export is owner-scoped and neutralises spreadsheet formulas',async()=>{
+  const f=fixture();
+  await request(f,path,{method:'POST',body:{...submission,message:'=cmd|calc'}});
+  const r=await request(f,`/api/forms/${ID}/submissions.csv`);
+  assert.equal(r.status,200);
+  assert.match(r.headers.get('content-type'),/text\/csv/);
+  assert.match(r.headers.get('content-disposition'),/attachment/);
+  assert.ok(r.text.startsWith('received,email_status,name,email,message'));
+  assert.ok(r.text.includes(String.fromCharCode(34,39) + "=cmd|calc" + String.fromCharCode(34)), "formula prefixed with an apostrophe");
+  assert.equal((await request(fixture({user:{...OWNER,id:'other'}}),`/api/forms/${ID}/submissions.csv`)).status,404);
+});
+
+test('a failed notification can be resent, and never to a submitted address',async()=>{
+  const f=await stored(fixture({sendError:true}));
+  assert.equal(f.rows.native_form_submissions[0].notification_status,'failed');
+  f.emails.length=0;
+  const r=await request(f,`/api/forms/${ID}/submissions/${SUB}/notify`,{method:'POST'});
+  assert.equal(r.status,502,'a provider that keeps failing is reported, not hidden');
+  assert.equal(f.emails[0].to,'owner@example.com');
+  const quiet=await stored(fixture({notify:false}));
+  assert.equal((await request(quiet,`/api/forms/${ID}/submissions/${SUB}/notify`,{method:'POST'})).status,400);
+  assert.equal((await request(fixture({user:{...OWNER,id:'other'}}),`/api/forms/${ID}/submissions/${SUB}/notify`,{method:'POST'})).status,404);
+});
+
+test('the new routes reject unauthenticated callers',async()=>{
+  for(const [url,method] of [[`/api/forms/${ID}`,'DELETE'],[`/api/forms/${ID}/submissions`,'DELETE'],[`/api/forms/${ID}/submissions/${SUB}`,'DELETE'],[`/api/forms/${ID}/submissions.csv`,'GET'],[`/api/forms/${ID}/submissions/${SUB}/notify`,'POST']]) {
+    assert.equal((await request(fixture({user:null}),url,{method})).status,401,url);
+  }
 });
