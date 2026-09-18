@@ -186,6 +186,8 @@ body {
   padding: 10px 10px 8px; transition: border-color .15s;
 }
 .composer-box:focus-within { border-color: var(--accent); }
+#agentSelect { width: 100%; margin: 6px 0; padding: 8px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+#agentHint { margin: 4px 0 8px; font-size: 11px; line-height: 1.4; }
 .composer textarea {
   width: 100%;
   resize: vertical;
@@ -635,3 +637,13 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .key-status.bad { color: var(--danger); }
 .key-status.unknown { color: var(--warn); }
 .key-status.checking { color: var(--text-dim); }
+
+.forms-workspace { padding: 24px; max-width: 960px; width: 100%; box-sizing: border-box; }
+.forms-workspace p { line-height: 1.6; }
+.forms-create { display: grid; gap: 12px; margin: 20px 0; }
+.forms-workspace label { display: block; }
+.forms-workspace input:not([type="checkbox"]), .forms-workspace select, .forms-workspace textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; }
+.forms-workspace [type="checkbox"] { width: auto; }
+.forms-actions, #nativeFormList { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.forms-submission { border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin: 12px 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+#nativeFormSnippet { font-family: monospace; }

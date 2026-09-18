@@ -698,12 +698,20 @@ function renderMeter() {
 /* ---------------- cost estimate (debounced, live) ---------------- */
 let estTimer = null;
 let lastEstimate = null;
+let estimateRequest = 0;
+const selectedAgent = () => $("agentSelect").value;
+$("agentSelect").addEventListener("change", () => {
+  lastEstimate = null;
+  setBusy(state.busy);
+  refreshEstimate();
+});
 $("promptInput").addEventListener("input", () => {
   clearTimeout(estTimer);
   estTimer = setTimeout(refreshEstimate, 700);
 });
 
 async function refreshEstimate() {
+  const request = ++estimateRequest;
   const prompt = $("promptInput").value.trim();
   const estEl = $("estimate");
   lastEstimate = null;
@@ -715,10 +723,11 @@ async function refreshEstimate() {
     const r = await fetch("/api/estimate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles(), palette: state.palette }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles(), palette: state.palette, agent: selectedAgent() }),
     });
     if (!r.ok) throw new Error((await r.json()).error || r.status);
     const est = await r.json();
+    if (request !== estimateRequest) return;
     lastEstimate = est;
     if (est.mode === "starter") {
       estEl.textContent = `free trial build · lighter model (${est.starter.model}) · less polished than Pro`;
@@ -735,10 +744,11 @@ async function refreshEstimate() {
       estEl.textContent = `est. ${fmt$(est.low)}–${fmt$(est.high)} — would exceed your ${fmt$(state.cap)} cap`;
       estEl.classList.add("blocked");
     } else {
-      estEl.textContent = `est. ${fmt$(est.low)}–${fmt$(est.high)} for this generation`;
+      estEl.textContent = `${est.agent} · est. ${fmt$(est.low)}–${fmt$(est.high)} for this request`;
       estEl.classList.remove("blocked");
     }
   } catch (e) {
+    if (request !== estimateRequest) return;
     estEl.textContent = "est. unavailable (" + e.message + ")";
   }
 }
@@ -808,6 +818,11 @@ $("composer").addEventListener("submit", async (e) => {
   if (state.busy) return;
   const prompt = $("promptInput").value.trim();
   if (!prompt) return;
+  const agent = selectedAgent();
+  if ((agent === 'debug' || agent === 'review') && !hasProject()) {
+    addMsg('system', 'Build or open a project before using Debug or Review.');
+    return;
+  }
   if (!state.apiKey && !managed.isSignedIn()) { $("settingsModal").showModal(); return; }
 
   // Spend-cap guard (fix #5: hard cap, checked before spending) — BYOK only;
@@ -827,8 +842,11 @@ $("composer").addEventListener("submit", async (e) => {
 
   addMsg("user", esc(prompt));
   $("promptInput").value = "";
+  ++estimateRequest;
+  lastEstimate = null;
   $("estimate").textContent = "est. —";
-  const workingMsg = addMsg("assistant working", "Building…");
+  const workingLabel = agent === 'review' ? 'Reviewing…' : agent === 'debug' ? 'Debugging…' : 'Working…';
+  const workingMsg = addMsg("assistant working", workingLabel);
   setBusy(true);
 
   try {
@@ -836,7 +854,7 @@ $("composer").addEventListener("submit", async (e) => {
     const r = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles(), palette: state.palette }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles(), palette: state.palette, agent }),
     });
     if (!r.ok && !r.headers.get("content-type")?.includes("event-stream")) {
       const errBody = await r.json();
@@ -856,9 +874,23 @@ $("composer").addEventListener("submit", async (e) => {
     }
 
     const result = await readSSE(r, (partial) => {
-      workingMsg.textContent = "Building… " + partial.length.toLocaleString() + " chars";
+      workingMsg.textContent = workingLabel + " " + partial.length.toLocaleString() + " chars";
     });
     if (result.type === "error") throw new Error(result.message);
+    // Review reports never enter the version/preview/patch path.
+    if (result.agent === 'review') {
+      state.spend += result.cost || 0;
+      workingMsg.className = 'msg assistant';
+      const report = document.createElement('div');
+      report.style.whiteSpace = 'pre-wrap';
+      report.textContent = result.report || 'No review returned.';
+      const cost = document.createElement('span');
+      cost.className = 'cost-line';
+      cost.textContent = `Review · ${fmt$(result.cost || 0)} · code unchanged · ${result.stopReason === 'max_tokens' ? 'report truncated · ' : ''}code inspection only; no tests run`;
+      workingMsg.replaceChildren(report, cost);
+      if (result.mode === 'starter') managed.refreshPlanStatus();
+      return;
+    }
 
     // In multi mode the server has already parsed the FILE blocks (one parser,
     // unit-tested, shared with publish) and returns just the changed files.
@@ -890,6 +922,7 @@ $("composer").addEventListener("submit", async (e) => {
       id: state.versions.length + 1,
       time: new Date().toLocaleTimeString(),
       prompt,
+      agent: result.agent || agent,
       code: isMulti() ? null : code,
       files: isMulti() ? mergedFiles : null,
       changed: isMulti() ? changedPaths : null,
@@ -934,17 +967,18 @@ $("newProjectBtn").addEventListener("click", () => {
 
 function setBusy(b) {
   state.busy = b;
+  $("agentSelect").disabled = b;
   $("sendBtn").disabled = b;
   // The send button is an icon now, so the label it used to carry moves to the
   // tooltip/aria-label (for screen readers and hover) and to a visible state
   // chip next to the estimate - the wording still tells you whether this is a
   // first build or a change, which the icon alone cannot.
-  const label = b ? "Building…" : state.versions.length ? "Make the change" : "Build it";
+  const label = b ? "Working…" : selectedAgent() === 'review' ? 'Review project' : selectedAgent() === 'debug' ? 'Debug project' : state.versions.length ? "Make the change" : "Build it";
   const btn = $("sendBtn");
   btn.title = label;
   btn.setAttribute("aria-label", label);
   const chip = $("composerState");
-  if (chip) chip.textContent = b ? "Building…" : "";
+  if (chip) chip.textContent = b ? "Working…" : "";
 }
 
 // The composer hint promises Enter sends and Shift+Enter makes a new line, so

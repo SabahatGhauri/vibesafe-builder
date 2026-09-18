@@ -134,6 +134,14 @@
       </div>
       <form class="composer" id="composer">
         <div class="composer-box">
+          <label for="agentSelect">Agent</label>
+          <select id="agentSelect" aria-describedby="agentHint">
+            <option value="auto">Auto — choose from your request</option>
+            <option value="build">Build — create or change features</option>
+            <option value="debug">Debug — focus on a reported problem</option>
+            <option value="review">Review — report without changing code</option>
+          </select>
+          <p class="hint" id="agentHint">Choose a task or let Auto route your request. All modes use your current model and consume usage. Review leaves code unchanged and does not run tests.</p>
           <textarea id="promptInput" rows="3" placeholder="Describe your app, or ask for a change…"></textarea>
           <div class="composer-row">
             <button type="button" class="composer-icon" id="micBtn" hidden title="Dictate your prompt" aria-label="Dictate your prompt">🎤</button>
@@ -153,6 +161,7 @@
         <button class="tab" data-tab="code">Code</button>
         <button class="tab" data-tab="versions">Versions</button>
         <button class="tab" data-tab="github">GitHub</button>
+        <button class="tab" data-tab="forms">Forms</button>
         <button class="tab" data-tab="deploy">Deploy</button>
         <button class="tab" data-tab="security">Security <span class="sec-badge" id="secBadge" hidden></span></button>
         <button class="tab" data-tab="launchcheck">Launch Check <span class="sec-badge" id="lcBadge" hidden></span></button>
@@ -228,6 +237,36 @@
         <div class="code-split">
           <div class="file-tree" id="fileTree" hidden></div>
           <pre class="code" id="codeView">No code yet.</pre>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-forms">
+        <div class="forms-workspace">
+          <h2>VibeSafe Forms</h2>
+          <p>Collect contact enquiries and waitlist signups. Submissions are private to your account. No extra form service or AI credits needed to receive them.</p>
+          <p class="hint">Pilot limits: 20 forms, 300 submissions per calendar month (UTC), and 1,000 stored submissions per account. Up to 10 submissions per form per minute.</p>
+          <form id="nativeFormCreate" class="forms-create">
+            <label>Form name <input id="nativeFormName" required maxlength="80" placeholder="Website enquiries" /></label>
+            <label>Type <select id="nativeFormKind"><option value="contact">Contact: name, email, message</option><option value="waitlist">Waitlist: name, email</option></select></label>
+            <label><input type="checkbox" id="nativeFormNotify" /> Email new submissions to my verified account address</label>
+            <button class="btn primary" type="submit">Create form</button>
+          </form>
+          <button class="btn ghost" type="button" id="nativeFormRefresh">Refresh forms</button>
+          <p id="nativeFormStatus" role="status" aria-live="polite"></p>
+          <div id="nativeFormList"></div>
+          <section id="nativeFormDetail" hidden>
+            <h3 id="nativeFormTitle"></h3>
+            <div class="forms-actions">
+              <button class="btn primary" id="nativeFormUse" type="button">Add to build prompt</button>
+              <button class="btn ghost" id="nativeFormCopy" type="button">Copy HTML</button>
+              <button class="btn ghost" id="nativeFormPause" type="button">Pause form</button>
+              <button class="btn ghost" id="nativeFormInbox" type="button">Refresh inbox</button>
+            </div>
+            <p class="hint">The prompt uses your normal generation estimate before building. A real submission may send email if enabled. Email status “sent” means the email service accepted it, not that it reached the inbox.</p>
+            <label>HTML form snippet<textarea id="nativeFormSnippet" readonly rows="9" spellcheck="false"></textarea></label>
+            <h3>Submissions</h3>
+            <div id="nativeFormSubmissions"></div>
+          </section>
         </div>
       </div>
 
@@ -396,6 +435,7 @@
   <script src="templates.js"></script>
   <script src="palettes.js"></script>
   <script src="app.js"></script>
+  <script src="forms.js"></script>
   <script src="visualEditor.js"></script>
   <script src="buildStatus.js"></script>
   <script src="github.js"></script>
