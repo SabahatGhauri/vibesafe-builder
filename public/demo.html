@@ -93,6 +93,16 @@
   .end h2{font-size:19px;margin-bottom:6px}
   .end p{color:var(--dim);font-size:13.5px;margin-bottom:14px}
   .foot{padding:10px 18px;font-size:11.5px;color:var(--dim);border-top:1px solid var(--line);text-align:center}
+  /* Written explanation below the demo: the demo itself is almost entirely
+     interactive, which leaves a search engine (and anyone skimming before
+     they click) with nothing to read. */
+  .about{max-width:820px;margin:0 auto;padding:34px 20px 48px;color:var(--dim);font-size:14.5px;line-height:1.65}
+  .about h2{color:var(--text);font-size:19px;margin:28px 0 10px}
+  .about h3{color:var(--text);font-size:15px;margin:20px 0 6px}
+  .about p{margin-bottom:12px}
+  .about ul{margin:0 0 14px 20px}
+  .about li{margin-bottom:7px}
+  .about a{color:var(--accent)}
   @media(max-width:900px){.left{border-right:none;border-bottom:1px solid var(--line)}}
 </style>
 </head>
@@ -153,6 +163,49 @@
 </div>
 
 <div class="foot">Pre-recorded demo. Costs and scan results shown are from real builds of these same apps.</div>
+
+<div class="about">
+  <h2>What this demo shows</h2>
+  <p>The three steps above replay a real session in VibeSafe Builder: building a habit tracker from one
+    sentence, asking for a login form, and rolling back when the security scan objects. The builds are
+    pre-recorded so the demo needs no account, no API key and costs nothing, and so every visitor sees the
+    same thing. The costs and scan results are taken from real builds of these same apps.</p>
+
+  <h3>Step 1 — the cost appears before the build runs</h3>
+  <p>Every generation shows an estimate first, and you set a hard cap it will not cross. Most single-file
+    apps run between $0.05 and $0.20. Failed generations are tracked separately, so a build that goes
+    wrong never counts against your spend. <a href="/blog/where-your-ai-credits-go.html">Where your AI
+    credits actually go</a> breaks the numbers down.</p>
+
+  <h3>Step 2 — the security scan blocks a leak</h3>
+  <p>Asking for a login form produces code with a hardcoded key in it, which is exactly how AI-built apps
+    leak credentials in the wild. The scan catches it and refuses to publish. Launch Check goes further and
+    opens the app in a real browser to catch errors a scan cannot see.
+    <a href="/security.html">See everything that gets checked</a>.</p>
+
+  <h3>Step 3 — every version can be rolled back</h3>
+  <p>Each change is a version with a diff, so an edit that breaks the app is one click from being undone.
+    Nothing is lost when you roll back; later versions stay in the list.
+    <a href="/blog/ai-doom-loop.html">Why the AI gets stuck repeating a fix</a> covers what happens when a
+    change keeps failing.</p>
+
+  <h2>What the real builder does that this demo cannot</h2>
+  <ul>
+    <li>Builds from your own description instead of a script, on Claude Opus 5</li>
+    <li>Publishes your app to a shareable link, or exports it as a single file you own</li>
+    <li>Pushes a multi-file React project to your own GitHub repository and deploys to your own Vercel account</li>
+    <li>Collects form submissions and stores data shared between visitors</li>
+    <li>Starts from <a href="/templates.html">15 free templates</a> at zero token cost</li>
+  </ul>
+
+  <h2>Ready to try the real thing?</h2>
+  <p>Your first build is free — no card and no API key. If you have never built an app this way before,
+    <a href="/blog/how-to-build-your-first-app-with-ai.html">how to build your first app with AI</a> is the
+    place to start, and the <a href="/blog/ai-app-builder-checklist.html">pre-launch checklist</a> covers
+    what to check before you share it. The <a href="/user-guide.html">user guide</a> explains the builder
+    screen by screen, and <a href="/pricing.html">pricing</a> lays out both plans.</p>
+  <p><a href="/app">Open the builder →</a></p>
+</div>
 
 <script>
 /* Pre-recorded builds. Kept as data rather than live generation so the demo costs

@@ -105,86 +105,6 @@
   ]
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What happens if I go over the $10/month Managed budget?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Generation pauses until your next billing cycle — you're never silently charged more. Switch to your own API key in Settings to keep going immediately."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How much does a typical build actually cost on my own key?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Most single-file app generations run $0.05–$0.20 depending on complexity, billed by Anthropic at their standard per-token rates. We add no markup on top."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I switch between Bring Your Own Key and Managed?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes, any time in Settings — add a key or sign in to Managed, nothing about your project or version history changes."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do failed generations ever cost me anything?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "You're never charged extra — the $15/month Managed fee is flat, and BYOK failures never count toward your session's build-spend meter or cap. One nuance on Managed: a failed attempt still draws from your $10/mo included usage, since that's real Anthropic cost we absorb either way — it just never counts against your visible \"builds this month.\""
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is there a free way to try it first?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes — every new account gets one free AI build with no API key or card. It runs on a lighter AI model (Claude Sonnet 5), so the result is less polished than paid builds, which use Claude Opus 5. All 15 templates are also free and cost zero tokens."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can it build more than one page?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes — start a multi-file React project instead of a single page, and the AI works across a real, multi-file codebase: components, hooks, and styles in separate files, only the files that need a change get touched."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I get my code onto GitHub?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes, for multi-file projects — connect your GitHub account and push to a repository you own with one click, as a real commit. It's ordinary code the moment it lands there, not something specific to this builder."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I deploy to my own domain?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes — connect a project-scoped Vercel token and deploy a multi-file project directly to your own Vercel account, your own domain, your own bill. It builds from real source, the same as if you'd pushed it yourself."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What stops an app going public with a leaked API key in it?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Every generation is scanned for hardcoded credentials before you can publish. Deploying to your own Vercel account runs an additional Publish Security Check at the moment you make something public — a live credential blocks the change outright, with no way to override it."
-      }
-    }
-  ]
-}
-</script>
 <style>
   :root {
     --bg: #0a0d11; --bg-raise: #0f1318; --bg-panel: #141a21;
@@ -492,31 +412,6 @@
   .cc-verdict { margin-top: 16px; font-size: 13.5px; color: var(--dim); text-align: center; }
   .cc-verdict b { color: var(--accent); }
 
-  /* ---------- comparison table ---------- */
-  .compare-wrap { margin: 40px 0; overflow-x: auto; border-radius: 16px; border: 1px solid var(--glass-border); }
-  table.compare-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 480px; }
-  .compare-table th, .compare-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--line); }
-  .compare-table thead th { color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; background: var(--bg-panel); }
-  .compare-table thead th:nth-child(2) { color: var(--accent); }
-  .compare-table thead th:nth-child(3) { color: var(--accent2); }
-  .compare-table th:not(:first-child), .compare-table td:not(:first-child) { text-align: center; }
-  .compare-table td:first-child { color: var(--text); font-weight: 600; }
-  .compare-table td.yes { color: var(--accent); font-weight: 700; }
-  .compare-table tbody tr:last-child td { border-bottom: none; }
-  .compare-table tbody tr:hover { background: rgba(255,255,255,0.03); }
-
-  /* ---------- pricing FAQ ---------- */
-  .pricing-faq { max-width: 720px; margin: 40px auto 0; }
-  .faq-title { font-size: 18px; font-weight: 800; margin-bottom: 14px; text-align: center; }
-  .faq-item { border-bottom: 1px solid var(--line); }
-  .faq-q {
-    width: 100%; text-align: left; background: none; border: none; color: var(--text); font-size: 14px; font-weight: 600;
-    padding: 16px 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  }
-  .faq-chevron { color: var(--dim); font-size: 18px; transition: transform 0.25s; flex-shrink: 0; }
-  .faq-item.open .faq-chevron { transform: rotate(90deg); color: var(--accent); }
-  .faq-a { max-height: 0; overflow: hidden; color: var(--dim); font-size: 13.5px; line-height: 1.6; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 4px; }
-  .faq-item.open .faq-a { max-height: 200px; padding: 0 4px 16px; }
   @media (max-width: 640px) { .cc-results { grid-template-columns: 1fr; } }
 
   /* ---------- scope clarity (what this is / isn't) ---------- */
@@ -622,7 +517,7 @@
           </h1>
         </div>
         <p class="sub">VibeSafe Builder is an AI app builder for founders and solo builders — describe an app in plain English and it writes a working one. The difference: other AI app builders bill you for their mistakes. This one shows every cost before you spend it, makes every change reversible, and scans every build before you publish.</p>
-        <p class="sub" style="font-size:14px; margin-top:14px;">For anyone who wants control over cost, code, and security — not just speed. Prototypes, internal tools, MVPs, landing pages, small SaaS apps. <b>Your first AI build is free</b>, no API key or card needed.</p>
+        <p class="sub" style="font-size:14px; margin-top:14px;">For anyone who wants control over cost, code, and security — not just speed. Prototypes, internal tools, MVPs, landing pages, small SaaS apps. <b>Your first AI build is free</b>, no API key or card needed. New to this? Read <a href="/blog/how-to-build-your-first-app-with-ai.html">how to build your first app with AI</a>, then run the <a href="/blog/ai-app-builder-checklist.html">pre-launch checklist</a> before you share it.</p>
         <div class="actions">
           <a class="btn primary" href="/app">Start building — free</a>
           <a class="btn" href="/demo.html">Try the demo — no account</a>
@@ -749,13 +644,13 @@ Public reports and user complaints about other AI app builders describe <b>large
           <div class="ic">🔒</div>
           <div class="pain">Leaked databases &amp; keys</div>
           <h3>Security scan on every build</h3>
-          <p>Hardcoded keys, eval(), insecure requests, data exfiltration — checked on every generation using the same kind of security check as <a href="https://vibesafe.info" target="_blank" rel="noopener" style="color:var(--accent2); font-weight:700;">vibesafe.info</a>, pass/fail before you share.</p>
+          <p>Hardcoded keys, eval(), insecure requests, data exfiltration — checked on every generation using the same kind of security check as <a href="https://vibesafe.info" target="_blank" rel="noopener" style="color:var(--accent2); font-weight:700;">vibesafe.info</a>, pass/fail before you share. <a href="/security.html">See exactly what gets checked</a>.</p>
         </div>
         <div class="bcard glass b-half reveal">
           <div class="ic">📦</div>
           <div class="pain">Lock-in</div>
           <h3>Your app is a file you own</h3>
-          <p>Full code always visible. Download your app as a single portable HTML file and run it anywhere.</p>
+          <p>Full code always visible. Download your app as a single portable HTML file and run it anywhere — the <a href="/user-guide.html">user guide</a> walks through editing, publishing and exporting it.</p>
         </div>
       </div>
 
@@ -863,65 +758,9 @@ Public reports and user complaints about other AI app builders describe <b>large
         </div>
       </div>
 
-      <div class="compare-wrap reveal">
-        <table class="compare-table">
-          <thead>
-            <tr><th>Feature</th><th>Bring your own key</th><th>Managed</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Platform fee</td><td>$0/mo</td><td>$15/mo</td></tr>
-            <tr><td>Anthropic usage</td><td>Billed directly, no markup</td><td>$10/mo included, on us</td></tr>
-            <tr><td>Anthropic API key required</td><td>Yes</td><td>No</td></tr>
-            <tr><td>Payment card required</td><td>No</td><td>Yes, via Stripe</td></tr>
-            <tr><td>15 free templates</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>Version history &amp; rollback</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>Security scan on every build</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>Launch Check (real-browser validation)</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>Publish to a shareable link</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-            <tr><td>Failed generations billed?</td><td>Never</td><td>Never</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pricing-faq reveal">
-        <h3 class="faq-title">Pricing questions</h3>
-        <div class="faq-item">
-          <button type="button" class="faq-q">What happens if I go over the $10/month Managed budget?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Generation pauses until your next billing cycle — you're never silently charged more. Switch to your own API key in Settings to keep going immediately.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">How much does a typical build actually cost on my own key?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Most single-file app generations run $0.05–$0.20 depending on complexity, billed by Anthropic at their standard per-token rates. We add no markup on top.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">Can I switch between Bring Your Own Key and Managed?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Yes, any time in Settings — add a key or sign in to Managed, nothing about your project or version history changes.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">Do failed generations ever cost me anything?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">You're never charged extra — the $15/month Managed fee is flat, and BYOK failures never count toward your session's build-spend meter or cap. One nuance on Managed: a failed attempt still draws from your $10/mo included usage, since that's real Anthropic cost we absorb either way — it just never counts against your visible "builds this month."</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">Is there a free way to try it first?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Yes — every new account gets one free AI build with no API key or card. It runs on a lighter AI model (Claude Sonnet 5), so the result is less polished than paid builds, which use Claude Opus 5. All 15 templates are also free and cost zero tokens.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">Can it build more than one page?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Yes — start a multi-file React project instead of a single page, and the AI works across a real, multi-file codebase: components, hooks, and styles in separate files, only the files that need a change get touched.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">Can I get my code onto GitHub?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Yes, for multi-file projects — connect your GitHub account and push to a repository you own with one click, as a real commit. It's ordinary code the moment it lands there, not something specific to this builder.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">Can I deploy to my own domain?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Yes — connect a project-scoped Vercel token and deploy a multi-file project directly to your own Vercel account, your own domain, your own bill. It builds from real source, the same as if you'd pushed it yourself.</div>
-        </div>
-        <div class="faq-item">
-          <button type="button" class="faq-q">What stops an app going public with a leaked API key in it?<span class="faq-chevron">›</span></button>
-          <div class="faq-a">Every generation is scanned for hardcoded credentials before you can publish. Deploying to your own Vercel account runs an additional Publish Security Check at the moment you make something public — a live credential blocks the change outright, with no way to override it.</div>
-        </div>
-      </div>
+      <p class="section-sub reveal" style="margin-top:26px;">
+        <a href="/pricing.html">See the full plan comparison and pricing questions →</a>
+      </p>
     </section>
   </div>
 
@@ -1132,12 +971,6 @@ Public reports and user complaints about other AI app builders describe <b>large
       });
     }
 
-    // ---------- pricing: FAQ accordion ----------
-    document.querySelectorAll(".pricing-faq .faq-q").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        btn.closest(".faq-item").classList.toggle("open");
-      });
-    });
   </script>
   <script src="/chatwidget.js"></script>
 <script>
