@@ -147,5 +147,11 @@
       "destination": "/.well-known/security.txt",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/landing.html"
+    }
   ]
 }
