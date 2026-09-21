@@ -83,7 +83,7 @@ test("totals split by mode; out-of-window and unknown-mode rows are ignored", ()
   );
   assert.deepEqual(s.totals.byok, { builds: 4, failures: 1, cost: 0.5 });
   assert.deepEqual(s.totals.managed, { builds: 2, failures: 0, cost: 0.2 });
-  assert.deepEqual(s.series[29], { day: "2026-09-11", byok: 3, managed: 0, failures: 1 });
+  assert.deepEqual(s.series[29], { day: "2026-09-11", byok: 3, managed: 0, starter: 0, failures: 1 });
   assert.equal(s.activeDays, 2);
 });
 
@@ -251,4 +251,27 @@ test("free trial figures sum this month's trial rows only", async () => {
   assert.equal(t.builds, 1);
   assert.equal(Number(t.spent.toFixed(2)), 0.06);
   assert.equal(t.monthlyCap, 2);
+});
+
+test("free-trial builds are recorded, not silently dropped", async () => {
+  // Regression: "starter" was missing from the accepted modes, so every free
+  // trial build recorded nothing and the dashboard chart stayed empty.
+  const calls = [];
+  const client = { rpc: async (name, args) => { calls.push(args); return { error: null }; } };
+  await recordGenerationStat(client, { mode: "starter", cost: 0.2269, succeeded: true });
+  assert.equal(calls.length, 1, "a free-trial build reaches the database");
+  assert.deepEqual(calls[0], { p_mode: "starter", p_cost: 0.2269, p_succeeded: true });
+});
+
+test("free-trial builds appear in the daily series and totals", () => {
+  const s = summarizeDailyStats(
+    [
+      { day: "2026-09-11", mode: "starter", builds: 1, failures: 0, cost: 0.2269 },
+      { day: "2026-09-11", mode: "byok", builds: 2, failures: 1, cost: 0.3 },
+    ],
+    { days: 30, now: NOW }
+  );
+  assert.deepEqual(s.totals.starter, { builds: 1, failures: 0, cost: 0.2269 });
+  assert.equal(s.series[29].starter, 1);
+  assert.equal(s.activeDays, 1, "a trial-only day still counts as active");
 });

@@ -71,7 +71,7 @@
   .loading { text-align: center; padding: 50px 20px; color: var(--dim); font-size: 13px; }
 
   /* ---------- sections ---------- */
-  :root { --series-byok: #2b9fe0; --series-managed: #8b5cf6; } /* validated pair, dark surface */
+  :root { --series-byok: #2b9fe0; --series-managed: #8b5cf6; --series-starter: #35c28f; } /* validated trio, dark surface */
   section.block { margin-bottom: 40px; }
   section.block h2 { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
   section.block .block-sub { color: var(--dim); font-size: 12.5px; margin-bottom: 14px; }
@@ -91,6 +91,7 @@
   .seg:last-child { border-radius: 4px 4px 0 0; }
   .seg.byok { background: var(--series-byok); }
   .seg.managed { background: var(--series-managed); }
+  .seg.starter { background: var(--series-starter); }
   .axis { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--dim2); margin-top: 6px; font-family: var(--mono); }
   #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--bg-panel); border: 1px solid var(--glass-border);
          border-radius: 8px; padding: 8px 10px; font-size: 12px; line-height: 1.5; white-space: nowrap; display: none; }
@@ -239,32 +240,35 @@
     const el = document.getElementById("activityBody");
     if (!a || !a.available) { el.innerHTML = unavailable(a || {}); return; }
     const t = a.totals;
-    const failures = t.byok.failures + t.managed.failures;
-    const max = Math.max(1, ...a.series.map((p) => p.byok + p.managed));
+    const failures = t.byok.failures + t.managed.failures + t.starter.failures;
+    const max = Math.max(1, ...a.series.map((p) => p.byok + p.managed + p.starter));
     const cols = a.series.map((p, i) => {
       const h = (n) => (n / max * 100).toFixed(2) + "%";
       return '<div class="bar-col" data-i="' + i + '">' +
         (p.byok ? '<div class="seg byok" style="height:' + h(p.byok) + '"></div>' : "") +
         (p.managed ? '<div class="seg managed" style="height:' + h(p.managed) + '"></div>' : "") +
+        (p.starter ? '<div class="seg starter" style="height:' + h(p.starter) + '"></div>' : "") +
         "</div>";
     }).join("");
-    const tableRows = a.series.slice().reverse().filter((p) => p.byok + p.managed + p.failures)
-      .map((p) => "<tr><td>" + fmtDay(p.day) + "</td><td>" + p.byok + "</td><td>" + p.managed + "</td><td>" + p.failures + "</td></tr>").join("");
+    const tableRows = a.series.slice().reverse().filter((p) => p.byok + p.managed + p.starter + p.failures)
+      .map((p) => "<tr><td>" + fmtDay(p.day) + "</td><td>" + p.byok + "</td><td>" + p.managed + "</td><td>" + p.starter + "</td><td>" + p.failures + "</td></tr>").join("");
     el.innerHTML =
       '<div class="summary-grid">' +
-        tile("Free-key builds", t.byok.builds, "est. $" + t.byok.cost.toFixed(2) + " paid by users to Anthropic") +
+        tile("Own-key builds", t.byok.builds, "est. $" + t.byok.cost.toFixed(2) + " paid by users to Anthropic") +
         tile("Managed builds", t.managed.builds, "$" + t.managed.cost.toFixed(2) + " on your key") +
+        tile("Free-trial builds", t.starter.builds, "$" + t.starter.cost.toFixed(2) + " on your key") +
         tile("Failed builds", failures, "never counted against users") +
         tile("Active days", a.activeDays + " / " + a.days) +
       "</div>" +
       '<div class="chart-card glass">' +
         '<div class="legend"><span><span class="sw" style="background:var(--series-byok)"></span>Free (own key)</span>' +
-        '<span><span class="sw" style="background:var(--series-managed)"></span>Managed</span></div>' +
+        '<span><span class="sw" style="background:var(--series-managed)"></span>Managed</span>' +
+        '<span><span class="sw" style="background:var(--series-starter)"></span>Free trial</span></div>' +
         '<div class="bars" id="bars">' + cols + "</div>" +
         '<div class="axis"><span>' + fmtDay(a.series[0].day) + "</span><span>" + fmtDay(a.series[a.series.length - 1].day) + "</span></div>" +
         '<details class="table-view"><summary>View as table</summary>' +
           (tableRows
-            ? "<table><thead><tr><th>Day</th><th>Free builds</th><th>Managed builds</th><th>Failed</th></tr></thead><tbody>" + tableRows + "</tbody></table>"
+            ? "<table><thead><tr><th>Day</th><th>Own key</th><th>Managed</th><th>Free trial</th><th>Failed</th></tr></thead><tbody>" + tableRows + "</tbody></table>"
             : '<div class="muted-row">No builds recorded in this window yet.</div>') +
         "</details>" +
       "</div>";
