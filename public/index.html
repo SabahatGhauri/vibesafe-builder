@@ -136,6 +136,18 @@
           <button type="button" class="btn ghost mini" id="paletteClearBtn">No preference (let the AI choose)</button>
         </div>
       </div>
+      <div class="palette-picker" id="imagePicker">
+        <button type="button" class="palette-toggle" id="imageToggleBtn" title="Use your own images in the app the AI builds">
+          <span id="imageToggleLabel">🖼️ Images: none added</span>
+          <span class="palette-chevron">›</span>
+        </button>
+        <div class="palette-panel" id="imagePanel" hidden>
+          <p class="gh-meta">Add your own logo or photo and the AI will place it in the app — a hero image, a header logo, or a page background. Images are stored with your project and embedded when you preview, publish or download, so the file you own still contains them.</p>
+          <div class="image-slots" id="imageSlots"></div>
+          <p class="gh-meta" id="imageHint"></p>
+          <p class="gh-meta">PNG, JPEG, WebP or GIF. Each image is resized and re-encoded in your browser, which also strips location data from photos. SVG isn't accepted — it can contain scripts.</p>
+        </div>
+      </div>
       <form class="composer" id="composer">
         <div class="composer-box">
           <label for="agentSelect">Agent</label>
@@ -442,6 +454,7 @@
   <script src="templates.js"></script>
   <script src="palettes.js"></script>
   <script src="app.js"></script>
+  <script src="assets.js"></script>
   <script src="forms.js"></script>
   <script src="visualEditor.js"></script>
   <script src="buildStatus.js"></script>

@@ -20,6 +20,10 @@ const state = {
   activeFile: null,   // which file the Code tab is showing in multi mode
   assembled: "",      // cached assembled preview HTML for the current version
   palette: null,      // { bg, primary, accent, text } — customer-chosen colors the AI builds with, or null for "no preference"
+  // Customer-supplied images, { slot: dataUri }. Kept out of the version list
+  // on purpose: versions store {{image:slot}} placeholders, so one image is
+  // stored once rather than duplicated into every build. See public/assets.js.
+  assets: {},
 };
 
 const $ = (id) => document.getElementById(id);
@@ -404,6 +408,7 @@ function buildSavePayload() {
     previewId: state.previewId || null,
     kind: state.kind,
     palette: state.palette,
+    assets: state.assets,
     chatHTML: messagesEl.innerHTML,
   };
 }
@@ -429,6 +434,14 @@ function loadProject() {
     // nothing built yet, so picking colors before ever hitting "Build it"
     // survives a reload instead of silently resetting to "no preference".
     state.palette = isValidPalette(p.palette) ? p.palette : null;
+    // Re-validate on the way in: stored data is only as trustworthy as the
+    // browser it came from, and these strings end up in an img src.
+    state.assets = {};
+    if (p.assets && window.assets) {
+      for (const slot of window.assets.SLOTS) {
+        if (window.assets.isSafeDataUri(p.assets[slot])) state.assets[slot] = p.assets[slot];
+      }
+    }
     if (!Array.isArray(p.versions) || p.versions.length === 0) return false;
     state.versions = p.versions;
     state.currentVersion = typeof p.currentVersion === "number" ? p.currentVersion : p.versions.length - 1;
@@ -754,8 +767,16 @@ async function refreshEstimate() {
 }
 
 /* ---------------- generation ---------------- */
+// The stored form. Carries {{image:slot}} placeholders, which is deliberately
+// what the model sees and what version history keeps.
 const currentCode = () =>
   state.currentVersion >= 0 ? state.versions[state.currentVersion].code || "" : "";
+
+// The runnable form. Every caller that produces something a browser will
+// actually render - preview, publish, download, Launch Check - goes through
+// this, so an image is embedded at the last moment and never stored per
+// version. Untrusted values resolve to a blank pixel (see public/assets.js).
+const withAssets = (code) => (window.assets ? window.assets.substitute(code, state.assets) : code);
 
 // In multi mode a version stores { files } instead of { code }. Everything that
 // needs "the whole project as one document" (preview, publish, download) goes
@@ -790,7 +811,7 @@ function hasProject() {
 }
 // Assembly is async, so callers that need runnable HTML must await this.
 async function runnableHtml() {
-  return isMulti() ? (state.assembled || (await assembleCurrent())) : currentCode();
+  return isMulti() ? (state.assembled || (await assembleCurrent())) : withAssets(currentCode());
 }
 
 async function assembleCurrent() {
@@ -1062,7 +1083,7 @@ async function renderAll() {
   // preview
   $("previewEmpty").style.display = code ? "none" : "";
   $("previewFrame").hidden = !code;
-  if (code) $("previewFrame").srcdoc = code;
+  if (code) $("previewFrame").srcdoc = withAssets(code);
   // code
   $("codeView").textContent = code || "No code yet.";
   $("fileTree").hidden = true;
@@ -1181,7 +1202,9 @@ $("publishBtn").addEventListener("click", async () => {
     const r = await fetch("/api/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, files: isMulti() ? currentFiles() : null, kind: state.kind, id: state.publishId, publishKey: state.pendingPublishKey }),
+      // Scanned as source above, published with images embedded: a data URI is
+      // content, not code, and the scanner has nothing useful to say about it.
+      body: JSON.stringify({ code: isMulti() ? code : withAssets(code), files: isMulti() ? currentFiles() : null, kind: state.kind, id: state.publishId, publishKey: state.pendingPublishKey }),
     });
     const data = await r.json();
     if (!r.ok) {
@@ -1713,6 +1736,121 @@ function setPalette(colors) {
   saveProject();
 }
 
+/* ---------------- customer images ---------------- */
+// Resizing happens here rather than server-side because the bytes never need to
+// leave the browser: the image is embedded into the app itself. Re-encoding via
+// canvas also drops EXIF, so a customer's holiday photo does not publish their
+// GPS coordinates along with it.
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const max = assets.MAX_EDGE;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      // Step the quality down until it fits the budget. Three attempts is
+      // enough to take a 12MB phone photo under 300KB; past that the image is
+      // pathological and the customer gets a clear message instead of a hang.
+      let out = "";
+      for (const q of [0.82, 0.68, 0.5]) {
+        out = canvas.toDataURL("image/webp", q);
+        if (out.length <= assets.MAX_BYTES) break;
+      }
+      if (!assets.isSafeDataUri(out)) return reject(new Error("That image could not be processed."));
+      if (out.length > assets.MAX_BYTES) {
+        return reject(new Error("That image is too detailed to compress under " + Math.round(assets.MAX_BYTES / 1024) + "KB. Try a smaller or simpler one."));
+      }
+      resolve(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("That file isn't a readable image.")); };
+    img.src = url;
+  });
+}
+
+function renderImagePicker() {
+  const host = $("imageSlots");
+  if (!host || !window.assets) return;
+  const count = Object.keys(state.assets).length;
+  $("imageToggleLabel").textContent = count
+    ? "\u{1f5bc}\ufe0f Images: " + count + " added"
+    : "\u{1f5bc}\ufe0f Images: none added";
+
+  host.innerHTML = assets.SLOTS.map((slot) => {
+    const has = Boolean(state.assets[slot]);
+    return `<div class="image-slot${has ? " has-image" : ""}">
+      <div class="image-slot-head"><b>${slot}</b><code>${assets.slotPlaceholder(slot)}</code></div>
+      ${has ? `<img class="image-slot-thumb" src="${state.assets[slot]}" alt="Your ${slot} image">` : `<div class="image-slot-empty">no image</div>`}
+      <div class="image-slot-actions">
+        <label class="btn ghost mini">${has ? "Replace" : "Upload"}<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-slot="${slot}" hidden></label>
+        ${has ? `<button type="button" class="btn ghost mini" data-remove="${slot}">Remove</button>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+
+  // Tell the customer what the CURRENT app actually uses, so an uploaded image
+  // that nothing references doesn't look like a broken feature.
+  const used = assets.placeholdersUsed(currentCode());
+  const hint = $("imageHint");
+  const added = Object.keys(state.assets);
+  if (!added.length) {
+    hint.textContent = "Add an image, then ask for it: \u201cuse my hero image at the top of the page\u201d.";
+  } else if (!used.length) {
+    hint.textContent = "Your app doesn't use " + (added.length > 1 ? "these images" : "this image") + " yet \u2014 ask the AI to add " + (added.length > 1 ? "them" : "it") + ", for example \u201cput my logo in the header\u201d.";
+  } else {
+    const missing = used.filter((u) => !state.assets[u]);
+    hint.textContent = "In use: " + used.join(", ") + (missing.length ? " \u00b7 still needs an image for: " + missing.join(", ") : "") +
+      " \u00b7 " + Math.round(assets.embeddedBytes(state.assets) / 1024) + "KB embedded";
+  }
+}
+
+function initImagePicker() {
+  if (!$("imagePicker") || !window.assets) return;
+  renderImagePicker();
+
+  $("imageToggleBtn").addEventListener("click", () => {
+    const panel = $("imagePanel");
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) renderImagePicker();
+  });
+
+  $("imageSlots").addEventListener("change", async (e) => {
+    const input = e.target.closest("input[type=file]");
+    if (!input || !input.files || !input.files[0]) return;
+    const slot = input.dataset.slot;
+    const file = input.files[0];
+    input.value = "";
+    if (!assets.validSlot(slot)) return;
+    const problem = assets.rejectFile(file);
+    if (problem) { addMsg("system", "\u26a0 " + esc(problem)); return; }
+    try {
+      state.assets[slot] = await compressImage(file);
+      renderImagePicker();
+      saveProject();
+      renderAll();
+      addMsg("system", `\u{1f5bc}\ufe0f Added your <b>${esc(slot)}</b> image (${Math.round(state.assets[slot].length / 1024)}KB). Ask me to use it \u2014 for example \u201cuse my ${esc(slot)} image at the top\u201d.`);
+    } catch (err) {
+      addMsg("system", "\u26a0 " + esc(err.message));
+    }
+  });
+
+  $("imageSlots").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove]");
+    if (!btn) return;
+    const slot = btn.dataset.remove;
+    delete state.assets[slot];
+    renderImagePicker();
+    saveProject();
+    renderAll();
+    addMsg("system", `Removed your <b>${esc(slot)}</b> image. Anywhere the app still references it will show nothing until you add another.`);
+  });
+}
+
 function initPalettePicker() {
   renderPaletteGrid();
   renderPaletteToggle();
@@ -1756,6 +1894,7 @@ function initPalettePicker() {
 const restored = loadProject();
 renderTemplateGrid();
 initPalettePicker();
+initImagePicker();
 
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
 // choice rather than something the AI infers: single-file apps stay the default
