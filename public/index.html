@@ -114,6 +114,14 @@
       <div class="stuck-banner" id="stuckBanner" hidden>
         ⚡ Same problem twice — switching strategy. The AI will re-diagnose from scratch instead of repeating the failed fix.
       </div>
+      <!-- Always reachable: the template grid lives in the chat, which scrolls
+           away the moment someone types. This row does not move. -->
+      <div class="palette-picker">
+        <a class="palette-toggle template-link" href="/templates.html" title="See all 15 templates, with a live preview of each">
+          <span>🧩 Templates: browse 15 free starters</span>
+          <span class="palette-chevron">›</span>
+        </a>
+      </div>
       <div class="palette-picker" id="palettePicker">
         <button type="button" class="palette-toggle" id="paletteToggleBtn" title="Pick a color palette the AI should build with">
           <span class="palette-toggle-swatch" id="paletteToggleSwatch" hidden></span>
