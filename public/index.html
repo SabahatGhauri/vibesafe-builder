@@ -97,23 +97,6 @@
       <button class="rail-btn" type="button" id="railSettings" title="Settings">⚙</button>
     </nav>
     <aside class="chat">
-      <div class="messages" id="messages">
-        <div class="msg system">
-          <p><strong>Describe the app you want.</strong> For example: “a habit tracker with streaks”, “an invoice generator”, “a flashcard app for Spanish”.</p>
-          <p class="hint">Before every generation you'll see a cost estimate. Failed generations don't count toward your build spend. Every change is a reviewable diff you can roll back.</p>
-        </div>
-        <div class="msg system">
-          <p><strong>Building something bigger?</strong> Start a multi-file React project instead of a single page — the AI can then edit several files at once.</p>
-          <button class="btn ghost" type="button" id="startReactBtn" style="margin-top:8px;">⚛ New React project</button>
-        </div>
-        <div class="msg system">
-          <p><strong>Or start from a template</strong> — instant v1, zero generation cost:</p>
-          <div class="template-grid" id="templateGrid"></div>
-        </div>
-      </div>
-      <div class="stuck-banner" id="stuckBanner" hidden>
-        ⚡ Same problem twice — switching strategy. The AI will re-diagnose from scratch instead of repeating the failed fix.
-      </div>
       <div class="setup-head">
         <h2>Create your app</h2>
         <p>Follow the steps, or just describe what you want.</p>
@@ -200,9 +183,28 @@
           <p class="gh-meta">PNG, JPEG, WebP or GIF. Each image is resized and re-encoded in your browser, which also strips location data from photos. SVG isn't accepted — it can contain scripts.</p>
         </div>
       </div>
+      <div class="messages" id="messages">
+        <div class="msg system">
+          <p><strong>Describe the app you want.</strong> For example: “a habit tracker with streaks”, “an invoice generator”, “a flashcard app for Spanish”.</p>
+          <p class="hint">Before every generation you'll see a cost estimate. Failed generations don't count toward your build spend. Every change is a reviewable diff you can roll back.</p>
+        </div>
+        <div class="msg system">
+          <p><strong>Building something bigger?</strong> Start a multi-file React project instead of a single page — the AI can then edit several files at once.</p>
+          <button class="btn ghost" type="button" id="startReactBtn" style="margin-top:8px;">⚛ New React project</button>
+        </div>
+        <div class="msg system">
+          <p><strong>Or start from a template</strong> — instant v1, zero generation cost:</p>
+          <div class="template-grid" id="templateGrid"></div>
+        </div>
+      </div>
+      <div class="stuck-banner" id="stuckBanner" hidden>
+        ⚡ Same problem twice — switching strategy. The AI will re-diagnose from scratch instead of repeating the failed fix.
+      </div>
       <form class="composer" id="composer">
         <div class="composer-box">
-          <label for="agentSelect">Agent</label>
+          <details class="agent-details">
+            <summary>Agent: <span id="agentSummary">Auto</span></summary>
+          <label for="agentSelect" class="sr-only">Agent</label>
           <select id="agentSelect" aria-describedby="agentHint">
             <option value="auto">Auto — choose from your request</option>
             <option value="build">Build — create or change features</option>
@@ -210,6 +212,7 @@
             <option value="review">Review — report without changing code</option>
           </select>
           <p class="hint" id="agentHint">Choose a task or let Auto route your request. All modes use your current model and consume usage. Review leaves code unchanged and does not run tests.</p>
+          </details>
           <div class="composer-title"><span class="pick-num">6</span> <b>Describe your app</b></div>
           <textarea id="promptInput" rows="4" placeholder="e.g. a task tracker for a small team, with a board view and due dates…"></textarea>
           <div class="prompt-chips" id="promptChips" aria-label="Example prompts">

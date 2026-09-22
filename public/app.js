@@ -2065,6 +2065,14 @@ function markStepsDone() {
 }
 
 function initPromptHelpers() {
+  // Keep the collapsed summary honest about which agent is selected.
+  const agent = $("agentSelect");
+  const summary = $("agentSummary");
+  if (agent && summary) {
+    const sync = () => { summary.textContent = agent.options[agent.selectedIndex].text.split(" — ")[0]; };
+    agent.addEventListener("change", sync);
+    sync();
+  }
   const input = $("promptInput");
   if (!input) return;
   // Chips fill the box rather than sending: a starting point the customer

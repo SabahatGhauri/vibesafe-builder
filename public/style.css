@@ -137,8 +137,17 @@ body {
   flex-direction: column;
   border-right: 1px solid var(--line);
   background: var(--bg-raise);
+  /* The whole column scrolls as one. It used to be the message list that
+     scrolled while the steps and composer held fixed height, so on a short
+     window the list was squeezed to an empty strip and the lower steps could
+     not be reached at all. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
-.messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.messages { flex: 0 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+/* No conversation yet means no empty box taking up the top of the panel. */
+.messages:empty { display: none; }
 
 .msg { padding: 10px 12px; border-radius: 10px; font-size: 13.5px; line-height: 1.5; }
 .msg.system { background: var(--bg-panel); color: var(--text-dim); border: 1px dashed var(--line); }
@@ -178,7 +187,16 @@ body {
   color: var(--warn);
 }
 
-.composer { padding: 12px 14px; border-top: 1px solid var(--line); }
+.composer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  /* Stays reachable while the steps above scroll: the thing you type into
+     should never be the thing you have to scroll to find. */
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-raise);
+  z-index: 2;
+}
 /* One rounded surface holding the textarea and its controls, so the composer
    reads as a single input rather than a box with a button parked underneath. */
 .composer-box {
@@ -549,6 +567,16 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .palette-picker.done .pick-num { color: transparent; }
 .palette-picker.done .pick-num::after { color: #fff; }
 .palette-toggle:hover .pick-num { border-color: var(--accent); color: var(--text); }
+
+/* The agent picker is a power-user control, not the main event: collapsed by
+   default so the prompt box owns the space. */
+.agent-details { margin-bottom: 8px; }
+.agent-details > summary { cursor: pointer; font-size: 11.5px; color: var(--dim); padding: 3px 0; list-style: none; }
+.agent-details > summary::-webkit-details-marker { display: none; }
+.agent-details > summary::before { content: "▸"; display: inline-block; margin-right: 6px; transition: transform .15s; }
+.agent-details[open] > summary::before { transform: rotate(90deg); }
+.agent-details > summary:hover { color: var(--text); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 /* ---------- the prompt box is the point of the screen ---------- */
 .composer-title { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
