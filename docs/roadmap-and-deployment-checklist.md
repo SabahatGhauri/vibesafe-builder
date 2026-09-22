@@ -21,7 +21,7 @@ existing features before implementing duplicates.
 - [ ] **Request indexing** in Search Console for the 7 pages Google has not indexed:
       pricing, templates, what-is-vibesafe-builder, security, user-guide, how-to-build-your-first-app,
       ai-app-builder-checklist.
-- [ ] **Test Payments end to end.** Create a real Stripe payment link, paste it into the Payments
+- [x] **Test Payments end to end.** Confirmed working 22 Sept: link pasted, buy button built, checkout opened. Create a real Stripe payment link, paste it into the Payments
       panel, ask for a buy button, publish, and click it as a buyer. Only you can do this: it needs
       your Stripe account.
 - [ ] **Backlinks.** Every current link is either from a site we own or `nofollow`. Independent
