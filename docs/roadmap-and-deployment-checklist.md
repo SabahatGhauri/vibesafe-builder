@@ -21,18 +21,21 @@ existing features before implementing duplicates.
 - [ ] **Request indexing** in Search Console for the 7 pages Google has not indexed:
       pricing, templates, what-is-vibesafe-builder, security, user-guide, how-to-build-your-first-app,
       ai-app-builder-checklist.
+- [ ] **Test Payments end to end.** Create a real Stripe payment link, paste it into the Payments
+      panel, ask for a buy button, publish, and click it as a buyer. Only you can do this: it needs
+      your Stripe account.
 - [ ] **Backlinks.** Every current link is either from a site we own or `nofollow`. Independent
       followed links are the single biggest constraint on brand-name search. Directories, a Show HN
       repost in a few weeks, articles on Dev.to or Hashnode.
 
 ### Next features, in order
 
-- [ ] **1. Payments in generated apps** (~2 days). The one capability Lovable has that we do not.
+- [x] **1. Payments in generated apps** — phase 1 shipped (payment links). The one capability Lovable has that we do not.
       Phase 1: customer pastes a Stripe payment link, AI builds checkout buttons, no secrets anywhere.
       Phase 2: connected Stripe account, server-side Checkout Sessions, webhook writes paid orders
       into the app's data store. Phase 3: subscriptions. Security scan must treat a hardcoded
       `sk_live` key as a publish-blocking critical.
-- [ ] **2. App Spec** (~2-3 days). A living document of what the app must do: the AI reads it before
+- [x] **2. App Spec** — shipped. A living document of what the app must do: the AI reads it before
       each build and updates it after. Warns when a change would break something the spec says must
       hold. Answers the complaint common to every prompt-to-app builder - intent and code drift apart
       as the project grows - and nobody else solves it. The most defensible thing on this list.
