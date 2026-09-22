@@ -27,6 +27,9 @@ const state = {
   // Stripe payment links the customer pasted, { slug: {label, price, url} }.
   // Links only - no key, no secret, and the money never passes through us.
   payments: {},
+  // What this app is for and what must stay true. Rides in every build prompt
+  // and is updated from what the model reports back. See public/spec.js.
+  spec: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -413,6 +416,7 @@ function buildSavePayload() {
     palette: state.palette,
     assets: state.assets,
     payments: state.payments,
+    spec: state.spec,
     chatHTML: messagesEl.innerHTML,
   };
 }
@@ -443,6 +447,7 @@ function loadProject() {
     // Re-validate on the way in for the same reason images are: a stored link
     // ends up in an href, and stored data is only as trustworthy as the browser
     // it came from.
+    state.spec = window.spec ? window.spec.normalise(p.spec) : null;
     state.payments = {};
     if (p.payments && window.payments) {
       for (const [slug, item] of Object.entries(p.payments)) {
@@ -751,7 +756,7 @@ async function refreshEstimate() {
     const r = await fetch("/api/estimate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles(), palette: state.palette, agent: selectedAgent() }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), kind: state.kind, files: currentFiles(), palette: state.palette, spec: state.spec, agent: selectedAgent() }),
     });
     if (!r.ok) throw new Error((await r.json()).error || r.status);
     const est = await r.json();
@@ -894,7 +899,7 @@ $("composer").addEventListener("submit", async (e) => {
     const r = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-anthropic-key": state.apiKey, ...managedHeaders },
-      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles(), palette: state.palette, agent }),
+      body: JSON.stringify({ prompt, currentCode: currentCode(), strategy, kind: state.kind, files: currentFiles(), palette: state.palette, spec: state.spec, agent }),
     });
     if (!r.ok && !r.headers.get("content-type")?.includes("event-stream")) {
       const errBody = await r.json();
@@ -945,6 +950,10 @@ $("composer").addEventListener("submit", async (e) => {
       code = ex.code;
       note = ex.note;
     }
+    // The model reports spec changes as SPEC+ / SPEC! lines in its reply. They
+    // are bookkeeping, so they are applied here and never shown as chat.
+    const specReport = window.spec ? spec.parseReply(result.text) : { added: [], conflicts: [] };
+    if (note) note = window.spec ? spec.stripSpecLines(note) || note : note;
     if (isMulti() ? !mergedFiles : !code) {
       // Failed generation → wasted, NOT build spend (fix #1)
       state.wasted += result.cost || 0;
@@ -978,6 +987,27 @@ $("composer").addEventListener("submit", async (e) => {
     workingMsg.innerHTML =
       esc(version.note) +
       `<span class="cost-line">v${version.id} · ${fmt$(version.cost)} · ${result.usage.output_tokens.toLocaleString()} tokens out</span>`;
+
+    // Seed the purpose from the very first request: by definition that is what
+    // the customer asked the app to be, and an empty spec never gets filled in
+    // by hand.
+    if (window.spec) {
+      if (spec.isEmpty(state.spec) && state.versions.length === 1) {
+        state.spec = spec.withPurpose(state.spec, prompt);
+      }
+      if (specReport.added.length) {
+        const before = spec.normalise(state.spec).rules.length;
+        state.spec = spec.withRules(state.spec, specReport.added);
+        const addedNow = spec.normalise(state.spec).rules.slice(before).map((r) => r.text);
+        if (addedNow.length) {
+          addMsg("system", `\u{1f4cb} Added to the spec: <b>${esc(addedNow.join("; "))}</b> \u2014 from now on I'll keep this true. Edit it in <b>Spec</b> below.`);
+        }
+      }
+      for (const clash of specReport.conflicts) {
+        addMsg("system", `<div class="spec-conflict">\u26a0 <b>This change works against your spec.</b> ${esc(clash)}<br>Check the <b>Spec</b> panel \u2014 either roll this version back, or remove the rule if it no longer applies.</div>`);
+      }
+      renderSpecPanel();
+    }
 
     await renderAll();
     if (result.mode === "starter") {
@@ -1755,6 +1785,65 @@ function setPalette(colors) {
   saveProject();
 }
 
+/* ---------------- the app spec ---------------- */
+function renderSpecPanel() {
+  if (!$("specPicker") || !window.spec) return;
+  const s = spec.normalise(state.spec);
+  $("specToggleLabel").textContent = spec.isEmpty(s)
+    ? "\u{1f4cb} Spec: not set"
+    : "\u{1f4cb} Spec: " + s.rules.length + (s.rules.length === 1 ? " rule" : " rules");
+
+  if ($("specPurpose") !== document.activeElement) $("specPurpose").value = s.purpose;
+
+  $("specRules").innerHTML = s.rules.length
+    ? s.rules.map((r) => `<div class="spec-rule"><span>${esc(r.text)}</span><button type="button" title="Remove this rule" data-spec-remove="${esc(r.text)}">\u00d7</button></div>`).join("")
+    : '<p class="gh-meta">No rules yet. They get added as you build, or you can write one below.</p>';
+
+  $("specHint").textContent = s.rules.length >= spec.MAX_RULES
+    ? "That's the maximum of " + spec.MAX_RULES + " rules. Remove one to add another \u2014 a spec nobody reads protects nothing."
+    : "Rules travel with every build. The AI is told to say so, rather than silently break one.";
+}
+
+function initSpecPanel() {
+  if (!$("specPicker") || !window.spec) return;
+  renderSpecPanel();
+
+  $("specToggleBtn").addEventListener("click", () => {
+    const panel = $("specPanel");
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) renderSpecPanel();
+  });
+
+  $("specPurpose").addEventListener("change", () => {
+    state.spec = spec.withPurpose(state.spec, $("specPurpose").value);
+    renderSpecPanel();
+    saveProject();
+  });
+
+  $("specAddForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const value = $("specRuleInput").value.trim();
+    if (!value) return;
+    const before = spec.normalise(state.spec).rules.length;
+    state.spec = spec.withRules(state.spec, [value]);
+    if (spec.normalise(state.spec).rules.length === before) {
+      addMsg("system", "\u26a0 That rule is already in the spec, or the spec is full.");
+      return;
+    }
+    $("specRuleInput").value = "";
+    renderSpecPanel();
+    saveProject();
+  });
+
+  $("specRules").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-spec-remove]");
+    if (!btn) return;
+    state.spec = spec.withoutRule(state.spec, btn.dataset.specRemove);
+    renderSpecPanel();
+    saveProject();
+  });
+}
+
 /* ---------------- selling something (payment links) ---------------- */
 function slugFor(label) {
   const base = String(label).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 20);
@@ -1998,6 +2087,7 @@ renderTemplateGrid();
 initPalettePicker();
 initImagePicker();
 initPayPicker();
+initSpecPanel();
 
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
 // choice rather than something the AI infers: single-file apps stay the default

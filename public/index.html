@@ -136,6 +136,23 @@
           <button type="button" class="btn ghost mini" id="paletteClearBtn">No preference (let the AI choose)</button>
         </div>
       </div>
+      <div class="palette-picker" id="specPicker">
+        <button type="button" class="palette-toggle" id="specToggleBtn" title="What this app is for, and what must stay true">
+          <span id="specToggleLabel">📋 Spec: not set</span>
+          <span class="palette-chevron">›</span>
+        </button>
+        <div class="palette-panel" id="specPanel" hidden>
+          <p class="gh-meta">What this app is for, and the things that must stay true as it changes. The AI reads this before every build, so a later change can't quietly undo an earlier decision — and it tells you when a request would break one.</p>
+          <label class="spec-label" for="specPurpose">Purpose</label>
+          <input id="specPurpose" maxlength="200" placeholder="e.g. Track my reading and show a streak" />
+          <div class="spec-rules" id="specRules"></div>
+          <form class="spec-add" id="specAddForm">
+            <input id="specRuleInput" maxlength="140" placeholder="Add something that must stay true…" />
+            <button class="btn ghost mini" type="submit">Add</button>
+          </form>
+          <p class="gh-meta" id="specHint"></p>
+        </div>
+      </div>
       <div class="palette-picker" id="payPicker">
         <button type="button" class="palette-toggle" id="payToggleBtn" title="Sell something in the app the AI builds">
           <span id="payToggleLabel">💳 Payments: not set up</span>
@@ -474,6 +491,7 @@
   <!-- assets.js and payments.js define window.assets / window.payments, which
        app.js reads at init time. They must load FIRST: loading them after meant
        both pickers initialised against undefined and silently wired up nothing. -->
+  <script src="spec.js"></script>
   <script src="assets.js"></script>
   <script src="payments.js"></script>
   <script src="app.js"></script>
