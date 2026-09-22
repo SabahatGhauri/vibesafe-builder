@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Report an App | VibeSafe Builder</title>
+<meta name="description" content="Report a published app that breaks the rules — illegal content, sexual content involving minors, malware, impersonation or spam." />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href="https://vibesafebuilder.com/report" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="/docs.css" />
+<style>
+  .rep { max-width: 620px; margin: 0 auto; }
+  .rep label { display: block; margin: 18px 0 6px; font-size: 14px; font-weight: 600; }
+  .rep select, .rep input, .rep textarea {
+    width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg-panel); color: var(--text); font: inherit; font-size: 14px;
+  }
+  .rep textarea { min-height: 120px; resize: vertical; }
+  .rep .hint { color: var(--dim); font-size: 13px; margin-top: 6px; }
+  .rep .app-id { font-family: var(--mono); font-size: 13px; color: var(--text); background: var(--bg-panel);
+    border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; word-break: break-all; }
+  .rep button { margin-top: 20px; cursor: pointer; font-family: inherit; }
+  .rep-status { margin-top: 16px; font-size: 14px; }
+  .rep-status.ok { color: var(--accent); }
+  .rep-status.err { color: var(--danger); }
+  .urgent { border-left: 3px solid var(--warn); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#8b5cf6"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/demo.html">Demo</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/blog.html">Blog</a>
+      <details class="nav-more">
+        <summary>More</summary>
+        <div class="nav-more-menu">
+          <a href="/user-guide.html">User guide</a>
+          <a href="/security.html">Security</a>
+          <a href="/deploy-guide.html">Deploy</a>
+          <a href="/about.html">About</a>
+          <a href="/legal.html">Legal</a>
+        </div>
+      </details>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<main class="wrap rep">
+  <div class="doc-kicker"><span class="dot"></span> Report</div>
+  <h1>Report a published app</h1>
+  <p>Apps published here are built by our customers, not by us. If one of them breaks the rules, tell us and we'll review it. You don't need an account, and you can report anonymously.</p>
+
+  <div class="callout urgent">
+    <div class="cal-label">If someone is in danger</div>
+    Contact your local emergency services first. For child sexual abuse material, report to
+    <a href="https://report.iwf.org.uk/" target="_blank" rel="noopener">the IWF</a> or
+    <a href="https://report.cybertip.org/" target="_blank" rel="noopener">NCMEC CyberTipline</a> as well as here — we act on these immediately, but those organisations can act far beyond one website.
+  </div>
+
+  <form id="reportForm" novalidate>
+    <label for="appId">Which app?</label>
+    <div class="app-id" id="appIdDisplay">—</div>
+    <input type="hidden" id="appId" name="appId" />
+    <p class="hint" id="appIdHint">This is filled in from the link you followed.</p>
+
+    <label for="reason">What's wrong with it?</label>
+    <select id="reason" name="reason" required>
+      <option value="">Choose a reason…</option>
+      <option value="illegal">Illegal content</option>
+      <option value="sexual">Sexual content</option>
+      <option value="violence">Violence or threats</option>
+      <option value="malware">Malware, phishing or a scam</option>
+      <option value="impersonation">Impersonates a person or company</option>
+      <option value="spam">Spam</option>
+      <option value="other">Something else</option>
+    </select>
+
+    <label for="details">Anything else we should know? <span style="font-weight:400;color:var(--dim)">(optional)</span></label>
+    <textarea id="details" name="details" maxlength="2000" placeholder="What did you see, and where on the page?"></textarea>
+
+    <label for="reporter">Your email <span style="font-weight:400;color:var(--dim)">(optional)</span></label>
+    <input type="email" id="reporter" name="reporter" maxlength="254" placeholder="you@example.com" autocomplete="email" />
+    <p class="hint">Only so we can ask a follow-up question. Leave it blank to report anonymously — the report counts either way.</p>
+
+    <button class="btn primary" type="submit" id="reportSubmit">Send report</button>
+    <p class="rep-status" id="reportStatus" role="status" aria-live="polite"></p>
+  </form>
+
+  <h2>What happens next</h2>
+  <p>Reports go to a person, not a queue that nobody reads. Apps that clearly break the rules are taken offline, and the link stops working for everyone. Where a report is borderline we look at the app before doing anything, because taking down someone's working project by mistake is its own harm.</p>
+  <p>We don't share your email with the app's owner. If you gave one, we may write to ask what you saw.</p>
+  <p>You can also email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> directly, which is the right route for legal notices and anything that needs a paper trail.</p>
+</main>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">vibesafe.info</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA</div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const form = document.getElementById("reportForm");
+  const status = document.getElementById("reportStatus");
+  const idInput = document.getElementById("appId");
+  const idDisplay = document.getElementById("appIdDisplay");
+
+  // The app id arrives in the URL from the badge on the published app. It is
+  // echoed into the page as text, never as markup, because it came from a
+  // query string a stranger controls.
+  const raw = new URLSearchParams(location.search).get("app") || "";
+  const valid = /^[a-zA-Z0-9_-]{6,24}$/.test(raw);
+  if (valid) {
+    idInput.value = raw;
+    idDisplay.textContent = location.origin + "/p/" + raw;
+  } else {
+    idDisplay.textContent = "No app selected";
+    document.getElementById("appIdHint").textContent =
+      "Open the app you want to report and use its ⚑ Report link, or email contact@vibesafebuilder.com with the address.";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("reportSubmit");
+    status.className = "rep-status";
+    if (!idInput.value) { status.className = "rep-status err"; status.textContent = "No app to report — use the Report link on the app itself."; return; }
+    if (!document.getElementById("reason").value) { status.className = "rep-status err"; status.textContent = "Choose a reason."; return; }
+    btn.disabled = true;
+    status.textContent = "Sending…";
+    try {
+      const r = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appId: idInput.value,
+          reason: document.getElementById("reason").value,
+          details: document.getElementById("details").value,
+          reporter: document.getElementById("reporter").value,
+        }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || "Could not send that report.");
+      form.hidden = true;
+      status.className = "rep-status ok";
+      status.textContent = "Thank you — the report has been received and a person will look at this app.";
+    } catch (err) {
+      status.className = "rep-status err";
+      status.textContent = err.message;
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+<script src="/nav.js" defer></script>
+</body>
+</html>

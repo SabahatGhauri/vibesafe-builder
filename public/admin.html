@@ -153,6 +153,12 @@
   </section>
 
   <section class="block">
+    <h2>Reported apps</h2>
+    <div class="block-sub">Anyone can report a published app from the badge on it. Taking one down stops the link working for everyone, immediately.</div>
+    <div id="reportsBody"><div class="loading">Loading…</div></div>
+  </section>
+
+  <section class="block">
     <h2>Published apps</h2>
     <div class="block-sub">Apps customers have published to a shareable link. Automated test apps are excluded.</div>
     <div id="appsBody"><div class="loading">Loading…</div></div>
@@ -313,6 +319,54 @@
         (r.truncated ? " Showing the first 2,000 records only." : "") + "</div>";
   }
 
+  function renderReports(list) {
+    const el = document.getElementById("reportsBody");
+    if (!list) { el.innerHTML = unavailable({}); return; }
+    if (!list.length) { el.innerHTML = '<div class="unavailable glass">No reports. Nothing to review.</div>'; return; }
+    const open = list.filter((r) => !r.handled_at);
+    el.innerHTML =
+      '<div class="summary-grid">' +
+        tile("Open reports", open.length, open.length ? "needs a decision" : "all reviewed") +
+        tile("Reports total", list.length) +
+      "</div>" +
+      '<div class="table-wrap glass"><table><thead><tr><th>App</th><th>Reason</th><th>Details</th><th>When</th><th></th></tr></thead><tbody>' +
+      list.slice(0, 40).map((r) =>
+        "<tr" + (r.handled_at ? ' style="opacity:.55"' : "") + ">" +
+          '<td><a href="/p/' + encodeURIComponent(r.app_id) + '" target="_blank" rel="noopener">' + escapeHtml(r.app_id) + "</a></td>" +
+          "<td>" + escapeHtml(r.reason) + "</td>" +
+          "<td>" + (escapeHtml(r.details || "").slice(0, 120) || '<span class="muted-row">\u2014</span>') + "</td>" +
+          "<td>" + fmtDate(r.created_at) + "</td>" +
+          "<td>" + (r.handled_at
+            ? '<span class="muted-row">handled</span>'
+            : '<button class="btn ghost mini" data-disable="' + escapeHtml(r.app_id) + '">Take offline</button>') +
+          "</td></tr>").join("") +
+      "</tbody></table></div>";
+  }
+
+  // Takedown is deliberately a two-step: an app going dark for its owner with
+  // no warning should take more than one stray click.
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-disable]");
+    if (!btn) return;
+    const id = btn.dataset.disable;
+    const reason = prompt("Take /p/" + id + " offline?\n\nThe link stops working for everyone immediately.\nGive a short reason (shown to visitors):");
+    if (reason === null) return;
+    btn.disabled = true;
+    try {
+      const res = await fetch("/api/admin/apps/" + encodeURIComponent(id) + "/disable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-key": sessionStorage.getItem(KEY_STORAGE) || "" },
+        body: JSON.stringify({ disable: true, reason }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not take that app offline.");
+      loadStats(sessionStorage.getItem(KEY_STORAGE) || "");
+    } catch (err) {
+      alert(err.message);
+      btn.disabled = false;
+    }
+  });
+
   function renderApps(p) {
     const el = document.getElementById("appsBody");
     if (!p || !p.available) { el.innerHTML = unavailable(p || {}); return; }
@@ -361,6 +415,14 @@
     renderActivity(body.activity);
     renderRevenue(body.revenue);
     renderApps(body.apps);
+
+    try {
+      const rres = await fetch("/api/admin/reports", { headers: { "x-admin-key": key } });
+      const rbody = await rres.json().catch(() => ({}));
+      renderReports(rres.ok ? rbody.reports : null);
+    } catch {
+      renderReports(null);
+    }
   }
 
   async function loadData(key) {
