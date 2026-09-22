@@ -531,6 +531,14 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .palette-toggle:hover { border-color: var(--accent, #8b5cf6); }
 .palette-toggle-swatch.palette-strip { flex-shrink: 0; }
 .palette-chevron { margin-left: auto; opacity: 0.6; }
+/* Each row is an action first, its current state second: "Colors: no
+   preference" told a customer what it WAS, never that it was clickable. */
+.palette-toggle { text-align: left; }
+.pick-icon { font-size: 15px; line-height: 1.2; flex-shrink: 0; }
+.pick-text { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.pick-text b { font-size: 13px; font-weight: 600; color: var(--text); }
+.pick-text small { font-size: 11.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .template-link { text-decoration: none; color: var(--text); justify-content: space-between; }
 .template-link:hover { border-color: var(--accent); }
 .template-link span:first-child { flex: 1; }

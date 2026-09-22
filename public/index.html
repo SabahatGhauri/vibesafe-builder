@@ -118,14 +118,16 @@
            away the moment someone types. This row does not move. -->
       <div class="palette-picker">
         <a class="palette-toggle template-link" href="/templates.html" title="See all 15 templates, with a live preview of each">
-          <span>🧩 Templates: browse 15 free starters</span>
+          <span class="pick-icon">🧩</span>
+          <span class="pick-text"><b>Start from a template</b><small>15 free, working starters</small></span>
           <span class="palette-chevron">›</span>
         </a>
       </div>
       <div class="palette-picker" id="palettePicker">
         <button type="button" class="palette-toggle" id="paletteToggleBtn" title="Pick a color palette the AI should build with">
+          <span class="pick-icon">🎨</span>
+          <span class="pick-text"><b>Choose your colours</b><small id="paletteToggleLabel">The AI is picking its own</small></span>
           <span class="palette-toggle-swatch" id="paletteToggleSwatch" hidden></span>
-          <span id="paletteToggleLabel">🎨 Colors: no preference</span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="palettePanel" hidden>
@@ -146,7 +148,8 @@
       </div>
       <div class="palette-picker" id="specPicker">
         <button type="button" class="palette-toggle" id="specToggleBtn" title="What this app is for, and what must stay true">
-          <span id="specToggleLabel">📋 Spec: not set</span>
+          <span class="pick-icon">📋</span>
+          <span class="pick-text"><b>Say what must stay true</b><small id="specToggleLabel">Nothing written down yet</small></span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="specPanel" hidden>
@@ -163,7 +166,8 @@
       </div>
       <div class="palette-picker" id="payPicker">
         <button type="button" class="palette-toggle" id="payToggleBtn" title="Sell something in the app the AI builds">
-          <span id="payToggleLabel">💳 Payments: not set up</span>
+          <span class="pick-icon">💳</span>
+          <span class="pick-text"><b>Sell something</b><small id="payToggleLabel">Nothing for sale yet</small></span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="payPanel" hidden>
@@ -181,7 +185,8 @@
       </div>
       <div class="palette-picker" id="imagePicker">
         <button type="button" class="palette-toggle" id="imageToggleBtn" title="Use your own images in the app the AI builds">
-          <span id="imageToggleLabel">🖼️ Images: none added</span>
+          <span class="pick-icon">🖼️</span>
+          <span class="pick-text"><b>Use your own images</b><small id="imageToggleLabel">No logo or photo added yet</small></span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="imagePanel" hidden>

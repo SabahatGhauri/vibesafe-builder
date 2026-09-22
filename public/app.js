@@ -1761,9 +1761,9 @@ function renderPaletteGrid() {
 }
 
 function paletteLabel() {
-  if (!state.palette) return "🎨 Colors: no preference";
+  if (!state.palette) return "The AI is picking its own";
   const found = window.PALETTES?.find((p) => JSON.stringify(p.colors) === JSON.stringify(state.palette));
-  return "🎨 Colors: " + (found ? found.name : "custom");
+  return "Building with " + (found ? found.name : "your custom colours");
 }
 
 function renderPaletteToggle() {
@@ -1790,8 +1790,8 @@ function renderSpecPanel() {
   if (!$("specPicker") || !window.spec) return;
   const s = spec.normalise(state.spec);
   $("specToggleLabel").textContent = spec.isEmpty(s)
-    ? "\u{1f4cb} Spec: not set"
-    : "\u{1f4cb} Spec: " + s.rules.length + (s.rules.length === 1 ? " rule" : " rules");
+    ? "Nothing written down yet"
+    : s.rules.length + (s.rules.length === 1 ? " rule kept on every build" : " rules kept on every build");
 
   if ($("specPurpose") !== document.activeElement) $("specPurpose").value = s.purpose;
 
@@ -1859,8 +1859,8 @@ function renderPayPicker() {
   if (!host || !window.payments) return;
   const entries = Object.entries(state.payments);
   $("payToggleLabel").textContent = entries.length
-    ? "\u{1f4b3} Payments: " + entries.length + (entries.length === 1 ? " product" : " products")
-    : "\u{1f4b3} Payments: not set up";
+    ? entries.length + (entries.length === 1 ? " product for sale" : " products for sale")
+    : "Nothing for sale yet";
 
   host.innerHTML = entries.map(([slug, item]) => `<div class="pay-item">
       <div class="pay-item-top"><b>${esc(item.label)}</b><span class="pay-price">${esc(item.price || "")}</span></div>
@@ -1969,8 +1969,8 @@ function renderImagePicker() {
   if (!host || !window.assets) return;
   const count = Object.keys(state.assets).length;
   $("imageToggleLabel").textContent = count
-    ? "\u{1f5bc}\ufe0f Images: " + count + " added"
-    : "\u{1f5bc}\ufe0f Images: none added";
+    ? count + (count === 1 ? " image ready to use" : " images ready to use")
+    : "No logo or photo added yet";
 
   host.innerHTML = assets.SLOTS.map((slot) => {
     const has = Boolean(state.assets[slot]);
