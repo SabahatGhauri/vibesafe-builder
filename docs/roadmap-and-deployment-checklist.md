@@ -1,30 +1,80 @@
 # VibeSafe Builder: suggestions and deployment checklist
 
-Updated: 17 September 2026.
+Updated: 22 September 2026.
 
-This is a planning checklist, not authorization to implement or deploy every item. Forms work is paused. Unchecked items are proposals or outstanding checks, not claims that the current product lacks every listed capability. Audit existing features before implementing duplicates.
+This is a planning checklist, not authorization to implement or deploy every item. Unchecked items are
+proposals or outstanding checks, not claims that the current product lacks every listed capability. Audit
+existing features before implementing duplicates.
 
-## 1. Native Forms: work remaining before deployment
+**Section 0 is the live to-do list.** Sections 1-6 are the original planning notes, kept for their reasoning.
 
-Current state: contact/waitlist forms, private inbox, optional notification emails, basic spam controls, quotas and build-prompt integration are implemented locally and uncommitted. Previous verification: 12 new backend tests and 286 existing tests passed. Database and browser end-to-end verification remain outstanding.
+## 0. Live to-do list
 
-- [ ] Review the complete pending diff and confirm the pilot scope.
-- [ ] Execute migration `005_native_forms.sql` on a dedicated test database.
-- [ ] Verify database permissions and owner isolation using real database roles.
-- [ ] Verify concurrent submission limits, monthly quotas and paused-form behavior against PostgreSQL.
-- [ ] Test Forms UI on desktop and mobile: create, select, copy, pause/resume and inbox refresh.
-- [ ] Test the full generated-form flow in preview and on the isolated published-app domain, including CSP/CORS behavior.
-- [ ] Test notifications to an owned test address and confirm failed email does not lose a submission.
-- [ ] Verify production database, mail sender and canonical SITE_URL configuration without exposing secrets.
-- [ ] Define pilot retention/full-inbox handling and notification-failure support procedures.
-- [ ] Add forms tests to the standard CI test command and run relevant release checks.
-- [ ] Prepare a compatible rollback and migration recovery plan that preserves submitted data.
-- [ ] Commit and push the reviewed changes when release work resumes.
-- [ ] Apply the production migration before enabling the application routes/UI.
-- [ ] Deploy to Vercel and verify the actual deployed version.
-- [ ] Run an authorized production smoke check and inspect errors and email delivery.
+### Needs a human — I cannot do these
 
-Details: [Native Forms](native-forms.md).
+- [ ] **Test Forms end to end.** Create a form in the builder, submit to it, confirm the submission
+      appears in the inbox AND that the notification email arrives. Nothing has exercised this path:
+      0 forms created, 0 submissions. Resend delivery is the likeliest failure point.
+- [ ] **Fix the Stripe display name.** Dashboard -> Settings -> Business -> Public details.
+      `Vibesafe Builder ` (lowercase s, trailing space) should be `VibeSafe Builder`. Also check the
+      statement descriptor and the Managed product name. Shows on receipts and card statements.
+- [ ] **Request indexing** in Search Console for the 7 pages Google has not indexed:
+      pricing, templates, what-is-vibesafe-builder, security, user-guide, how-to-build-your-first-app,
+      ai-app-builder-checklist.
+- [ ] **Backlinks.** Every current link is either from a site we own or `nofollow`. Independent
+      followed links are the single biggest constraint on brand-name search. Directories, a Show HN
+      repost in a few weeks, articles on Dev.to or Hashnode.
+
+### Next features, in order
+
+- [ ] **1. Payments in generated apps** (~2 days). The one capability Lovable has that we do not.
+      Phase 1: customer pastes a Stripe payment link, AI builds checkout buttons, no secrets anywhere.
+      Phase 2: connected Stripe account, server-side Checkout Sessions, webhook writes paid orders
+      into the app's data store. Phase 3: subscriptions. Security scan must treat a hardcoded
+      `sk_live` key as a publish-blocking critical.
+- [ ] **2. App Spec** (~2-3 days). A living document of what the app must do: the AI reads it before
+      each build and updates it after. Warns when a change would break something the spec says must
+      hold. Answers the complaint common to every prompt-to-app builder - intent and code drift apart
+      as the project grows - and nobody else solves it. The most defensible thing on this list.
+- [ ] **3. Email from the generated app** (~1 day). Forms notify the owner; this notifies the person
+      who submitted ("thanks, we got your booking"). Reuses the existing Resend transport.
+- [ ] **4. End-user file uploads** (~1-2 days). The app backend stores JSON but not files. Unlocks
+      portfolios, job applications, anything with an attachment.
+- [ ] **5. Published-app analytics** (~half a day). Views per published app. Answers the first
+      question every customer asks after publishing.
+- [ ] **6. Custom domains for published apps** (~2 days).
+
+Deliberately skipped: mobile via Expo, Vue/Svelte support, real-time collaboration. Weeks each,
+chasing a competitor's strength instead of building our own.
+
+### Smaller outstanding items
+
+- [ ] **Backfill the Report badge** onto the 19 apps published before it existed (one-off script over
+      the stored HTML). New publishes already carry it.
+- [ ] **Automated image moderation at publish** (~1 day). Claude vision, one call per image at publish
+      only, ~$0.002 each. Refuses explicit, violent or illegal content. The takedown path now exists,
+      which matters more than the classifier.
+- [ ] **Per-account trial cap overshoot.** `STARTER_USER_CAP` is checked before a build when spend is
+      $0, so one build can exceed it (observed: $0.227 against a $0.10 cap). The $1 monthly ceiling
+      still bounds total exposure. Only worth changing if the per-account number needs to be exact.
+
+### Done since this file was written
+
+- [x] Native Forms shipped: migration 005 applied to production, routes live, tests in `npm test`.
+- [x] Forms data management: delete a form, delete a submission, clear an inbox, CSV export
+      (spreadsheet formulas neutralised), manual resend of a failed notification.
+- [x] Agent modes (auto/build/debug/review) shipped with tests in CI.
+- [x] Customer images: hero/logo/background slots, resized and re-encoded in the browser, EXIF
+      stripped, SVG refused, publish blocked if a placeholder was not substituted.
+- [x] Abuse reporting and takedown: migration 007, report badge on every new publish, `/report`,
+      admin queue, 451 takedown page, acceptable-use terms.
+- [x] `generation_stats` now records free-trial builds (migration 006); the dashboard has a third
+      series. It recorded nothing for trial builds before.
+- [x] Free-trial limits tightened: 1 build, $0.10 per account, $1.00 per month, explicit kill switch.
+- [x] CI runs the test suite on every push to main and every PR (PR #1).
+- [x] Crawler logging: one line per search-engine or AI crawler visit in the runtime logs.
+- [x] SEO: pricing page no longer duplicates the homepage, contextual internal links added, demo page
+      expanded from 158 to 561 words, favicons in every size, sitemap lastmod corrected.
 
 ## 2. Highest-priority reliability and cost suggestions
 
