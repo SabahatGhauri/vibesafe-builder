@@ -136,6 +136,24 @@
           <button type="button" class="btn ghost mini" id="paletteClearBtn">No preference (let the AI choose)</button>
         </div>
       </div>
+      <div class="palette-picker" id="payPicker">
+        <button type="button" class="palette-toggle" id="payToggleBtn" title="Sell something in the app the AI builds">
+          <span id="payToggleLabel">💳 Payments: not set up</span>
+          <span class="palette-chevron">›</span>
+        </button>
+        <div class="palette-panel" id="payPanel" hidden>
+          <p class="gh-meta">Sell something from your app. You create a payment link in your own Stripe account and paste it here; buyers check out on Stripe's own page and the money goes straight to you. We never handle the payment, and no secret key is ever needed.</p>
+          <p class="gh-meta"><a href="https://dashboard.stripe.com/payment-links" target="_blank" rel="noopener">Create a payment link in Stripe ↗</a> — takes about a minute.</p>
+          <div class="pay-items" id="payItems"></div>
+          <form class="pay-add" id="payAddForm">
+            <input id="payLabel" maxlength="60" placeholder="What are you selling? e.g. Starter plan" required />
+            <input id="payPrice" maxlength="24" placeholder="Price shown to buyers, e.g. $29" />
+            <input id="payUrl" maxlength="300" placeholder="https://buy.stripe.com/…" required />
+            <button class="btn ghost mini" type="submit">Add product</button>
+          </form>
+          <p class="gh-meta" id="payHint"></p>
+        </div>
+      </div>
       <div class="palette-picker" id="imagePicker">
         <button type="button" class="palette-toggle" id="imageToggleBtn" title="Use your own images in the app the AI builds">
           <span id="imageToggleLabel">🖼️ Images: none added</span>
@@ -453,8 +471,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="templates.js"></script>
   <script src="palettes.js"></script>
-  <script src="app.js"></script>
+  <!-- assets.js and payments.js define window.assets / window.payments, which
+       app.js reads at init time. They must load FIRST: loading them after meant
+       both pickers initialised against undefined and silently wired up nothing. -->
   <script src="assets.js"></script>
+  <script src="payments.js"></script>
+  <script src="app.js"></script>
   <script src="forms.js"></script>
   <script src="visualEditor.js"></script>
   <script src="buildStatus.js"></script>

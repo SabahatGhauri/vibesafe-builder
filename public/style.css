@@ -531,6 +531,18 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .palette-toggle:hover { border-color: var(--accent, #8b5cf6); }
 .palette-toggle-swatch.palette-strip { flex-shrink: 0; }
 .palette-chevron { margin-left: auto; opacity: 0.6; }
+/* ---- selling something (payment links) ---- */
+.pay-items { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.pay-item { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.pay-item-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.pay-item b { font-size: 13px; }
+.pay-item .pay-price { color: var(--accent); font-size: 12.5px; font-weight: 700; }
+.pay-item code { display: block; font-size: 11px; color: var(--dim); margin: 5px 0; }
+.pay-item .pay-url { font-size: 11px; color: var(--dim2); word-break: break-all; }
+.pay-add { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.pay-add input { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: 12.5px; }
+.pay-add button { align-self: flex-start; }
+
 /* ---- customer images (mirrors the palette picker above) ---- */
 .image-slots { display: flex; flex-direction: column; gap: 10px; margin: 10px 0; }
 .image-slot { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }

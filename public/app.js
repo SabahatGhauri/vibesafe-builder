@@ -24,6 +24,9 @@ const state = {
   // on purpose: versions store {{image:slot}} placeholders, so one image is
   // stored once rather than duplicated into every build. See public/assets.js.
   assets: {},
+  // Stripe payment links the customer pasted, { slug: {label, price, url} }.
+  // Links only - no key, no secret, and the money never passes through us.
+  payments: {},
 };
 
 const $ = (id) => document.getElementById(id);
@@ -409,6 +412,7 @@ function buildSavePayload() {
     kind: state.kind,
     palette: state.palette,
     assets: state.assets,
+    payments: state.payments,
     chatHTML: messagesEl.innerHTML,
   };
 }
@@ -436,6 +440,17 @@ function loadProject() {
     state.palette = isValidPalette(p.palette) ? p.palette : null;
     // Re-validate on the way in: stored data is only as trustworthy as the
     // browser it came from, and these strings end up in an img src.
+    // Re-validate on the way in for the same reason images are: a stored link
+    // ends up in an href, and stored data is only as trustworthy as the browser
+    // it came from.
+    state.payments = {};
+    if (p.payments && window.payments) {
+      for (const [slug, item] of Object.entries(p.payments)) {
+        if (payments.validSlug(slug) && item && payments.isSafeLink(item.url)) {
+          state.payments[slug] = payments.normaliseItem(item);
+        }
+      }
+    }
     state.assets = {};
     if (p.assets && window.assets) {
       for (const slot of window.assets.SLOTS) {
@@ -776,7 +791,11 @@ const currentCode = () =>
 // actually render - preview, publish, download, Launch Check - goes through
 // this, so an image is embedded at the last moment and never stored per
 // version. Untrusted values resolve to a blank pixel (see public/assets.js).
-const withAssets = (code) => (window.assets ? window.assets.substitute(code, state.assets) : code);
+const withAssets = (code) => {
+  let out = window.assets ? window.assets.substitute(code, state.assets) : code;
+  if (window.payments) out = window.payments.substitute(out, state.payments);
+  return out;
+};
 
 // In multi mode a version stores { files } instead of { code }. Everything that
 // needs "the whole project as one document" (preview, publish, download) goes
@@ -1736,6 +1755,89 @@ function setPalette(colors) {
   saveProject();
 }
 
+/* ---------------- selling something (payment links) ---------------- */
+function slugFor(label) {
+  const base = String(label).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 20);
+  let slug = /^[a-z]/.test(base) ? base : "item-" + base;
+  slug = slug.replace(/^-+|-+$/g, "") || "item";
+  if (!state.payments[slug]) return slug;
+  for (let i = 2; i < 50; i++) if (!state.payments[slug + "-" + i]) return slug + "-" + i;
+  return slug + "-x";
+}
+
+function renderPayPicker() {
+  const host = $("payItems");
+  if (!host || !window.payments) return;
+  const entries = Object.entries(state.payments);
+  $("payToggleLabel").textContent = entries.length
+    ? "\u{1f4b3} Payments: " + entries.length + (entries.length === 1 ? " product" : " products")
+    : "\u{1f4b3} Payments: not set up";
+
+  host.innerHTML = entries.map(([slug, item]) => `<div class="pay-item">
+      <div class="pay-item-top"><b>${esc(item.label)}</b><span class="pay-price">${esc(item.price || "")}</span></div>
+      <code>${esc(payments.slotPlaceholder(slug))}</code>
+      <div class="pay-url">${esc(item.url)}</div>
+      <button type="button" class="btn ghost mini" data-pay-remove="${esc(slug)}" style="margin-top:6px">Remove</button>
+    </div>`).join("");
+
+  const used = payments.placeholdersUsed(currentCode());
+  const hint = $("payHint");
+  if (!entries.length) {
+    hint.textContent = "No products yet. Add one, then ask: \u201cadd a buy button for the starter plan\u201d.";
+  } else if (!used.length) {
+    hint.textContent = "Your app doesn't have a buy button yet \u2014 ask for one, for example \u201cadd a pricing section with a buy button for " + entries[0][1].label + "\u201d.";
+  } else {
+    const missing = used.filter((u) => !state.payments[u]);
+    hint.textContent = "In use: " + used.join(", ") + (missing.length ? " \u00b7 removed, so those buttons go nowhere: " + missing.join(", ") : "");
+  }
+}
+
+function initPayPicker() {
+  if (!$("payPicker") || !window.payments) return;
+  renderPayPicker();
+
+  $("payToggleBtn").addEventListener("click", () => {
+    const panel = $("payPanel");
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) renderPayPicker();
+  });
+
+  $("payAddForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const item = payments.normaliseItem({
+      label: $("payLabel").value,
+      price: $("payPrice").value,
+      url: $("payUrl").value,
+    });
+    if (!item.label) { addMsg("system", "\u26a0 Give the product a name so buyers know what they're paying for."); return; }
+    if (Object.keys(state.payments).length >= payments.MAX_ITEMS) {
+      addMsg("system", `\u26a0 You can add up to ${payments.MAX_ITEMS} products. Remove one first.`);
+      return;
+    }
+    const problem = payments.linkProblem(item.url);
+    if (problem) { addMsg("system", "\u26a0 " + esc(problem)); return; }
+
+    const slug = slugFor(item.label);
+    state.payments[slug] = item;
+    $("payLabel").value = ""; $("payPrice").value = ""; $("payUrl").value = "";
+    renderPayPicker();
+    saveProject();
+    addMsg("system", `\u{1f4b3} Added <b>${esc(item.label)}</b>. Ask me to sell it \u2014 for example \u201cadd a buy button for ${esc(item.label)}\u201d. Buyers pay on Stripe's own page and the money goes straight to your Stripe account.`);
+  });
+
+  $("payItems").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-pay-remove]");
+    if (!btn) return;
+    const slug = btn.dataset.payRemove;
+    const label = state.payments[slug] && state.payments[slug].label;
+    delete state.payments[slug];
+    renderPayPicker();
+    saveProject();
+    renderAll();
+    addMsg("system", `Removed <b>${esc(label || slug)}</b>. Any buy button still pointing at it now goes nowhere \u2014 ask me to take it out of the app.`);
+  });
+}
+
 /* ---------------- customer images ---------------- */
 // Resizing happens here rather than server-side because the bytes never need to
 // leave the browser: the image is embedded into the app itself. Re-encoding via
@@ -1895,6 +1997,7 @@ const restored = loadProject();
 renderTemplateGrid();
 initPalettePicker();
 initImagePicker();
+initPayPicker();
 
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
 // choice rather than something the AI infers: single-file apps stay the default
