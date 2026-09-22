@@ -100,9 +100,20 @@ ${form.kind === 'contact' ? '  <label>Message <textarea name="message" maxlength
     const button = event.submitter || byId('nativeFormCreate').querySelector('button[type="submit"]');
     button.disabled = true;
     run(async()=>{
-      const {form} = await api('/',{method:'POST',body:JSON.stringify({name:byId('nativeFormName').value,kind:byId('nativeFormKind').value,notify:byId('nativeFormNotify').checked})});
+      const {form} = await api('/',{method:'POST',body:JSON.stringify({
+        name:byId('nativeFormName').value,
+        kind:byId('nativeFormKind').value,
+        notify:byId('nativeFormNotify').checked,
+        replyEnabled:byId('nativeFormReply').checked,
+        replySubject:byId('nativeFormReplySubject').value,
+        replyBody:byId('nativeFormReplyBody').value,
+      })});
       await refresh(); await choose(form); status('Form created. Add it to your build prompt or copy the HTML.');
     }).finally(()=>{button.disabled=false;});
+  });
+  // The confirmation fields only matter when it is switched on.
+  byId('nativeFormReply').addEventListener('change',()=> {
+    byId('nativeFormReplyFields').hidden = !byId('nativeFormReply').checked;
   });
   byId('nativeFormRefresh').addEventListener('click',()=>run(refresh));
   document.querySelector('[data-tab="forms"]').addEventListener('click',()=>run(refresh));

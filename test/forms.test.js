@@ -172,3 +172,49 @@ test('the new routes reject unauthenticated callers',async()=>{
     assert.equal((await request(fixture({user:null}),url,{method})).status,401,url);
   }
 });
+
+/* ---- confirmation email to the person who submitted ---- */
+
+const { validateReplySettings, replyHtml } = require('../lib/forms');
+
+test('the confirmation message comes from the owner, never the submitter', () => {
+  const r = validateReplySettings({ replyEnabled: true, replySubject: 'Thanks!', replyBody: 'We got your booking.' });
+  assert.deepEqual(r, { reply_enabled: true, reply_subject: 'Thanks!', reply_body: 'We got your booking.' });
+  // off by default, and nothing is stored when it is off
+  assert.deepEqual(validateReplySettings({}), { reply_enabled: false, reply_subject: null, reply_body: null });
+});
+
+test('a confirmation needs both a subject and a message', () => {
+  assert.throws(() => validateReplySettings({ replyEnabled: true, replyBody: 'x' }), /subject/);
+  assert.throws(() => validateReplySettings({ replyEnabled: true, replySubject: 'x' }), /message/);
+});
+
+test('header injection through the subject is impossible', () => {
+  const r = validateReplySettings({
+    replyEnabled: true,
+    replySubject: 'Thanks\r\nBcc: victim@example.com',
+    replyBody: 'hello',
+  });
+  assert.ok(!/[\r\n]/.test(r.reply_subject), 'newlines cannot survive into a mail header');
+  assert.ok(r.reply_subject.includes('Bcc'), 'flattened, not silently truncated into something else');
+});
+
+test('subject and body are length-bounded', () => {
+  const r = validateReplySettings({ replyEnabled: true, replySubject: 's'.repeat(400), replyBody: 'b'.repeat(2000) });
+  assert.equal(r.reply_subject.length, 120);
+  assert.equal(r.reply_body.length, 500);
+});
+
+test("an owner's text is escaped, so it reaches the inbox as words not markup", () => {
+  const html = replyHtml({ name: 'Bookings', reply_body: '<img src=x onerror="alert(1)">\nSecond line' }, 'VibeSafe Builder');
+  assert.ok(!html.includes('<img src=x'), 'no markup from the body');
+  assert.ok(html.includes('&lt;img'));
+  assert.ok(html.includes('<br>'), 'line breaks still render');
+});
+
+test('every confirmation explains why it arrived and promises no more', () => {
+  const html = replyHtml({ name: 'Bookings', reply_body: 'Thanks' }, 'VibeSafe Builder');
+  assert.match(html, /you submitted the/i);
+  assert.match(html, /will not be emailed again/i);
+  assert.ok(html.includes('Bookings'), 'names the form so it is recognisable');
+});

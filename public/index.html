@@ -300,6 +300,12 @@
             <label>Form name <input id="nativeFormName" required maxlength="80" placeholder="Website enquiries" /></label>
             <label>Type <select id="nativeFormKind"><option value="contact">Contact: name, email, message</option><option value="waitlist">Waitlist: name, email</option></select></label>
             <label><input type="checkbox" id="nativeFormNotify" /> Email new submissions to my verified account address</label>
+            <label><input type="checkbox" id="nativeFormReply" /> Also send a confirmation to the person who submits</label>
+            <div id="nativeFormReplyFields" hidden>
+              <label>Subject <input id="nativeFormReplySubject" maxlength="120" placeholder="Thanks — we got your message" /></label>
+              <label>Message <textarea id="nativeFormReplyBody" maxlength="500" rows="3" placeholder="Thanks for getting in touch. We'll reply within two working days."></textarea></label>
+              <p class="hint">Plain text, up to 500 characters. You write this once; it is never taken from what someone submits. Each person gets it at most once an hour, and every confirmation explains why it arrived.</p>
+            </div>
             <button class="btn primary" type="submit">Create form</button>
           </form>
           <button class="btn ghost" type="button" id="nativeFormRefresh">Refresh forms</button>
