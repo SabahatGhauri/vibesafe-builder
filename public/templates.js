@@ -1039,6 +1039,172 @@ renderAll();
 </script></body></html>`,
   },
   {
+    id: "dashboard",
+    icon: "📈",
+    name: "Sales Dashboard",
+    desc: "Revenue, orders and a 7-day chart",
+    prompt: "Build a sales dashboard with revenue tiles, a 7-day bar chart and a recent-sales table I can add to",
+    code: `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales Dashboard</title>
+<style>
+  :root{--bg:#0f1218;--panel:#161b23;--line:#242c37;--text:#eaf0f7;--dim:#93a1b3;--up:#3ddc97;--down:#ff6b6b;--bar:#6c8cff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--dim);font-size:13.5px;margin:0 0 22px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .tile .label{color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  .tile .value{font-size:26px;font-weight:700;margin:6px 0 2px}
+  .tile .delta{font-size:12.5px;font-weight:600}
+  .delta.up{color:var(--up)} .delta.down{color:var(--down)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px}
+  .panel h2{font-size:15px;margin:0 0 14px}
+  .chart{display:flex;align-items:flex-end;gap:10px;height:190px}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+  .bar{width:100%;background:var(--bar);border-radius:6px 6px 0 0;min-height:3px;transition:height .5s ease}
+  .col:hover .bar{filter:brightness(1.2)}
+  .col span{color:var(--dim);font-size:11.5px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{font-size:11.5px;padding:2px 9px;border-radius:100px;border:1px solid var(--line);color:var(--dim)}
+  .pill.paid{color:var(--up);border-color:rgba(61,220,151,.4)}
+  .empty{color:var(--dim);text-align:center;padding:24px}
+  form{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  input,select{padding:9px 11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;font-size:13.5px}
+  input{flex:1;min-width:120px}
+  button{padding:9px 16px;border-radius:9px;border:0;background:var(--bar);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+  button:hover{filter:brightness(1.1)}
+  .row-del{background:none;color:var(--dim);padding:2px 6px;font-size:15px}
+  .row-del:hover{color:var(--down)}
+  @media(max-width:560px){body{padding:16px}.chart{height:150px}}
+</style>
+</head>
+<body>
+<h1>Sales Dashboard</h1>
+<p class="sub">Your numbers at a glance. Add a sale below and every figure updates.</p>
+
+<div class="tiles" id="tiles"></div>
+
+<div class="panel">
+  <h2>Last 7 days</h2>
+  <div class="chart" id="chart"></div>
+</div>
+
+<div class="panel">
+  <h2>Recent sales</h2>
+  <div id="rows"></div>
+  <form id="addForm">
+    <input id="customer" placeholder="Customer name" required>
+    <input id="amount" type="number" step="0.01" min="0" placeholder="Amount" required>
+    <select id="status"><option value="paid">Paid</option><option value="pending">Pending</option></select>
+    <button type="submit">Add sale</button>
+  </form>
+</div>
+
+<script>
+/* Your data lives here. Delete these examples and add your own, or use the
+   form above — everything is saved in this browser. */
+const SAMPLE = [
+  {customer:"Acme Ltd",     amount:1200, status:"paid",    day:0},
+  {customer:"Bluebird Co",  amount:480,  status:"paid",    day:1},
+  {customer:"Carter & Sons",amount:2150, status:"pending", day:1},
+  {customer:"Delta Studio", amount:760,  status:"paid",    day:3},
+  {customer:"Eastgate",     amount:310,  status:"paid",    day:4},
+  {customer:"Fairview",     amount:1890, status:"paid",    day:6},
+];
+
+let sales = JSON.parse(localStorage.getItem("dashboardSales") || "null") || SAMPLE.map(s => ({
+  customer: s.customer, amount: s.amount, status: s.status,
+  at: Date.now() - s.day * 86400000,
+}));
+
+const save = () => localStorage.setItem("dashboardSales", JSON.stringify(sales));
+const money = n => "$" + n.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+const dayKey = ms => new Date(ms).toISOString().slice(0,10);
+
+function render() {
+  const now = Date.now();
+  const week = sales.filter(s => now - s.at < 7*86400000);
+  const prevWeek = sales.filter(s => now - s.at >= 7*86400000 && now - s.at < 14*86400000);
+  const total = week.reduce((sum,s) => sum + s.amount, 0);
+  const prevTotal = prevWeek.reduce((sum,s) => sum + s.amount, 0);
+  const change = prevTotal ? Math.round(((total - prevTotal) / prevTotal) * 100) : null;
+  const paid = week.filter(s => s.status === "paid").reduce((sum,s) => sum + s.amount, 0);
+  const avg = week.length ? Math.round(total / week.length) : 0;
+
+  document.getElementById("tiles").innerHTML = [
+    ["Revenue, 7 days", money(total), change === null ? "" : (change >= 0 ? "↑ " + change + "% vs last week" : "↓ " + Math.abs(change) + "% vs last week"), change >= 0],
+    ["Sales", String(week.length), week.length === 1 ? "1 order" : week.length + " orders", true],
+    ["Average order", money(avg), "per sale", true],
+    ["Collected", money(paid), total ? Math.round((paid/total)*100) + "% of revenue" : "nothing yet", true],
+  ].map(([label, value, delta, up]) =>
+    '<div class="tile"><div class="label">' + label + '</div><div class="value">' + value + '</div>' +
+    (delta ? '<div class="delta ' + (up ? "up" : "down") + '">' + delta + '</div>' : '') + '</div>'
+  ).join("");
+
+  // Seven columns, oldest on the left, each scaled against the busiest day.
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now - i * 86400000);
+    const key = dayKey(d.getTime());
+    const value = sales.filter(s => dayKey(s.at) === key).reduce((sum,s) => sum + s.amount, 0);
+    days.push({label: d.toLocaleDateString(undefined, {weekday:"short"}), value});
+  }
+  const max = Math.max(1, ...days.map(d => d.value));
+  document.getElementById("chart").innerHTML = days.map(d =>
+    '<div class="col" title="' + d.label + ": " + money(d.value) + '">' +
+      '<div class="bar" style="height:' + ((d.value / max) * 100).toFixed(1) + '%"></div>' +
+      '<span>' + d.label + '</span>' +
+    '</div>'
+  ).join("");
+
+  const recent = [...sales].sort((a,b) => b.at - a.at).slice(0, 8);
+  document.getElementById("rows").innerHTML = recent.length
+    ? '<table><thead><tr><th>Customer</th><th>Status</th><th class="num">Amount</th><th></th></tr></thead><tbody>' +
+      recent.map(s => {
+        const i = sales.indexOf(s);
+        return '<tr><td>' + esc(s.customer) + '</td>' +
+          '<td><span class="pill ' + (s.status === "paid" ? "paid" : "") + '">' + s.status + '</span></td>' +
+          '<td class="num">' + money(s.amount) + '</td>' +
+          '<td class="num"><button class="row-del" data-i="' + i + '" title="Remove">×</button></td></tr>';
+      }).join("") + '</tbody></table>'
+    : '<div class="empty">No sales yet — add one below.</div>';
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+document.getElementById("addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  sales.push({
+    customer: document.getElementById("customer").value.trim() || "Customer",
+    amount: Math.round(parseFloat(document.getElementById("amount").value) || 0),
+    status: document.getElementById("status").value,
+    at: Date.now(),
+  });
+  save(); render(); e.target.reset();
+});
+
+document.getElementById("rows").addEventListener("click", e => {
+  const btn = e.target.closest("[data-i]");
+  if (!btn) return;
+  sales.splice(Number(btn.dataset.i), 1);
+  save(); render();
+});
+
+render();
+</script>
+</body>
+</html>
+`,
+  },
+  {
     id: "contact-book",
     icon: "📇",
     name: "Contact Book",
