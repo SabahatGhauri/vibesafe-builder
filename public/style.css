@@ -531,6 +531,54 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .palette-toggle:hover { border-color: var(--accent, #8b5cf6); }
 .palette-toggle-swatch.palette-strip { flex-shrink: 0; }
 .palette-chevron { margin-left: auto; opacity: 0.6; }
+/* ---------- guided setup: six steps, not five unrelated boxes ---------- */
+.setup-head { padding: 2px 2px 10px; }
+.setup-head h2 { font-size: 15px; margin: 0 0 2px; }
+.setup-head p { font-size: 12.5px; color: var(--dim); margin: 0; }
+
+.pick-num {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 11.5px; font-weight: 700;
+  color: var(--dim); background: transparent; border: 1px solid var(--line);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+/* Done is shown, not implied: a step with something in it gets a tick, so the
+   panel answers "what have I actually set?" at a glance. */
+.palette-picker.done .pick-num { background: var(--accent); border-color: var(--accent); color: #fff; font-size: 12px; }
+.palette-picker.done .pick-num::after { content: "¹3"; }
+.palette-picker.done .pick-num { color: transparent; }
+.palette-picker.done .pick-num::after { color: #fff; }
+.palette-toggle:hover .pick-num { border-color: var(--accent); color: var(--text); }
+
+/* ---------- the prompt box is the point of the screen ---------- */
+.composer-title { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+.composer-title b { font-weight: 600; }
+.composer-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139,92,246,0.14); }
+#promptInput { font-size: 14px; }
+.prompt-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  border: 1px solid var(--line); background: transparent; color: var(--dim);
+  border-radius: 100px; padding: 5px 11px; font: inherit; font-size: 11.5px;
+  cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+
+/* ---------- empty preview: show the shape of what is coming ---------- */
+.preview-empty { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 42px 24px; text-align: center; }
+.preview-empty h3 { font-size: 16px; margin: 0; color: var(--text); }
+.preview-empty p { font-size: 13.5px; color: var(--dim); margin: 0; max-width: 42ch; line-height: 1.55; }
+.pe-frame { width: min(320px, 80%); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg-panel, #141a21); opacity: 0.75; }
+.pe-bar { display: flex; align-items: center; gap: 5px; padding: 7px 9px; border-bottom: 1px solid var(--line); }
+.pe-bar span { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.pe-bar em { flex: 1; margin-left: 6px; font-style: normal; font-size: 9.5px; color: var(--dim2); text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pe-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.pe-body i { display: block; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--line), transparent); }
+.pe-body i:nth-child(1) { width: 55%; height: 12px; }
+.pe-body i:nth-child(2) { width: 92%; }
+.pe-body i:nth-child(3) { width: 78%; }
+.pe-body i:nth-child(4) { width: 40%; }
+.pe-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+
 /* Each row is an action first, its current state second: "Colors: no
    preference" told a customer what it WAS, never that it was clickable. */
 .palette-toggle { text-align: left; }
@@ -539,9 +587,9 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .pick-text b { font-size: 13px; font-weight: 600; color: var(--text); }
 .pick-text small { font-size: 11.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.template-link { text-decoration: none; color: var(--text); justify-content: space-between; }
+.template-link { text-decoration: none; color: var(--text); }
 .template-link:hover { border-color: var(--accent); }
-.template-link span:first-child { flex: 1; }
+
 
 /* ---- the app spec ---- */
 .spec-label { display: block; font-size: 12px; color: var(--dim); margin: 10px 0 4px; }

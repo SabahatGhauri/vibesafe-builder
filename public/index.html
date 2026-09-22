@@ -114,19 +114,23 @@
       <div class="stuck-banner" id="stuckBanner" hidden>
         ⚡ Same problem twice — switching strategy. The AI will re-diagnose from scratch instead of repeating the failed fix.
       </div>
+      <div class="setup-head">
+        <h2>Create your app</h2>
+        <p>Follow the steps, or just describe what you want.</p>
+      </div>
       <!-- Always reachable: the template grid lives in the chat, which scrolls
            away the moment someone types. This row does not move. -->
-      <div class="palette-picker">
+      <div class="palette-picker" data-step="1" id="stepTemplate">
         <a class="palette-toggle template-link" href="/templates.html" title="See all 16 templates, with a live preview of each">
-          <span class="pick-icon">🧩</span>
-          <span class="pick-text"><b>Start from a template</b><small>16 free, working starters</small></span>
+          <span class="pick-num">1</span>
+          <span class="pick-text"><b>Choose a starting point</b><small>16 free, working templates</small></span>
           <span class="palette-chevron">›</span>
         </a>
       </div>
-      <div class="palette-picker" id="palettePicker">
+      <div class="palette-picker" data-step="2" id="palettePicker">
         <button type="button" class="palette-toggle" id="paletteToggleBtn" title="Pick a color palette the AI should build with">
-          <span class="pick-icon">🎨</span>
-          <span class="pick-text"><b>Choose your colours</b><small id="paletteToggleLabel">The AI is picking its own</small></span>
+          <span class="pick-num">2</span>
+          <span class="pick-text"><b>Brand style</b><small id="paletteToggleLabel">The AI is picking its own colours</small></span>
           <span class="palette-toggle-swatch" id="paletteToggleSwatch" hidden></span>
           <span class="palette-chevron">›</span>
         </button>
@@ -146,10 +150,10 @@
           <button type="button" class="btn ghost mini" id="paletteClearBtn">No preference (let the AI choose)</button>
         </div>
       </div>
-      <div class="palette-picker" id="specPicker">
+      <div class="palette-picker" data-step="3" id="specPicker">
         <button type="button" class="palette-toggle" id="specToggleBtn" title="What this app is for, and what must stay true">
-          <span class="pick-icon">📋</span>
-          <span class="pick-text"><b>Say what must stay true</b><small id="specToggleLabel">Nothing written down yet</small></span>
+          <span class="pick-num">3</span>
+          <span class="pick-text"><b>Non-negotiables</b><small id="specToggleLabel">Tell the AI what must stay true</small></span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="specPanel" hidden>
@@ -164,10 +168,10 @@
           <p class="gh-meta" id="specHint"></p>
         </div>
       </div>
-      <div class="palette-picker" id="payPicker">
+      <div class="palette-picker" data-step="4" id="payPicker">
         <button type="button" class="palette-toggle" id="payToggleBtn" title="Sell something in the app the AI builds">
-          <span class="pick-icon">💳</span>
-          <span class="pick-text"><b>Sell something</b><small id="payToggleLabel">Nothing for sale yet</small></span>
+          <span class="pick-num">4</span>
+          <span class="pick-text"><b>Monetisation</b><small id="payToggleLabel">Add products, prices or subscriptions</small></span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="payPanel" hidden>
@@ -183,10 +187,10 @@
           <p class="gh-meta" id="payHint"></p>
         </div>
       </div>
-      <div class="palette-picker" id="imagePicker">
+      <div class="palette-picker" data-step="5" id="imagePicker">
         <button type="button" class="palette-toggle" id="imageToggleBtn" title="Use your own images in the app the AI builds">
-          <span class="pick-icon">🖼️</span>
-          <span class="pick-text"><b>Use your own images</b><small id="imageToggleLabel">No logo or photo added yet</small></span>
+          <span class="pick-num">5</span>
+          <span class="pick-text"><b>Brand assets</b><small id="imageToggleLabel">Upload your own images or logo</small></span>
           <span class="palette-chevron">›</span>
         </button>
         <div class="palette-panel" id="imagePanel" hidden>
@@ -206,7 +210,14 @@
             <option value="review">Review — report without changing code</option>
           </select>
           <p class="hint" id="agentHint">Choose a task or let Auto route your request. All modes use your current model and consume usage. Review leaves code unchanged and does not run tests.</p>
-          <textarea id="promptInput" rows="3" placeholder="Describe your app, or ask for a change…"></textarea>
+          <div class="composer-title"><span class="pick-num">6</span> <b>Describe your app</b></div>
+          <textarea id="promptInput" rows="4" placeholder="e.g. a task tracker for a small team, with a board view and due dates…"></textarea>
+          <div class="prompt-chips" id="promptChips" aria-label="Example prompts">
+            <button type="button" class="chip">A CRM for a small team</button>
+            <button type="button" class="chip">An invoicing dashboard</button>
+            <button type="button" class="chip">A booking app for a salon</button>
+            <button type="button" class="chip">A landing page with a waitlist</button>
+          </div>
           <div class="composer-row">
             <button type="button" class="composer-icon" id="micBtn" hidden title="Dictate your prompt" aria-label="Dictate your prompt">🎤</button>
             <span class="estimate" id="estimate">est. —</span>
@@ -239,7 +250,18 @@
           <button class="btn primary" id="publishBtn" disabled style="margin-left:auto;">🚀 Publish</button>
           <span class="publish-url" id="publishUrl"></span>
         </div>
-        <div class="empty" id="previewEmpty">Your app preview appears here.</div>
+        <div class="empty preview-empty" id="previewEmpty">
+          <div class="pe-frame" aria-hidden="true">
+            <div class="pe-bar"><span></span><span></span><span></span><em>your-app.vibesafebuilder.com</em></div>
+            <div class="pe-body"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <h3>Your app preview will appear here</h3>
+          <p>Start by describing what you want to build, or pick a template and change it from there.</p>
+          <div class="pe-actions">
+            <a class="btn primary" href="/templates.html">Start with a template</a>
+            <button type="button" class="btn" id="peFocusPrompt">Describe your app</button>
+          </div>
+        </div>
         <div class="build-errors" id="buildErrors" hidden></div>
         <div class="stat-bar" id="statBar" hidden>
           <div class="stat"><span class="stat-ico code">&lt;/&gt;</span><span class="stat-text"><b id="statLoc">0</b><span>Lines of code</span></span></div>

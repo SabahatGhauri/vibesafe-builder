@@ -1127,6 +1127,7 @@ function extractCode(text) {
 
 /* ---------------- render: preview / code / versions / security ---------------- */
 async function renderAll() {
+  if (typeof markStepsDone === "function") markStepsDone();
   if (isMulti()) return renderAllMulti();
   const code = currentCode();
   // preview
@@ -1761,12 +1762,13 @@ function renderPaletteGrid() {
 }
 
 function paletteLabel() {
-  if (!state.palette) return "The AI is picking its own";
+  if (!state.palette) return "The AI is picking its own colours";
   const found = window.PALETTES?.find((p) => JSON.stringify(p.colors) === JSON.stringify(state.palette));
   return "Building with " + (found ? found.name : "your custom colours");
 }
 
 function renderPaletteToggle() {
+  if (typeof markStepsDone === "function") setTimeout(markStepsDone, 0);
   const label = $("paletteToggleLabel");
   const swatch = $("paletteToggleSwatch");
   if (!label || !swatch) return;
@@ -1787,10 +1789,11 @@ function setPalette(colors) {
 
 /* ---------------- the app spec ---------------- */
 function renderSpecPanel() {
+  if (typeof markStepsDone === "function") setTimeout(markStepsDone, 0);
   if (!$("specPicker") || !window.spec) return;
   const s = spec.normalise(state.spec);
   $("specToggleLabel").textContent = spec.isEmpty(s)
-    ? "Nothing written down yet"
+    ? "Tell the AI what must stay true"
     : s.rules.length + (s.rules.length === 1 ? " rule kept on every build" : " rules kept on every build");
 
   if ($("specPurpose") !== document.activeElement) $("specPurpose").value = s.purpose;
@@ -1855,12 +1858,13 @@ function slugFor(label) {
 }
 
 function renderPayPicker() {
+  if (typeof markStepsDone === "function") setTimeout(markStepsDone, 0);
   const host = $("payItems");
   if (!host || !window.payments) return;
   const entries = Object.entries(state.payments);
   $("payToggleLabel").textContent = entries.length
     ? entries.length + (entries.length === 1 ? " product for sale" : " products for sale")
-    : "Nothing for sale yet";
+    : "Add products, prices or subscriptions";
 
   host.innerHTML = entries.map(([slug, item]) => `<div class="pay-item">
       <div class="pay-item-top"><b>${esc(item.label)}</b><span class="pay-price">${esc(item.price || "")}</span></div>
@@ -1965,12 +1969,13 @@ function compressImage(file) {
 }
 
 function renderImagePicker() {
+  if (typeof markStepsDone === "function") setTimeout(markStepsDone, 0);
   const host = $("imageSlots");
   if (!host || !window.assets) return;
   const count = Object.keys(state.assets).length;
   $("imageToggleLabel").textContent = count
     ? count + (count === 1 ? " image ready to use" : " images ready to use")
-    : "No logo or photo added yet";
+    : "Upload your own images or logo";
 
   host.innerHTML = assets.SLOTS.map((slot) => {
     const has = Boolean(state.assets[slot]);
@@ -2042,6 +2047,41 @@ function initImagePicker() {
   });
 }
 
+// A step is "done" when it holds something. Called from each panel's own
+// render so the ticks can never drift from the actual state.
+function markStepsDone() {
+  const done = {
+    palettePicker: Boolean(state.palette),
+    specPicker: window.spec ? !spec.isEmpty(state.spec) : false,
+    payPicker: Object.keys(state.payments || {}).length > 0,
+    imagePicker: Object.keys(state.assets || {}).length > 0,
+    // Step 1 counts as done once there is an app at all, however it started.
+    stepTemplate: state.versions.length > 0,
+  };
+  for (const [id, isDone] of Object.entries(done)) {
+    const el = $(id);
+    if (el) el.classList.toggle("done", isDone);
+  }
+}
+
+function initPromptHelpers() {
+  const input = $("promptInput");
+  if (!input) return;
+  // Chips fill the box rather than sending: a starting point the customer
+  // edits beats a prompt fired off before they have read it.
+  $("promptChips")?.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    input.value = chip.textContent.trim();
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.focus();
+  });
+  $("peFocusPrompt")?.addEventListener("click", () => {
+    input.focus();
+    input.scrollIntoView({ block: "center", behavior: "smooth" });
+  });
+}
+
 function initPalettePicker() {
   renderPaletteGrid();
   renderPaletteToggle();
@@ -2088,6 +2128,8 @@ initPalettePicker();
 initImagePicker();
 initPayPicker();
 initSpecPanel();
+initPromptHelpers();
+markStepsDone();
 
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
 // choice rather than something the AI infers: single-file apps stay the default
