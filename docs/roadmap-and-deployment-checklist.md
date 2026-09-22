@@ -39,9 +39,9 @@ existing features before implementing duplicates.
       each build and updates it after. Warns when a change would break something the spec says must
       hold. Answers the complaint common to every prompt-to-app builder - intent and code drift apart
       as the project grows - and nobody else solves it. The most defensible thing on this list.
-- [ ] **3. Email from the generated app** (~1 day). Forms notify the owner; this notifies the person
+- [x] **3. Email from the generated app** — shipped (owner-written confirmation, rate-limited per address).
       who submitted ("thanks, we got your booking"). Reuses the existing Resend transport.
-- [ ] **4. End-user file uploads** (~1-2 days). The app backend stores JSON but not files. Unlocks
+- [x] **4. End-user file uploads** — shipped (PNG/JPEG/GIF/WebP/PDF, type decided by byte inspection).
       portfolios, job applications, anything with an attachment.
 - [ ] **5. Published-app analytics** (~half a day). Views per published app. Answers the first
       question every customer asks after publishing.
