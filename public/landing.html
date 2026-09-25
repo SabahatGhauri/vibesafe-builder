@@ -23,6 +23,8 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/instrument-serif-400-italic.woff2" as="font" type="font/woff2" crossorigin />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -110,18 +112,42 @@
 }
 </script>
 <style>
+  /* Self-hosted so the strict CSP stays as it is - no fonts.googleapis.com in
+     style-src, no fonts.gstatic.com in font-src, and no third-party request on
+     first paint. Manrope is one variable file covering 400-800. */
+  @font-face {
+    font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap;
+    src: url("/fonts/manrope-variable.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap;
+    src: url("/fonts/instrument-serif-400-italic.woff2") format("woff2");
+  }
   :root {
     --bg: #0a0d11; --bg-raise: #0f1318; --bg-panel: #141a21;
     --glass: rgba(255,255,255,0.035); --glass-border: rgba(255,255,255,0.09);
     --line: #232b34; --text: #eef3f7; --dim: #8d9aa8; --dim2: #5f6b78;
     --accent: #8b5cf6; --accent2: #4fc3ff; --warn: #f0b84e; --danger: #ff6b6b;
     --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+
+    /* One scale for spacing, radii and shadows, so panels across the page stop
+       each picking their own 14px / 16px / 18px. */
+    --s-1: 4px;  --s-2: 8px;   --s-3: 12px; --s-4: 16px;
+    --s-5: 24px; --s-6: 32px;  --s-7: 48px; --s-8: 72px;
+    --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-full: 100px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
+    --shadow-md: 0 8px 24px -8px rgba(0,0,0,0.45);
+    --shadow-lg: 0 30px 60px -20px rgba(0,0,0,0.60);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, sans-serif; line-height: 1.6;
+    background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.65;
     overflow-x: hidden; position: relative;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
@@ -190,7 +216,13 @@
     font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 18px;
   }
   .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-  .kinetic h1 { font-size: clamp(32px, 4.2vw, 52px); line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; }
+  .kinetic h1 { font-size: clamp(34px, 4.4vw, 54px); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
+  /* Exactly one word carries the serif. More than one and it stops reading as
+     emphasis and starts reading as a second font. */
+  .kinetic h1 .serif {
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    letter-spacing: -0.01em; font-size: 1.08em;
+  }
   /* The product name leads the H1 so the page states its own name in its
      most prominent heading, without shouting it at the same size. */
   .kinetic h1 .h1-brand { font-size: 0.46em; letter-spacing: 0.01em; color: var(--dim); display: inline-block; margin-bottom: 6px; }
@@ -219,9 +251,8 @@
   .hero p.sub { color: var(--dim); font-size: 17px; max-width: 520px; margin: 22px 0 0; }
   .hero .actions { margin-top: 30px; display: flex; gap: 14px; }
 
-  /* ---------- 3D hero object ---------- */
+  /* ---------- hero cards ---------- */
   .hero-3d { position: relative; height: 380px; perspective: 1400px; }
-  #heroCrystal { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .hero-fallback { position: absolute; inset: 0; }
   .card-stack { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 0.15s ease-out; }
   .float-card {
@@ -238,6 +269,24 @@
   .card-c { left: 10px; top: 210px; transform: translateZ(10px) rotateY(-4deg) rotateX(6deg); animation-delay: -4s; z-index: 2; }
   @keyframes bob { 0%, 100% { margin-top: 0; } 50% { margin-top: -12px; } }
   .glow-orb { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%); filter: blur(20px); top: 40px; right: -20px; z-index: 1; }
+
+  /* Orbital rings: two thin ellipses tilted in 3D behind the cards, to give the
+     stack something to sit inside instead of floating on a flat panel. Pure
+     border + transform, no images, and they are aria-hidden decoration. */
+  .orbit { position: absolute; top: 50%; left: 50%; border-radius: 50%; z-index: 0;
+    border: 1px solid rgba(139,92,246,0.38); transform-style: preserve-3d; pointer-events: none; }
+  .orbit-a { width: 420px; height: 420px; margin: -210px 0 0 -210px;
+    transform: rotateX(74deg) rotateZ(0deg); animation: spin 38s linear infinite; }
+  .orbit-b { width: 300px; height: 300px; margin: -150px 0 0 -150px;
+    border-color: rgba(79,195,255,0.28);
+    transform: rotateX(68deg) rotateZ(0deg); animation: spin 26s linear infinite reverse; }
+  /* The travelling node is what makes it read as an orbit rather than a circle. */
+  .orbit-a::after, .orbit-b::after {
+    content: ""; position: absolute; top: -3px; left: 50%; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent);
+  }
+  .orbit-b::after { background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+  @keyframes spin { to { transform: rotateX(74deg) rotateZ(360deg); } }
 
   /* ---------- stat strip ---------- */
   .strip { padding: 22px 0; }
@@ -439,8 +488,26 @@
   footer a:hover { color: var(--accent); }
   footer .foot-legal { font-size: 12px; color: var(--dim2); }
 
+  /* The hero's decoration is deliberately wider than its box - the orbital rings
+     are 420px and the card stack leans out of frame. On a phone that widened the
+     document and produced a horizontal scrollbar, so the decoration is clipped to
+     its own container there and the rings, which need room to read as orbits,
+     step aside entirely. Nothing informational is inside either. */
+  @media (max-width: 900px) {
+    .hero-3d { overflow: hidden; }
+    .orbit { display: none; }
+  }
+
+  /* There was no focus style anywhere on this page, so tabbing through it was
+     invisible. :focus-visible keeps it off mouse clicks. */
+  a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent2); outline-offset: 3px; border-radius: var(--r-sm);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .kinetic .word, .float-card, .mesh span, .reveal { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+    .orbit { animation: none !important; }
+    html { scroll-behavior: auto; }
   }
 </style>
 </head>
@@ -513,7 +580,7 @@
             <span class="word" style="animation-delay:0.02s">Build</span>
             <span class="word" style="animation-delay:0.04s">apps</span>
             <span class="word" style="animation-delay:0.06s">by</span>
-            <span class="word" style="animation-delay:0.08s">chatting.</span><br/>
+            <span class="word serif" style="animation-delay:0.08s">chatting.</span><br/>
             <span class="word grad" style="animation-delay:0.10s">Without</span>
             <span class="word grad" style="animation-delay:0.12s">the</span>
             <span class="word grad" style="animation-delay:0.14s">credit</span>
@@ -529,9 +596,10 @@
         </div>
       </div>
       <div class="hero-3d" id="heroCards">
-        <canvas id="heroCrystal" hidden aria-hidden="true"></canvas>
         <div class="hero-fallback" id="heroFallback">
           <div class="glow-orb"></div>
+          <div class="orbit orbit-a" aria-hidden="true"></div>
+          <div class="orbit orbit-b" aria-hidden="true"></div>
           <div class="card-stack" id="cardStack">
             <div class="float-card glass card-a">
               <div class="fc-top"><span class="fc-dot" style="background:#ff6b6b"></span><span class="fc-dot" style="background:#f0b84e"></span><span class="fc-dot" style="background:#35d99a"></span></div>
@@ -792,7 +860,6 @@ Public reports and user complaints about other AI app builders describe <b>large
     </div>
   </footer>
 
-  <script src="hero3d.js" defer></script>
   <script>
     // Scroll-reveal via IntersectionObserver
     const io = new IntersectionObserver((entries) => {

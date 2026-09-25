@@ -1,16 +1,54 @@
 /* Shared styles for static doc pages (legal, guide, how-it-works, about).
    Palette matches landing.html so these feel like the same product, not a bolted-on wiki. */
+/* Self-hosted: the strict CSP allows fonts from 'self' only, and this keeps the
+   first paint free of a third-party request. Manrope is one variable file. */
+@font-face {
+  font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url("/fonts/manrope-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("/fonts/instrument-serif-400-italic.woff2") format("woff2");
+}
 :root {
   --bg: #0a0d11; --bg-raise: #0f1318; --bg-panel: #141a21;
   --glass: rgba(255,255,255,0.035); --glass-border: rgba(255,255,255,0.09);
   --line: #232b34; --text: #eef3f7; --dim: #8d9aa8; --dim2: #5f6b78;
   --accent: #8b5cf6; --accent2: #4fc3ff; --warn: #f0b84e; --danger: #ff6b6b;
   --mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  --sans: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --s-1: 4px;  --s-2: 8px;   --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px;  --s-7: 48px; --s-8: 72px;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-full: 100px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-md: 0 8px 24px -8px rgba(0,0,0,0.45);
+  --shadow-lg: 0 30px 60px -20px rgba(0,0,0,0.60);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--bg); color: var(--text); font-family: "Segoe UI", system-ui, sans-serif; line-height: 1.65;
+  background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.7;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Article headings were the one place the old system font looked weakest at
+   large sizes. Manrope needs negative tracking to hold together up there. */
+.doc-hero h1 { letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+article h2 { letter-spacing: -0.015em; }
+/* One serif italic accent, matching the landing headline. */
+.doc-hero h1 em, .doc-hero h1 .serif {
+  font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em;
+}
+
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent2); outline-offset: 3px; border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
 .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
 .glass { background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); }

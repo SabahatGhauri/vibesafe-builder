@@ -1,3 +1,13 @@
+/* Self-hosted: the strict CSP allows fonts from 'self' only, and this keeps the
+   first paint free of a third-party request. Manrope is one variable file. */
+@font-face {
+  font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url("/fonts/manrope-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("/fonts/instrument-serif-400-italic.woff2") format("woff2");
+}
 :root {
   --bg: #101418;
   --bg-raise: #171d23;
@@ -65,7 +75,8 @@
 .auth-gate-forgot { display: block; text-align: center; font-size: 12px; margin-top: 10px; }
 
 body {
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   background: var(--bg);
   color: var(--text);
   height: 100vh;
