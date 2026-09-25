@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="Lock-in has four separate parts — code, data, deployment and workflow — and an export feature only answers the first one.">
+  <defs>
+    <style>
+      .t  { fill:#eef3f7; font:600 15px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+      .q  { fill:#5f6b78; font:400 12px "Segoe UI",system-ui,sans-serif; }
+    </style>
+    <symbol id="lock" viewBox="0 0 24 24">
+      <path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#0f1318"/>
+  <text x="40" y="46" class="lbl">FOUR LOCKS, NOT ONE</text>
+  <text x="40" y="76" class="t" style="font-size:18px">“You can export your code” unlocks exactly one of these</text>
+
+  <g>
+    <rect x="40" y="100" width="222" height="168" rx="12" fill="#141a21" stroke="#232b34"/>
+    <use href="#lock" x="62" y="122" width="24" height="24" color="#ff6b6b"/>
+    <text x="62" y="176" class="t">Code</text>
+    <text x="62" y="202" class="d">Proprietary or obfuscated,</text>
+    <text x="62" y="220" class="d">runs only in their runtime.</text>
+    <text x="62" y="250" class="q">Unlocked by an export? Maybe.</text>
+
+    <rect x="280" y="100" width="222" height="168" rx="12" fill="#141a21" stroke="#232b34"/>
+    <use href="#lock" x="302" y="122" width="24" height="24" color="#f0b84e"/>
+    <text x="302" y="176" class="t">Data</text>
+    <text x="302" y="202" class="d">Your database sits in their</text>
+    <text x="302" y="220" class="d">infrastructure, view-only.</text>
+    <text x="302" y="250" class="q">Unlocked by an export? No.</text>
+
+    <rect x="520" y="100" width="222" height="168" rx="12" fill="#141a21" stroke="#232b34"/>
+    <use href="#lock" x="542" y="122" width="24" height="24" color="#f0b84e"/>
+    <text x="542" y="176" class="t">Deployment</text>
+    <text x="542" y="202" class="d">You own the files but still</text>
+    <text x="542" y="220" class="d">need their servers to run.</text>
+    <text x="542" y="250" class="q">Unlocked by an export? No.</text>
+
+    <rect x="760" y="100" width="200" height="168" rx="12" fill="#141a21" stroke="#232b34"/>
+    <use href="#lock" x="782" y="122" width="24" height="24" color="#f0b84e"/>
+    <text x="782" y="176" class="t">Workflow</text>
+    <text x="782" y="202" class="d">Changes only happen in</text>
+    <text x="782" y="220" class="d">their chat box.</text>
+    <text x="782" y="250" class="q">Unlocked by an export? No.</text>
+  </g>
+
+  <rect x="40" y="292" width="920" height="60" rx="12" fill="#141a21" stroke="#4fc3ff" stroke-opacity=".45"/>
+  <text x="62" y="318" class="t" fill="#4fc3ff">The test that actually settles it</text>
+  <text x="62" y="340" class="d">Can this run on a computer that has never heard of the platform that built it? One file, no build step, no backend — or it isn’t an export.</text>
+
+  <text x="40" y="388" class="cap">By one industry estimate, around 30% of builders that advertise a code export still need their own servers to run the result.</text>
+</svg>

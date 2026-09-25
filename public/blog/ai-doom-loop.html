@@ -108,7 +108,14 @@
   <article>
     <section style="border-top:none; padding-top:8px;">
       <p>If you've spent more than an hour fixing a bug in an AI-built app, you've probably lived through this: you report the bug, the AI fixes it, a different thing breaks, you report that, the fix for the second thing quietly brings the first bug back. It's called the "doom loop," it's the single most-quoted pain point in 2026 vibe-coding discussion, and it has a specific, well-understood cause — it's not just "the AI being bad."</p>
-    </section>
+    <figure class="post-figure">
+  <a class="post-figure-zoom" href="/img/blog/ai-doom-loop.svg" target="_blank" rel="noopener">
+  <img src="/img/blog/ai-doom-loop.svg" alt="Diagram of the doom loop: each fix is reasonable on its own, and the cycle still closes." width="1000" height="420" loading="lazy" decoding="async" />
+    <span class="post-figure-hint">Tap to enlarge</span>
+  </a>
+  <figcaption>The loop closes because nothing carries the reason for an earlier decision into the next turn.</figcaption>
+</figure>
+</section>
 
     <section>
       <h2><span class="num">01</span>The actual mechanism</h2>
@@ -128,7 +135,7 @@
         <li><strong>Detect the pattern, not just the bug.</strong> If the same category of complaint ("still broken," "didn't work," "same error") comes in twice in a row, that's the signal — not the third attempt at explaining it more clearly.</li>
         <li><strong>Force a genuinely different approach on the second failure</strong>, instead of another pass at the same fix. Re-diagnosing from scratch, explicitly told to avoid repeating what was already tried, breaks the pattern-matching problem described above rather than feeding it more context to repeat.</li>
       </ul>
-      <p>This is exactly what VibeSafe Builder's doom-loop detection does: two fix-complaints in a row trigger a visible banner and switch the next generation to a "rethink" strategy — re-diagnose the root cause step by step and take a genuinely different approach, rather than iterating on a fix that's already failed twice. Paired with full version history and one-click rollback, the cost of an approach not working out is a click backward, not a rebuild.</p>
+      <p>That is what VibeSafe Builder's doom-loop detection does. Two fix-complaints in a row raise a banner, and the next generation switches to a "rethink" strategy: work out the root cause from scratch, and try something different. It does not get to attempt the same fix a third time. Every version is kept, so if the different approach turns out worse, going back is one click rather than a rebuild.</p>
     </section>
 
     <section>

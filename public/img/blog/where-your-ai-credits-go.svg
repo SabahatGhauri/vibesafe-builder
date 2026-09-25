@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="A ten-turn build where the useful work happens on turns one and two and the rest of the spend goes into a repeating fix-A-breaks-B regression loop.">
+  <defs>
+    <style>
+      .t  { fill:#eef3f7; font:600 16px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 13px "Segoe UI",system-ui,sans-serif; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+      .num{ fill:#5f6b78; font:400 11px "Cascadia Code",monospace; }
+    </style>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#0f1318"/>
+  <text x="40" y="46" class="lbl">WHERE THE SPEND GOES</text>
+  <text x="40" y="76" class="t">A ten-turn afternoon, turn by turn</text>
+
+  <!-- bars -->
+  <g>
+    <!-- turn 1 -->
+    <text x="40" y="118" class="num">turn 1</text>
+    <rect x="105" y="105" width="150" height="18" rx="4" fill="#4fc3ff"/>
+    <text x="300" y="119" class="d">Builds the thing you asked for</text>
+    <!-- turn 2 -->
+    <text x="40" y="150" class="num">turn 2</text>
+    <rect x="105" y="137" width="110" height="18" rx="4" fill="#4fc3ff"/>
+    <text x="300" y="151" class="d">Adds the feature you forgot</text>
+    <!-- 3 -->
+    <text x="40" y="182" class="num">turn 3</text>
+    <rect x="105" y="169" width="130" height="18" rx="4" fill="#8b5cf6"/>
+    <text x="300" y="183" class="d">Fixes bug A</text>
+    <!-- 4 -->
+    <text x="40" y="214" class="num">turn 4</text>
+    <rect x="105" y="201" width="145" height="18" rx="4" fill="#8b5cf6"/>
+    <text x="300" y="215" class="d">Fixes bug B, which the last fix caused</text>
+    <!-- 5 -->
+    <text x="40" y="246" class="num">turn 5</text>
+    <rect x="105" y="233" width="160" height="18" rx="4" fill="#f0b84e"/>
+    <text x="300" y="247" class="d">Bug A is back. Fixes bug A again</text>
+    <!-- 6 -->
+    <text x="40" y="278" class="num">turn 6</text>
+    <rect x="105" y="265" width="170" height="18" rx="4" fill="#f0b84e"/>
+    <text x="300" y="279" class="d">Same fix as turn 4, slightly reworded</text>
+    <!-- 7-10 -->
+    <text x="40" y="310" class="num">7 – 10</text>
+    <rect x="105" y="297" width="350" height="18" rx="4" fill="#ff6b6b"/>
+    <text x="470" y="311" class="d">Still bug A. Still bug B. More code than you started with.</text>
+  </g>
+
+  <line x1="40" y1="340" x2="960" y2="340" stroke="#232b34" stroke-width="1"/>
+
+  <!-- legend -->
+  <g>
+    <rect x="40" y="362" width="12" height="12" rx="3" fill="#4fc3ff"/>
+    <text x="60" y="373" class="cap">Progress</text>
+    <rect x="150" y="362" width="12" height="12" rx="3" fill="#8b5cf6"/>
+    <text x="170" y="373" class="cap">Repair</text>
+    <rect x="245" y="362" width="12" height="12" rx="3" fill="#f0b84e"/>
+    <text x="265" y="373" class="cap">Repeating itself</text>
+    <rect x="400" y="362" width="12" height="12" rx="3" fill="#ff6b6b"/>
+    <text x="420" y="373" class="cap">Paid for, nothing gained</text>
+  </g>
+  <text x="40" y="399" class="cap">Bar length is the tokens billed. Most credit complaints aren’t about the first two turns.</text>
+</svg>

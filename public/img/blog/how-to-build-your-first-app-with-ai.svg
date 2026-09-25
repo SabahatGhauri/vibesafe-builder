@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" role="img" aria-label="Four steps to a first app: describe it in one sentence, watch the preview, check it the way a visitor would, then publish to a live link.">
+  <defs>
+    <marker id="fbArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3c4855"/>
+    </marker>
+    <style>
+      .t  { fill:#eef3f7; font:600 15.5px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+      .n  { fill:#8b5cf6; font:700 13px "Cascadia Code",Consolas,monospace; }
+    </style>
+  </defs>
+  <rect width="1000" height="300" rx="16" fill="#0f1318"/>
+  <text x="40" y="46" class="lbl">FROM SENTENCE TO LIVE LINK</text>
+
+  <g>
+    <rect x="40" y="70" width="210" height="140" rx="12" fill="#141a21" stroke="#232b34"/>
+    <text x="62" y="102" class="n">01</text>
+    <text x="62" y="130" class="t">Describe it</text>
+    <text x="62" y="156" class="d">One app, one sentence.</text>
+    <text x="62" y="176" class="d">Not a platform.</text>
+
+    <rect x="278" y="70" width="210" height="140" rx="12" fill="#141a21" stroke="#232b34"/>
+    <text x="300" y="102" class="n">02</text>
+    <text x="300" y="130" class="t">Watch the preview</text>
+    <text x="300" y="156" class="d">Change one thing per</text>
+    <text x="300" y="176" class="d">turn so you can tell what</text>
+    <text x="300" y="196" class="d">broke.</text>
+
+    <rect x="516" y="70" width="210" height="140" rx="12" fill="#141a21" stroke="#232b34"/>
+    <text x="538" y="102" class="n">03</text>
+    <text x="538" y="130" class="t">Check it properly</text>
+    <text x="538" y="156" class="d">Open it like a visitor.</text>
+    <text x="538" y="176" class="d">Try it at phone size.</text>
+
+    <rect x="754" y="70" width="206" height="140" rx="12" fill="#141a21" stroke="#8b5cf6" stroke-opacity=".5"/>
+    <text x="776" y="102" class="n">04</text>
+    <text x="776" y="130" class="t">Publish</text>
+    <text x="776" y="156" class="d">A real link you can send</text>
+    <text x="776" y="176" class="d">to someone.</text>
+  </g>
+
+  <path d="M256 140 L272 140" stroke="#3c4855" stroke-width="2" marker-end="url(#fbArrow)"/>
+  <path d="M494 140 L510 140" stroke="#3c4855" stroke-width="2" marker-end="url(#fbArrow)"/>
+  <path d="M732 140 L748 140" stroke="#3c4855" stroke-width="2" marker-end="url(#fbArrow)"/>
+
+  <text x="40" y="262" class="cap">If a step goes wrong, go back to the last version that worked rather than prompting your way forward. That one habit saves most of the money.</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="Two different products with similar names: vibesafe.info scans code you already have, while VibeSafe Builder writes the app for you.">
+  <defs>
+    <style>
+      .t  { fill:#eef3f7; font:700 19px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 13.5px "Segoe UI",system-ui,sans-serif; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+      .dom{ font:400 13px "Cascadia Code",Consolas,monospace; fill:#4fc3ff; }
+    </style>
+  </defs>
+  <rect width="1000" height="380" rx="16" fill="#0f1318"/>
+  <text x="40" y="46" class="lbl">TWO PRODUCTS, SIMILAR NAMES</text>
+
+  <rect x="40" y="70" width="440" height="222" rx="14" fill="#141a21" stroke="#232b34"/>
+  <text x="66" y="110" class="dom">vibesafe.info</text>
+  <text x="66" y="142" class="t">Checks code you already have</text>
+  <text x="66" y="174" class="d">You bring an app. It scans for leaked keys,</text>
+  <text x="66" y="196" class="d">unsafe patterns and exposed data, then</text>
+  <text x="66" y="218" class="d">tells you what to fix.</text>
+  <text x="66" y="262" class="cap">A scanner. It does not write anything.</text>
+
+  <text x="500" y="192" class="t" text-anchor="middle" fill="#5f6b78" style="font-size:15px">vs</text>
+
+  <rect x="520" y="70" width="440" height="222" rx="14" fill="#141a21" stroke="#8b5cf6" stroke-opacity=".5"/>
+  <text x="546" y="110" class="dom" fill="#8b5cf6">vibesafebuilder.com</text>
+  <text x="546" y="142" class="t">Writes the app for you</text>
+  <text x="546" y="174" class="d">You describe what you want. It builds a</text>
+  <text x="546" y="196" class="d">working single-file app, runs the same</text>
+  <text x="546" y="218" class="d">safety checks, and publishes it to a link.</text>
+  <text x="546" y="262" class="cap">A builder. The checks come built in.</text>
+
+  <text x="40" y="340" class="cap">Two products from the same company, SG Digital Ventures. Already have code? You want the scanner. Have an idea? You want this one.</text>
+</svg>

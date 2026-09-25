@@ -108,7 +108,14 @@
   <article>
     <section style="border-top:none; padding-top:8px;">
       <p>Almost every AI app builder now advertises "export your code" as proof you're not locked in. It's become table stakes marketing. What's less advertised: by one industry estimate, roughly <strong>30% of builders that advertise a code export still require their own servers to actually run the result</strong>. You get a folder of files. You don't get an app you can run anywhere else. That's not really an export — it's a demo of what lock-in looks like with extra steps.</p>
-    </section>
+    <figure class="post-figure">
+  <a class="post-figure-zoom" href="/img/blog/ai-app-builder-lock-in.svg" target="_blank" rel="noopener">
+  <img src="/img/blog/ai-app-builder-lock-in.svg" alt="Four separate locks — code, data, deployment and workflow — with an export feature only opening the first." width="1000" height="420" loading="lazy" decoding="async" />
+    <span class="post-figure-hint">Tap to enlarge</span>
+  </a>
+  <figcaption>“Export your code” answers one of these four questions. The other three usually go unasked.</figcaption>
+</figure>
+</section>
 
     <section>
       <h2><span class="num">01</span>Lock-in isn't one thing — it's four</h2>
@@ -136,7 +143,7 @@
         <li><strong>No required backend.</strong> If the app doesn't need a server to function, there's no hosting to be locked into.</li>
         <li><strong>A file, not an account.</strong> Something you can put on a USB stick and it still works is the honest version of "you own it."</li>
       </ul>
-      <p>This is the specific reason VibeSafe Builder generates single-file apps — one HTML document, styling and logic inline, no dependency tree, no build command. Downloading it isn't an "export feature" bolted onto a platform-dependent app; it's the only form the app has ever existed in. Drop it on <a href="/deploy-guide.html">Netlify, Vercel, GitHub Pages, or any static host</a> and it runs exactly the same as it did in the builder — because there was never a platform-specific runtime to leave behind in the first place.</p>
+      <p>That is why VibeSafe Builder generates single-file apps. One HTML document, styling and logic inline. No dependency tree, no build command. Downloading it isn't an export feature bolted onto a platform-dependent app; it is the only form the app has ever had. Put it on <a href="/deploy-guide.html">Netlify, Vercel, GitHub Pages or any static host</a> and it behaves exactly as it did in the builder, because there was never a platform-specific runtime to leave behind.</p>
     </section>
 
     <section>

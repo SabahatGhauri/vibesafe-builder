@@ -108,7 +108,14 @@
   <article>
     <section style="border-top:none; padding-top:8px;">
       <p>"Ran out of credits" is one of the most common complaints across every AI app builder in 2026, and it's usually described the same way: a user spends an afternoon and $40, and ends up with more broken features than they started with. One Bolt.new founder has publicly said <strong>20 million tokens</strong> went into a single authentication bug. That's not a story about the model being expensive. It's a story about where the spend actually went.</p>
-    </section>
+    <figure class="post-figure">
+  <a class="post-figure-zoom" href="/img/blog/where-your-ai-credits-go.svg" target="_blank" rel="noopener">
+  <img src="/img/blog/where-your-ai-credits-go.svg" alt="Ten build turns, coloured by whether the spend produced progress, repair, repetition or nothing at all." width="1000" height="420" loading="lazy" decoding="async" />
+    <span class="post-figure-hint">Tap to enlarge</span>
+  </a>
+  <figcaption>An illustrative afternoon. The pattern — not the exact numbers — is what shows up in the complaints.</figcaption>
+</figure>
+</section>
 
     <section>
       <h2><span class="num">01</span>The real mechanism: regression loops</h2>
@@ -130,7 +137,7 @@
         <li><strong>Separate failed generations from real progress.</strong> If a generation didn't produce something usable, it shouldn't count the same as one that did. Lumping them together is exactly what makes "I paid for nothing" feel true.</li>
         <li><strong>Break the loop instead of repeating it.</strong> If you're reporting the same bug for the second time, the tool re-diagnosing from scratch — instead of trying the same fix again — is the difference between one more attempt and ten more.</li>
       </ul>
-      <p>This is the specific set of decisions behind VibeSafe Builder's cost model: an estimate shown before every generation, a hard spend cap you set yourself, failed generations tracked separately and never billed to your build spend, and — after two failed fix attempts on the same issue — an automatic switch to re-diagnosing from scratch rather than repeating a fix that already didn't work. None of that makes generation free. It makes the spend visible and legible, which is the actual thing missing from the complaints above.</p>
+      <p>VibeSafe Builder's cost model is built around those three points. You see an estimate before every generation. You set your own hard spend cap. Failed generations are tracked separately and never billed to your build spend. And after two failed attempts at the same issue, the next one re-diagnoses the problem instead of repeating a fix that already didn't work. None of that makes generation free. It makes the spend visible, which is the part the complaints above are actually about.</p>
     </section>
 
     <section>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="Diagram of the doom loop: report a bug, the AI fixes it, something else breaks, and the next fix brings the first bug back — with version history as the way out.">
+  <defs>
+    <marker id="dlArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b5cf6"/>
+    </marker>
+    <marker id="dlArrowOut" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4fc3ff"/>
+    </marker>
+    <style>
+      .bx { fill:#141a21; stroke:#232b34; }
+      .t  { fill:#eef3f7; font:600 16px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 13px "Segoe UI",system-ui,sans-serif; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+    </style>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#0f1318"/>
+
+  <text x="40" y="46" class="lbl">THE LOOP</text>
+
+  <!-- four nodes of the cycle -->
+  <g>
+    <rect class="bx" x="40"  y="70"  width="250" height="78" rx="12" stroke-width="1"/>
+    <text x="62" y="100" class="t">1 · You report a bug</text>
+    <text x="62" y="124" class="d">“The save button does nothing.”</text>
+
+    <rect class="bx" x="400" y="70"  width="250" height="78" rx="12" stroke-width="1"/>
+    <text x="422" y="100" class="t">2 · The AI edits the code</text>
+    <text x="422" y="124" class="d">Locally reasonable. Save works.</text>
+
+    <rect class="bx" x="400" y="240" width="250" height="78" rx="12" stroke-width="1"/>
+    <text x="422" y="270" class="t">3 · Something else breaks</text>
+    <text x="422" y="294" class="d">The list stops sorting.</text>
+
+    <rect class="bx" x="40"  y="240" width="250" height="78" rx="12" stroke-width="1"/>
+    <text x="62" y="270" class="t">4 · Fixing that…</text>
+    <text x="62" y="294" class="d">…brings bug 1 straight back.</text>
+  </g>
+
+  <!-- cycle arrows -->
+  <path d="M296 109 L392 109" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#dlArrow)"/>
+  <path d="M525 154 L525 234" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#dlArrow)"/>
+  <path d="M394 279 L298 279" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#dlArrow)"/>
+  <path d="M165 234 L165 154" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#dlArrow)"/>
+
+  <text x="345" y="200" class="cap" text-anchor="middle">every turn</text>
+  <text x="345" y="218" class="cap" text-anchor="middle">costs money</text>
+
+  <!-- the way out -->
+  <path d="M660 109 L742 109" stroke="#4fc3ff" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#dlArrowOut)"/>
+  <rect x="750" y="70" width="210" height="248" rx="12" fill="#141a21" stroke="#4fc3ff" stroke-width="1" stroke-opacity=".5"/>
+  <text x="772" y="102" class="t" fill="#4fc3ff">The way out</text>
+  <text x="772" y="136" class="d">Roll back to the last</text>
+  <text x="772" y="156" class="d">version that worked.</text>
+  <text x="772" y="192" class="d">Re-diagnose instead of</text>
+  <text x="772" y="212" class="d">retrying the same fix.</text>
+  <text x="772" y="248" class="d">Don’t pay twice for a</text>
+  <text x="772" y="268" class="d">generation that failed.</text>
+
+  <text x="40" y="372" class="cap">The model re-reads your code fresh every turn — it has no memory of why an earlier turn chose differently.</text>
+  <text x="40" y="394" class="cap">A failed fix that stays in the conversation is statistically more likely to be proposed again, not less.</text>
+</svg>

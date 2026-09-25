@@ -109,7 +109,14 @@
     <section style="border-top:none; padding-top:8px;">
       <p>In January 2026, an AI social network called Moltbook launched to a wave of attention. Within three days, security researchers found its production database wide open: 1.5 million API authentication tokens, 35,000 email addresses, and private messages between users, all reachable by anyone who looked. The root cause wasn't exotic — the AI-generated code shipped a Supabase API key directly in client-side JavaScript, and nobody had turned on Row Level Security (RLS) to restrict what that key could read.</p>
       <p>That's not a freak accident. It's the single most common failure mode in AI-generated applications, and it happens for a specific, understandable reason.</p>
-    </section>
+    <figure class="post-figure">
+  <a class="post-figure-zoom" href="/img/blog/ai-app-security-database-leaks.svg" target="_blank" rel="noopener">
+  <img src="/img/blog/ai-app-security-database-leaks.svg" alt="View-source panel showing a Supabase key hardcoded in client-side JavaScript with no row-level security behind it." width="1000" height="420" loading="lazy" decoding="async" />
+    <span class="post-figure-hint">Tap to enlarge</span>
+  </a>
+  <figcaption>The Moltbook failure in five lines: a database key anyone can read, and nothing checking who is asking.</figcaption>
+</figure>
+</section>
 
     <section>
       <h2><span class="num">01</span>Why AI tools do this</h2>
@@ -132,7 +139,7 @@
         <li><strong>Verify requests only go to the third parties you actually intended</strong> — silent data exfiltration to an unexpected endpoint is invisible in a normal demo.</li>
         <li><strong>Actually load the app and check what a real visitor could reach</strong> — a static code read misses runtime issues; you need something that opens the app the way a user would.</li>
       </ul>
-      <p>This is the exact reasoning behind how VibeSafe Builder is built: every generation is scanned server-side for hardcoded keys, <code>eval()</code>, and unexpected outbound requests before you can publish — and separately, <a href="/how-it-works.html">Launch Check</a> opens the app in a real headless browser to catch what a pattern-matching scan alone would miss. Neither replaces a professional security review for anything handling real user data at scale, but both catch the exact class of mistake that took Moltbook down in under an hour of review instead of after three days of public exposure.</p>
+      <p>VibeSafe Builder is built around that list. Every generation is scanned server-side for hardcoded keys, <code>eval()</code> and unexpected outbound requests before you can publish. Separately, <a href="/how-it-works.html">Launch Check</a> opens the app in a real headless browser, because a pattern-matching scan misses things that only show up when the page runs. Neither is a professional security review, and you should get one if you are handling real user data at scale. What they do catch is the Moltbook mistake — in a minute, rather than after three days in public.</p>
     </section>
 
     <section>
