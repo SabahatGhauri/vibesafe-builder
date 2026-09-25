@@ -27,6 +27,15 @@ existing features before implementing duplicates.
 - [ ] **Backlinks.** Every current link is either from a site we own or `nofollow`. Independent
       followed links are the single biggest constraint on brand-name search. Directories, a Show HN
       repost in a few weeks, articles on Dev.to or Hashnode.
+      Ready-to-paste copy for each one is in `drafts/directory-submissions.md`, ordered by entity
+      value rather than traffic — LinkedIn, Crunchbase and Wikidata first, because the failure we
+      are actually fixing is Google not knowing which "VibeSafe" this is. Each needs an account,
+      so each is yours to submit. Send me the live profile URLs and I will add them to the
+      `sameAs` arrays on the homepage.
+- [x] **IndexNow submitted** (25 Sept 2026). All 18 sitemap URLs accepted, HTTP 200. Key file is
+      `public/dfb1d6a9010be26920d5b2b4f208ead6.txt`; re-run with `node scripts/indexnow.js` after
+      publishing a new page. This only tells Bing/Yandex the URLs exist — it buys no authority.
+      Context: Bing had the homepage as "Discovered but not crawled" since 13 Sept.
 
 ### Next features, in order
 
