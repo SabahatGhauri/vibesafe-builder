@@ -211,18 +211,27 @@ const managed = {
 
   // Sign-in is required for everyone now, not just paying Managed customers — being
   // signed up and having an active subscription are separate facts, checked later by
-  // refreshPlanStatus()/resolveMode() — not gated here. Password auth, not magic-link:
-  // Supabase's default email-confirmation setting means signUp() may not return an
-  // active session immediately (data.session is null until the confirmation link is
-  // clicked) — callers must handle that case, not assume signUp = signed in.
+  // refreshPlanStatus()/resolveMode() — not gated here.
+  //
+  // Routed through our own /api/signup rather than sb.auth.signUp(), for the same
+  // reason resetPassword() below is: Supabase's signUp() sends the confirmation
+  // through Supabase's own email configuration, and this project has been warned
+  // about its auth-email bounce rate. Every other email we send already goes out
+  // through Resend on a verified domain; this was the last one that didn't.
+  //
+  // Signing up never returns a session now — confirmation always comes first, and
+  // the caller shows the "check your email" message. The response is deliberately
+  // identical whether or not the address already has an account, so callers cannot
+  // treat it as an answer to that question. See lib/signup.js.
   async signUp(email, password, name) {
-    if (!this.sb) throw new Error("Sign-up isn't available right now.");
-    const { data, error } = await this.sb.auth.signUp({
-      email, password,
-      options: { data: name ? { full_name: name } : undefined, emailRedirectTo: location.origin + "/app" },
+    const r = await fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name: name || undefined }),
     });
-    if (error) throw error;
-    return { needsEmailConfirmation: !data.session };
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || "Couldn't create your account.");
+    return { needsEmailConfirmation: true, message: data.message };
   },
 
   async signIn(email, password) {
@@ -372,16 +381,15 @@ $("gateSubmitBtn")?.addEventListener("click", async () => {
   btn.textContent = gateMode === "signup" ? "Creating account…" : "Logging in…";
   try {
     if (gateMode === "signup") {
-      const { needsEmailConfirmation } = await managed.signUp(email, password, name);
-      if (needsEmailConfirmation) {
-        // setGateMode() resets gateStatus as part of switching views, so it must run
-        // BEFORE the success message is set below — not after — or it wipes the message
-        // out immediately.
-        setGateMode("login");
-        status.textContent = "Account created — check your email to confirm it, then come back and log in.";
-        status.className = "auth-gate-status success";
-      }
-      // else: onAuthStateChange fires on its own and the gate hides itself.
+      // Signing up always needs the emailed confirmation first — there is no
+      // branch where a session comes back straight away any more.
+      const { message } = await managed.signUp(email, password, name);
+      // setGateMode() resets gateStatus as part of switching views, so it must run
+      // BEFORE the success message is set below — not after — or it wipes the message
+      // out immediately.
+      setGateMode("login");
+      status.textContent = message || "Check your email to confirm your account, then come back and log in.";
+      status.className = "auth-gate-status success";
     } else {
       await managed.signIn(email, password);
       // onAuthStateChange fires on its own and hides the gate.
