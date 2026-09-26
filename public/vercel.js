@@ -381,7 +381,7 @@ const vercel = {
   },
 
   async disconnect() {
-    if (!confirm("Disconnect Vercel? Your deployed sites stay online — this only removes the stored token from VibeSafe.")) return;
+    if (!confirm("Disconnect Vercel? Your deployed sites stay online — this only removes the stored token from VibeSafe Builder.")) return;
     try {
       await this.api("/api/vercel/disconnect", { method: "POST" });
       this.connected = false;

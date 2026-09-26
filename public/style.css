@@ -672,6 +672,53 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .pe-body i:nth-child(4) { width: 40%; }
 .pe-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
 
+/* ---------- empty preview, with some life in it ----------
+   This is the first thing anyone sees, and it was a flat grey wireframe on a
+   flat background - it read as "broken" rather than "waiting". It now sits in
+   a soft pool of brand light, leans back very slightly so it has depth, and
+   the skeleton lines drift, which is what says "your app goes here" without a
+   word of extra copy. All of it is built from existing tokens, so it works in
+   both themes and the palette is unchanged. */
+.preview-empty { position: relative; }
+.preview-empty::before {
+  content: ""; position: absolute; left: 50%; top: 18%;
+  width: min(520px, 90%); aspect-ratio: 1; transform: translateX(-50%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 62%);
+  filter: blur(26px); pointer-events: none; z-index: 0;
+}
+.preview-empty > * { position: relative; z-index: 1; }
+
+.pe-frame {
+  transform: perspective(900px) rotateX(7deg);
+  transform-origin: 50% 100%;
+  transition: transform 0.4s ease;
+}
+.preview-empty:hover .pe-frame { transform: perspective(900px) rotateX(2deg); }
+
+/* Traffic lights, because three identical grey dots is the detail that made
+   the mock look unfinished rather than deliberate. */
+.pe-bar span:nth-child(1) { background: #ff5f57; }
+.pe-bar span:nth-child(2) { background: #febc2e; }
+.pe-bar span:nth-child(3) { background: #28c840; }
+
+.pe-body i {
+  background: linear-gradient(90deg, var(--line), color-mix(in srgb, var(--accent) 30%, var(--line)), var(--line));
+  background-size: 220% 100%;
+  animation: peShimmer 2.8s ease-in-out infinite;
+}
+.pe-body i:nth-child(2) { animation-delay: 0.18s; }
+.pe-body i:nth-child(3) { animation-delay: 0.36s; }
+.pe-body i:nth-child(4) { animation-delay: 0.54s; }
+@keyframes peShimmer {
+  0%, 100% { background-position: 140% 0; }
+  50% { background-position: -40% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pe-body i { animation: none; }
+  .pe-frame, .preview-empty:hover .pe-frame { transition: none; }
+}
+
 /* Each row is an action first, its current state second: "Colors: no
    preference" told a customer what it WAS, never that it was clickable. */
 .palette-toggle { text-align: left; }
@@ -930,6 +977,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .rail-label { display: block; font-size: 10px; line-height: 1.1; font-weight: 700; }
 .rail-btn:hover { color: var(--text); background: var(--rail-hover-bg); }
 .rail-btn.active { background: var(--rail-active-bg); border-color: var(--rail-active-border); color: var(--accent-strong); }
+
+/* ---------- collapsible rail ----------
+   Collapsed keeps the icons and drops the labels, rather than hiding the rail
+   altogether: navigation you cannot see is navigation you stop using. Each
+   button already carries a title and aria-label, so the names are still
+   reachable by hover and by screen reader once the text is gone. */
+.rail { transition: width 0.16s ease; }
+:root.rail-collapsed .rail { width: 60px; padding: 16px 6px; }
+:root.rail-collapsed .rail-label { display: none; }
+:root.rail-collapsed .rail-btn { height: 44px; font-size: 17px; }
+
+/* Quieter than the section buttons - it is a control for the chrome, not a
+   place to navigate to. */
+.rail-collapse { color: var(--dim2); margin-top: 2px; }
+.rail-collapse:hover { color: var(--text); }
+:root.rail-collapsed .rail-collapse { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rail { transition: none; }
+}
 .chat { width: var(--chat-w, min(390px, 33vw)); min-width: 300px; padding-top: 10px; background: var(--chat-bg); }
 .setup-head { padding: 9px 16px 16px; }
 .setup-head h2 { font-size: 18px; letter-spacing: -.03em; }
@@ -949,7 +1016,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .preview-empty { margin: auto; }
 #panel-preview .empty { color: var(--text-dim); }
 .pe-frame { background: var(--card-bg); opacity: 1; box-shadow: 0 20px 45px rgba(20,30,60,.08); }
-.pe-body i { background: linear-gradient(90deg, var(--skeleton-a), var(--skeleton-b)); }
+.pe-body i { background: linear-gradient(90deg, var(--skeleton-a), color-mix(in srgb, var(--accent) 22%, var(--skeleton-a)), var(--skeleton-a)); background-size: 220% 100%; }
 .auth-gate { background: radial-gradient(circle at 50% 0, var(--gate-a), var(--gate-b) 60%); }
 .auth-gate-card { max-width: 430px; padding: 36px; border-radius: 22px; box-shadow: 0 30px 80px rgba(27,32,59,.12); }
 .auth-gate-card h1 { font-size: 25px; letter-spacing: -.04em; }
@@ -971,6 +1038,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .rail { width: 100%; flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 7px 9px; }
   .rail-btn { flex: 0 0 66px; height: 48px; }
   .rail-spacer { display: none; }
+  .rail-collapse { display: none; }
+  /* The rail is a horizontal strip here, so a collapsed width must not apply. */
+  :root.rail-collapsed .rail { width: 100%; padding: 7px 9px; }
+  :root.rail-collapsed .rail-label { display: block; }
   .chat { order: 1; width: 100%; min-width: 0; max-height: 55vh; border-right: 0; border-bottom: 1px solid var(--line); }
   /* Stacked, so there is no vertical edge to drag. */
   .splitter { display: none; }

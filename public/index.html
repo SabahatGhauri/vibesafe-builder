@@ -25,6 +25,7 @@
     try {
       var t = localStorage.getItem("vc_theme");
       if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+      if (localStorage.getItem("vc_rail_collapsed") === "1") document.documentElement.classList.add("rail-collapsed");
     } catch (e) {}
   })();
 </script>
@@ -101,7 +102,7 @@
   </header>
 
   <main class="layout">
-    <nav class="rail" aria-label="Sections">
+    <nav class="rail" id="sectionRail" aria-label="Sections">
       <button class="rail-btn active" type="button" data-rail="preview" title="Preview" aria-label="Preview"><span aria-hidden="true">✦</span><span class="rail-label">Preview</span></button>
       <button class="rail-btn" type="button" data-rail="code" title="Code" aria-label="Code"><span aria-hidden="true">&lt;/&gt;</span><span class="rail-label">Code</span></button>
       <button class="rail-btn" type="button" data-rail="health" title="Build Health" aria-label="Build Health"><span aria-hidden="true">☷</span><span class="rail-label">Health</span></button>
@@ -110,6 +111,8 @@
       <button class="rail-btn" type="button" data-rail="deploy" title="Deploy" aria-label="Deploy"><span aria-hidden="true">☁</span><span class="rail-label">Deploy</span></button>
       <span class="rail-spacer"></span>
       <button class="rail-btn" type="button" id="railSettings" title="Settings" aria-label="Settings"><span aria-hidden="true">⚙</span><span class="rail-label">Settings</span></button>
+      <button class="rail-btn rail-collapse" type="button" id="railCollapse" title="Collapse the sidebar"
+              aria-expanded="true" aria-controls="sectionRail"><span aria-hidden="true" id="railCollapseIcon">«</span><span class="rail-label" id="railCollapseLabel">Collapse</span></button>
     </nav>
     <aside class="chat">
       <div class="setup-head">
@@ -355,7 +358,7 @@
 
       <div class="panel" id="panel-forms">
         <div class="forms-workspace">
-          <h2>VibeSafe Forms</h2>
+          <h2>VibeSafe Builder Forms</h2>
           <p>Collect contact enquiries and waitlist signups. Submissions are private to your account. No extra form service or AI credits needed to receive them.</p>
           <p class="hint">Pilot limits: 20 forms, 300 submissions per calendar month (UTC), and 1,000 stored submissions per account. Up to 10 submissions per form per minute.</p>
           <form id="nativeFormCreate" class="forms-create">

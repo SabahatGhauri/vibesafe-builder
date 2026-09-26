@@ -242,13 +242,13 @@ test("the scaffold title reflects the project name, not a placeholder", () => {
 // actually calling scaffold() with no argument, not by reading the code.
 test("with no name at all, the title is properly cased, not the lowercase package slug", () => {
   const html = scaffold()["index.html"];
-  assert.match(html, /<title>VibeSafe App<\/title>/);
+  assert.match(html, /<title>VibeSafe Builder App<\/title>/);
   assert.ok(!html.includes("<title>vibesafe-app</title>"), "title leaked the lowercase package-name slug");
 });
 
 test("an empty string name falls back the same way as no name", () => {
   const html = scaffold("")["index.html"];
-  assert.match(html, /<title>VibeSafe App<\/title>/);
+  assert.match(html, /<title>VibeSafe Builder App<\/title>/);
 });
 
 test("the scaffold title is HTML-escaped", () => {

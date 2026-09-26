@@ -2110,6 +2110,34 @@ function markStepsDone() {
 // The width lives in a CSS variable rather than an inline style on .chat, so
 // the stacked mobile layout can still override it with a plain rule instead of
 // having to fight inline specificity with !important.
+// Collapses the icon rail to icons only. Like the theme, the state is applied
+// in a <head> script before paint; this only wires the button and keeps its
+// label honest.
+function initRailCollapse() {
+  const btn = $("railCollapse");
+  if (!btn) return;
+  const icon = $("railCollapseIcon"), label = $("railCollapseLabel");
+  const root = document.documentElement;
+  const KEY = "vc_rail_collapsed";
+
+  const paint = () => {
+    const collapsed = root.classList.contains("rail-collapsed");
+    // aria-expanded describes the rail, so it is the opposite of collapsed.
+    btn.setAttribute("aria-expanded", String(!collapsed));
+    btn.title = collapsed ? "Expand the sidebar" : "Collapse the sidebar";
+    if (icon) icon.textContent = collapsed ? "\u00bb" : "\u00ab";
+    if (label) label.textContent = collapsed ? "Expand" : "Collapse";
+  };
+
+  btn.addEventListener("click", () => {
+    const collapsed = root.classList.toggle("rail-collapsed");
+    try { localStorage.setItem(KEY, collapsed ? "1" : "0"); } catch (e) {}
+    paint();
+  });
+
+  paint();
+}
+
 function initSplitter() {
   const bar = $("chatSplitter");
   const chat = document.querySelector(".chat");
@@ -2303,6 +2331,7 @@ initImagePicker();
 initPayPicker();
 initSpecPanel();
 initPromptHelpers();
+initRailCollapse();
 initSplitter();
 initThemeToggle();
 markStepsDone();

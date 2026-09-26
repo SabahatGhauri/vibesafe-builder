@@ -93,7 +93,7 @@ test("listProviders reports availability per provider", () => {
   const list = listProviders({ supabase: {}, supabaseAdmin: {} });
   const vs = list.find((p) => p.id === "vibesafe");
   assert.ok(vs.available);
-  assert.strictEqual(vs.name, "VibeSafe Hosting");
+  assert.strictEqual(vs.name, "VibeSafe Builder Hosting");
 });
 
 test("a new provider can register without touching existing ones", () => {

@@ -210,13 +210,13 @@
   .btn.primary:hover { box-shadow: 0 12px 34px -10px rgba(139,92,246,0.55); }
 
   /* ---------- hero ---------- */
-  .hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items: center; }
+  .hero { padding: 38px 0 22px; display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 28px; align-items: center; }
   .hero-eyebrow {
     display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 100px;
     font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 18px;
   }
   .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-  .kinetic h1 { font-size: clamp(34px, 4.4vw, 54px); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
+  .kinetic h1 { font-size: clamp(34px, 4.2vw, 51px); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
   /* Exactly one word carries the serif. More than one and it stops reading as
      emphasis and starts reading as a second font. */
   .kinetic h1 .serif {
@@ -248,8 +248,35 @@
     animation-iteration-count: 1, infinite;
   }
   @keyframes sheen { to { background-position: 200% center; } }
-  .hero p.sub { color: var(--dim); font-size: 17px; max-width: 520px; margin: 22px 0 0; }
+  .hero p.sub { color: var(--dim); font-size: 15px; max-width: 550px; margin: 16px 0 0; }
   .hero .actions { margin-top: 30px; display: flex; gap: 14px; }
+  .hero-start { margin-top: 19px; padding: 8px; border: 1px solid rgba(180,160,255,.28); border-radius: 18px; background: rgba(255,255,255,.07); box-shadow: 0 22px 60px -36px rgba(139,92,246,.8); }
+  .hero-start label { display: block; padding: 6px 10px 4px; color: #c9b8ff; font-size: 12px; font-weight: 700; letter-spacing: .03em; }
+  .hero-start-row { display: flex; gap: 8px; align-items: stretch; }
+  .hero-start textarea { flex: 1; min-width: 0; min-height: 70px; resize: vertical; border: 0; border-radius: 11px; padding: 12px; background: #171b2b; color: #fff; font: 500 14px/1.55 var(--sans); }
+  .hero-start textarea::placeholder { color: #a6afc5; }
+  .hero-start button { min-width: 132px; cursor: pointer; }
+  .hero-start-note { margin-top: 10px; color: var(--dim); font-size: 12px; }
+  .hero-secondary { margin-top: 14px; display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; }
+  .hero-secondary a { color: #d7c9ff; text-decoration: none; }
+  .hero-secondary a:hover { text-decoration: underline; }
+  .workflow-peek { margin: 28px auto 56px; border: 1px solid rgba(255,255,255,.12); border-radius: 24px; overflow: hidden; background: #f8f9fd; color: #182139; box-shadow: 0 40px 90px -44px rgba(0,0,0,.9); }
+  .workflow-peek-top { display: flex; align-items: center; gap: 10px; padding: 13px 18px; background: #fff; border-bottom: 1px solid #e4e7ef; font-size: 13px; font-weight: 800; }
+  .workflow-peek-top small { margin-left: auto; color: #67738d; font-size: 11px; font-weight: 600; }
+  .workflow-peek-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); }
+  .workflow-peek-prompt { padding: 24px; border-right: 1px solid #e4e7ef; }
+  .workflow-peek-prompt p { color: #6b7590; font-size: 12px; margin: 8px 0 18px; }
+  .workflow-peek-bubble { padding: 15px; border-radius: 13px; background: #fff; border: 1px solid #e1e4ef; font-size: 13px; }
+  .workflow-peek-step { display: flex; align-items: center; gap: 9px; margin-top: 13px; font-size: 12px; color: #53617a; }
+  .workflow-peek-step b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #ede8ff; color: #6842d7; }
+  .workflow-peek-preview { padding: 18px; background: #f1f3f9; }
+  .workflow-peek-browser { min-height: 220px; border: 1px solid #dee2ed; border-radius: 12px; overflow: hidden; background: #fff; }
+  .workflow-peek-browser-bar { padding: 8px 12px; color: #7a8498; font-size: 10px; border-bottom: 1px solid #e9ebf2; }
+  .workflow-peek-site { padding: 24px; }
+  .workflow-peek-site strong { display: block; font-size: 22px; letter-spacing: -.04em; }
+  .workflow-peek-site p { margin: 7px 0 16px; color: #66738b; font-size: 12px; }
+  .workflow-peek-site span { display: inline-block; padding: 8px 12px; border-radius: 7px; background: #7251df; color: #fff; font-size: 11px; font-weight: 700; }
+  @media (max-width: 700px) { .hero-start-row, .workflow-peek-grid { display: block; } .hero-start button { width: 100%; margin-top: 8px; } .workflow-peek-prompt { border-right: 0; border-bottom: 1px solid #e4e7ef; } .workflow-peek-top small { max-width: 120px; text-align: right; } }
 
   /* ---------- hero cards ---------- */
   .hero-3d { position: relative; height: 380px; perspective: 1400px; }
@@ -587,13 +614,16 @@
             <span class="word grad" style="animation-delay:0.16s">burn.</span>
           </h1>
         </div>
-        <p class="sub">VibeSafe Builder is an AI app builder for founders and solo builders — describe an app in plain English and it writes a working one. The difference: other AI app builders bill you for their mistakes. This one shows every cost before you spend it, makes every change reversible, and scans every build before you publish.</p>
-        <p class="sub" style="font-size:14px; margin-top:14px;">For anyone who wants control over cost, code, and security — not just speed. Prototypes, internal tools, MVPs, landing pages, small SaaS apps. <b>Your first AI build is free</b>, no API key or card needed. New to this? Read <a href="/blog/how-to-build-your-first-app-with-ai.html">how to build your first app with AI</a>, then run the <a href="/blog/ai-app-builder-checklist.html">pre-launch checklist</a> before you share it.</p>
-        <div class="actions">
-          <a class="btn primary" href="/app">Start building — free</a>
-          <a class="btn" href="/demo.html">Try the demo — no account</a>
-          <a class="btn" href="#features">Why it's different</a>
-        </div>
+        <p class="sub">Describe an app in plain English. VibeSafe Builder shows a cost estimate before building, lets you review and roll back changes, and checks for security issues before you publish.</p>
+        <form class="hero-start" id="heroStartForm">
+          <label for="heroIdea">What would you like to build?</label>
+          <div class="hero-start-row">
+            <textarea id="heroIdea" maxlength="2000" placeholder="A booking app for my salon with services, available times, and a contact form…" required></textarea>
+            <button class="btn primary" type="submit">Start building →</button>
+          </div>
+        </form>
+        <div class="hero-start-note">Your idea opens in the builder for review. Nothing is generated or published until you choose to continue. First build free; no card or API key.</div>
+        <div class="hero-secondary"><a href="/demo.html">Explore the demo →</a><a href="/templates.html">Browse templates →</a></div>
       </div>
       <div class="hero-3d" id="heroCards">
         <div class="hero-fallback" id="heroFallback">
@@ -604,13 +634,13 @@
             <div class="float-card glass card-a">
               <div class="fc-top"><span class="fc-dot" style="background:#ff6b6b"></span><span class="fc-dot" style="background:#f0b84e"></span><span class="fc-dot" style="background:#35d99a"></span></div>
               <div class="fc-line" style="width:80%"></div><div class="fc-line short"></div>
-              <div style="margin-top:12px; font-family:var(--mono); font-size:11px; color:#35d99a;">$0.14 Anthropic cost</div>
-              <div style="font-family:var(--mono); font-size:10px; color:#5f6b78;">+ $0 platform fee</div>
+              <div style="margin-top:12px; font-family:var(--mono); font-size:11px; color:#35d99a;">Review cost estimate</div>
+              <div style="font-family:var(--mono); font-size:10px; color:#8d9aa8;">before generating</div>
             </div>
             <div class="float-card glass card-b">
               <div class="ic">🔒</div>
               <div class="fc-line" style="width:70%"></div><div class="fc-line short"></div>
-              <div style="margin-top:8px; font-family:var(--mono); font-size:11px; color:#4fc3ff;">✓ security scan passed</div>
+              <div style="margin-top:8px; font-family:var(--mono); font-size:11px; color:#4fc3ff;">Review security findings</div>
             </div>
             <div class="float-card glass card-c">
               <div class="fc-line" style="width:60%; text-decoration:line-through; opacity:0.4"></div>
@@ -623,9 +653,19 @@
   </div>
 
   <div class="wrap">
+    <div class="workflow-peek" aria-label="Illustrative builder workflow preview">
+      <div class="workflow-peek-top"><span aria-hidden="true">◆</span> VibeSafe Builder <small>Illustrative preview · not a live build</small></div>
+      <div class="workflow-peek-grid">
+        <div class="workflow-peek-prompt"><strong>Start with an idea</strong><p>Describe what you need in plain English.</p><div class="workflow-peek-bubble">Build a simple appointment booking page for my studio.</div><div class="workflow-peek-step"><b>1</b> Review the cost estimate</div><div class="workflow-peek-step"><b>2</b> Build and inspect the preview</div><div class="workflow-peek-step"><b>3</b> Run a security check before publishing</div></div>
+        <div class="workflow-peek-preview"><div class="workflow-peek-browser"><div class="workflow-peek-browser-bar">● ● ● &nbsp; preview.example</div><div class="workflow-peek-site"><strong>Book time for what matters.</strong><p>Choose a service and find a time that works for you.</p><span>View availability</span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
     <div class="strip reveal">
       <div class="strip-inner glass">
-Public reports and user complaints about other AI app builders describe <b>large shares of paid credits</b> going to fixing the AI's own errors, and <b>vibe-coded apps</b> shipping with exposed databases and hardcoded keys. We built this app to end both.
+Know what a build may cost before you start, review every change, and check for security issues before you publish.
       </div>
     </div>
   </div>
@@ -679,8 +719,8 @@ Public reports and user complaints about other AI app builders describe <b>large
     </section>
 
     <section class="features" id="features">
-      <h2 class="section-title reveal">Every feature answers a real complaint</h2>
-      <p class="section-sub reveal">We researched thousands of reviews of the big vibe-coding tools. Each thing users hate became a feature users get.</p>
+      <h2 class="section-title reveal">Build with more control</h2>
+      <p class="section-sub reveal">See the cost, inspect the result, and decide when it is ready to share.</p>
       <div class="bento">
         <div class="bcard glass b-wide reveal">
           <div class="ic">🧾</div>
@@ -734,7 +774,7 @@ Public reports and user complaints about other AI app builders describe <b>large
       </div>
 
       <div class="receipt glass reveal">
-        <div class="row dim"><span>— your build receipt —</span><span></span></div>
+        <div class="row dim"><span>— illustrative build receipt —</span><span>example only</span></div>
         <div class="row"><span>v1 habit tracker</span><span>$0.14</span></div>
         <div class="row"><span>v2 add streaks</span><span>$0.09</span></div>
         <div class="row strike"><span>failed generation</span><span>$0.11 → not counted</span></div>
@@ -774,7 +814,7 @@ Public reports and user complaints about other AI app builders describe <b>large
       <div class="cost-calc glass reveal">
         <div class="cc-head">
           <div class="cc-title">💡 Which plan is cheaper for you?</div>
-          <div class="cc-sub">Estimate using $0.10 average cost per generation (based on our own build receipts above).</div>
+          <div class="cc-sub">Illustrative estimate using $0.10 per generation. Actual AI usage varies by request and model.</div>
         </div>
         <label class="cc-slider-label">
           <span>Builds per month: <b id="ccCount">40</b></span>
@@ -861,6 +901,13 @@ Public reports and user complaints about other AI app builders describe <b>large
   </footer>
 
   <script>
+    document.getElementById("heroStartForm")?.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const idea = document.getElementById("heroIdea").value.trim();
+      if (!idea) return;
+      try { sessionStorage.setItem("vc_landing_idea", idea); } catch (_) {}
+      location.href = "/app";
+    });
     // Scroll-reveal via IntersectionObserver
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
