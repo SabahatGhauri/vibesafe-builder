@@ -142,7 +142,7 @@ body {
 .rail-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 .chat {
-  width: 380px;
+  width: var(--chat-w, 380px);
   min-width: 300px;
   display: flex;
   flex-direction: column;
@@ -266,6 +266,30 @@ body {
 
 /* ---------- workspace ---------- */
 .workspace { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ---------- resizable split ----------
+   The chat column used to be a fixed width, which is wrong for a panel whose
+   job changes: reading a long diff wants it narrow, writing a detailed prompt
+   wants it wide. The visible line is 1px; the grab area is 9px, because a 1px
+   drag target is the classic way to make a resizer infuriating. */
+.splitter {
+  flex: 0 0 9px; margin: 0 -4px; z-index: 5; position: relative;
+  cursor: col-resize; background: transparent; border: 0; padding: 0;
+  touch-action: none; align-self: stretch;
+}
+.splitter::before {
+  content: ""; position: absolute; inset: 0 4px; background: var(--line);
+  transition: background 0.15s;
+}
+.splitter:hover::before, .splitter:focus-visible::before, .splitter.dragging::before {
+  background: var(--accent);
+}
+.splitter:focus-visible { outline: none; }
+.splitter:focus-visible::before { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+/* While dragging, the pointer must not be captured by the preview iframe or
+   land as a text selection halfway across the page. */
+body.is-resizing { cursor: col-resize; user-select: none; }
+body.is-resizing iframe { pointer-events: none; }
 .tabs { display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid var(--line); background: var(--bg-raise); }
 .tab {
   background: none; border: none; color: var(--text-dim);
@@ -906,7 +930,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .rail-label { display: block; font-size: 10px; line-height: 1.1; font-weight: 700; }
 .rail-btn:hover { color: var(--text); background: var(--rail-hover-bg); }
 .rail-btn.active { background: var(--rail-active-bg); border-color: var(--rail-active-border); color: var(--accent-strong); }
-.chat { width: min(390px, 33vw); min-width: 300px; padding-top: 10px; background: var(--chat-bg); }
+.chat { width: var(--chat-w, min(390px, 33vw)); min-width: 300px; padding-top: 10px; background: var(--chat-bg); }
 .setup-head { padding: 9px 16px 16px; }
 .setup-head h2 { font-size: 18px; letter-spacing: -.03em; }
 .palette-picker { margin-left: 10px; margin-right: 10px; }
@@ -948,6 +972,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .rail-btn { flex: 0 0 66px; height: 48px; }
   .rail-spacer { display: none; }
   .chat { order: 1; width: 100%; min-width: 0; max-height: 55vh; border-right: 0; border-bottom: 1px solid var(--line); }
+  /* Stacked, so there is no vertical edge to drag. */
+  .splitter { display: none; }
   .workspace { order: 2; min-height: 560px; }
   .panel.active { min-height: 470px; }
   .composer { position: sticky; }

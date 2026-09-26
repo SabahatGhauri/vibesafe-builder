@@ -2105,6 +2105,104 @@ function markStepsDone() {
 // customer's and it sticks, so the button reports the theme it will switch TO,
 // not the one currently showing - a button labelled with the current state
 // reads as a status line and gets clicked by mistake.
+// Lets the customer decide how the screen is divided, and remembers it.
+//
+// The width lives in a CSS variable rather than an inline style on .chat, so
+// the stacked mobile layout can still override it with a plain rule instead of
+// having to fight inline specificity with !important.
+function initSplitter() {
+  const bar = $("chatSplitter");
+  const chat = document.querySelector(".chat");
+  const layout = document.querySelector(".layout");
+  if (!bar || !chat || !layout) return;
+
+  const KEY = "vc_chat_width";
+  const MIN = 300;
+  // Never let the panel eat the workspace it is meant to sit beside.
+  //
+  // The zero check is not defensive padding. A page loaded in a background tab
+  // reports innerWidth 0 until it is first shown, and without this the stored
+  // width was clamped against a 0-wide viewport and collapsed to the minimum -
+  // so opening the builder in a new tab silently threw the saved layout away.
+  const max = () => {
+    const vw = window.innerWidth || document.documentElement.clientWidth || 0;
+    if (!vw) return 720;
+    return Math.max(MIN, Math.min(720, Math.round(vw * 0.6)));
+  };
+
+  const apply = (px, persist) => {
+    const w = Math.round(Math.min(max(), Math.max(MIN, px)));
+    layout.style.setProperty("--chat-w", w + "px");
+    bar.setAttribute("aria-valuenow", String(w));
+    bar.setAttribute("aria-valuemax", String(max()));
+    if (persist) { try { localStorage.setItem(KEY, String(w)); } catch (e) {} }
+    return w;
+  };
+
+  // A stored width from a wider window must not strand the panel off-screen.
+  let stored = null;
+  try { stored = parseInt(localStorage.getItem(KEY), 10); } catch (e) {}
+  if (stored && !Number.isNaN(stored)) apply(stored, false);
+
+  let startX = 0, startW = 0;
+
+  const onMove = (e) => apply(startW + (e.clientX - startX), false);
+
+  const onUp = (e) => {
+    bar.classList.remove("dragging");
+    document.body.classList.remove("is-resizing");
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    try { bar.releasePointerCapture(e.pointerId); } catch (err) {}
+    // Written once at the end rather than on every move: this is a
+    // synchronous storage write inside a pointermove handler otherwise.
+    const finalW = chat.getBoundingClientRect().width;
+    if (finalW > 0) apply(finalW, true);
+  };
+
+  bar.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    startX = e.clientX;
+    startW = chat.getBoundingClientRect().width;
+    bar.classList.add("dragging");
+    document.body.classList.add("is-resizing");
+    try { bar.setPointerCapture(e.pointerId); } catch (err) {}
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    e.preventDefault();
+  });
+
+  // Dragging is not available to every customer, so the same control works
+  // from the keyboard once it has focus.
+  bar.addEventListener("keydown", (e) => {
+    const w = chat.getBoundingClientRect().width;
+    const step = e.shiftKey ? 48 : 16;
+    if (e.key === "ArrowLeft") apply(w - step, true);
+    else if (e.key === "ArrowRight") apply(w + step, true);
+    else if (e.key === "Home") apply(MIN, true);
+    else if (e.key === "End") apply(max(), true);
+    else return;
+    e.preventDefault();
+  });
+
+  // Back to the default, for anyone who has dragged themselves somewhere odd.
+  bar.addEventListener("dblclick", () => {
+    layout.style.removeProperty("--chat-w");
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    bar.setAttribute("aria-valuenow", String(Math.round(chat.getBoundingClientRect().width)));
+  });
+
+  // A window that shrinks below the stored width must not push the workspace
+  // out of view. A measurement of 0 means the panel is not laid out yet (hidden
+  // tab, stacked mobile layout), and re-applying that would clamp the width to
+  // the minimum for no reason.
+  window.addEventListener("resize", () => {
+    if (!layout.style.getPropertyValue("--chat-w")) return;
+    const w = chat.getBoundingClientRect().width;
+    if (w > 0) apply(w, false);
+  });
+}
+
 function initThemeToggle() {
   const btn = $("themeBtn");
   if (!btn) return;
@@ -2205,6 +2303,7 @@ initImagePicker();
 initPayPicker();
 initSpecPanel();
 initPromptHelpers();
+initSplitter();
 initThemeToggle();
 markStepsDone();
 
