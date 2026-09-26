@@ -750,6 +750,15 @@ $("promptInput").addEventListener("input", () => {
   clearTimeout(estTimer);
   estTimer = setTimeout(refreshEstimate, 700);
 });
+// Carry a homepage idea into the editor without putting private text in the URL.
+// The user still reviews it and explicitly submits the build.
+try {
+  const landingIdea = sessionStorage.getItem("vc_landing_idea");
+  if (landingIdea && !$('promptInput').value) {
+    $('promptInput').value = landingIdea;
+    setTimeout(refreshEstimate, 0);
+  }
+} catch (_) {}
 
 async function refreshEstimate() {
   const request = ++estimateRequest;
@@ -893,6 +902,9 @@ $("composer").addEventListener("submit", async (e) => {
   const strategy = state.fixFailStreak >= 2 ? "rethink" : null;
   $("stuckBanner").hidden = strategy !== "rethink";
 
+  // Keep the homepage idea through an OAuth/email signup redirect. Clear it only
+  // once the user has actually submitted the generation.
+  try { sessionStorage.removeItem("vc_landing_idea"); } catch (_) {}
   addMsg("user", esc(prompt));
   $("promptInput").value = "";
   ++estimateRequest;
@@ -2063,13 +2075,30 @@ function markStepsDone() {
     specPicker: window.spec ? !spec.isEmpty(state.spec) : false,
     payPicker: Object.keys(state.payments || {}).length > 0,
     imagePicker: Object.keys(state.assets || {}).length > 0,
-    // Step 1 counts as done once there is an app at all, however it started.
-    stepTemplate: state.versions.length > 0,
   };
   for (const [id, isDone] of Object.entries(done)) {
     const el = $(id);
     if (el) el.classList.toggle("done", isDone);
   }
+
+  // The panel has two shapes, and this is the switch between them. Until there
+  // is a version, the only thing asked for is a description; the refine tools
+  // are hidden because there is nothing yet for them to apply to. Once an app
+  // exists the panel turns into the conversation about it.
+  const hasBuild = state.versions.length > 0;
+  const panel = document.querySelector(".chat");
+  if (panel) panel.classList.toggle("has-build", hasBuild);
+  const title = $("composerTitle");
+  if (title) title.innerHTML = hasBuild ? "<b>Ask for a change</b>" : "<b>Describe your app</b>";
+  const input = $("promptInput");
+  if (input) {
+    input.placeholder = hasBuild
+      ? "e.g. make the header sticky, add a search box…"
+      : "e.g. a task tracker for a small team, with a board view and due dates…";
+  }
+  // The example chips are starting points, not change requests.
+  const chips = $("promptChips");
+  if (chips) chips.hidden = hasBuild;
 }
 
 function initPromptHelpers() {

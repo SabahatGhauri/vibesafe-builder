@@ -561,23 +561,53 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .palette-toggle-swatch.palette-strip { flex-shrink: 0; }
 .palette-chevron { margin-left: auto; opacity: 0.6; }
 /* ---------- guided setup: six steps, not five unrelated boxes ---------- */
-.setup-head { padding: 2px 2px 10px; }
-.setup-head h2 { font-size: 15px; margin: 0 0 2px; }
-.setup-head p { font-size: 12.5px; color: var(--dim); margin: 0; }
+.setup-head { padding: 4px 2px 12px; }
+.setup-head h2 { font-size: 17px; margin: 0 0 4px; letter-spacing: -0.02em; }
+.setup-head p { font-size: 12.5px; color: var(--dim); margin: 0; line-height: 1.5; }
 
-.pick-num {
-  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
-  display: grid; place-items: center; font-size: 11.5px; font-weight: 700;
-  color: var(--dim); background: transparent; border: 1px solid var(--line);
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+/* ---------- panel order ----------
+   Two states, one DOM. Before anything exists the panel asks a single question
+   and the prompt is the first thing under it. Once there is an app it becomes a
+   conversation: history on top, composer pinned to the bottom the way a chat
+   should be, and the optional tools in between.
+
+   This replaces a numbered 1-6 sequence that put five configuration rows ahead
+   of the prompt. It asked people to choose colours, declare non-negotiables,
+   set up payments and upload a logo before describing the thing any of that
+   would apply to - and numbering implied all five were required, which none
+   of them are. */
+.chat .setup-head { order: 1; }
+.chat .composer   { order: 2; position: static; border-top: 0; }
+.chat .start-alt  { order: 3; }
+.chat .messages   { order: 4; }
+.chat .refine     { order: 5; display: none; }
+/* Unset order would leave this at 0, i.e. above the heading. It belongs
+   directly above the box you are about to type the next attempt into. */
+.chat .stuck-banner { order: 6; }
+
+.chat.has-build .setup-head { display: none; }
+.chat.has-build .messages   { order: 1; }
+.chat.has-build .refine     { order: 2; display: block; }
+.chat.has-build .start-alt  { order: 3; }
+.chat.has-build .stuck-banner { order: 4; }
+.chat.has-build .composer   { order: 5; position: sticky; bottom: 0; border-top: 1px solid var(--line); }
+
+/* The second way in, deliberately quieter than the prompt. */
+.start-alt { display: flex; align-items: center; gap: 8px; padding: 2px 4px 12px; font-size: 12.5px; }
+.start-alt-or { color: var(--dim); }
+.start-alt-link { color: var(--accent); text-decoration: none; font-weight: 600; }
+.start-alt-link:hover { text-decoration: underline; }
+
+.refine { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }
+.refine-head { padding: 0 2px 8px; }
+.refine-head h3 { font-size: 13px; margin: 0 0 2px; letter-spacing: 0.02em; }
+.refine-head p { font-size: 12px; color: var(--dim); margin: 0; }
+
+/* Something set is shown, not implied - but as a tick beside the label rather
+   than a numbered bubble, because these are not steps in an order. */
+.palette-picker.done .pick-text b::after {
+  content: "✓"; color: var(--accent); font-weight: 700; margin-left: 6px;
 }
-/* Done is shown, not implied: a step with something in it gets a tick, so the
-   panel answers "what have I actually set?" at a glance. */
-.palette-picker.done .pick-num { background: var(--accent); border-color: var(--accent); color: #fff; font-size: 12px; }
-.palette-picker.done .pick-num::after { content: "¹3"; }
-.palette-picker.done .pick-num { color: transparent; }
-.palette-picker.done .pick-num::after { color: #fff; }
-.palette-toggle:hover .pick-num { border-color: var(--accent); color: var(--text); }
 
 /* The agent picker is a power-user control, not the main event: collapsed by
    default so the prompt box owns the space. */
@@ -784,3 +814,99 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .btn.ghost.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
 .btn.ghost.danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
 #nativeFormSnippet { font-family: monospace; }
+
+/* Light, practical workspace paired with the dark public site. Existing status
+   colours remain semantic; these tokens only change the application surfaces. */
+:root {
+  --bg: #f5f6fb;
+  --bg-raise: #fff;
+  --bg-panel: #fff;
+  --line: #e1e5ef;
+  --text: #18223a;
+  --text-dim: #5f6c83;
+  --dim: #5f6c83;
+  --dim2: #738099;
+  --border: #e1e5ef;
+  --panel-2: #f8f9fd;
+  --accent: #7048d8;
+  --accent-dim: #e9e3fb;
+  --ok: #147858;
+  --warn: #9b6508;
+  --danger: #bd3f43;
+}
+body { max-width: 100%; }
+button, input, textarea, select { font-family: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid #8b65ee; outline-offset: 2px;
+}
+.topbar { gap: 14px; padding: 12px 20px; box-shadow: 0 1px 12px rgba(22,31,59,.04); }
+.brand-name { letter-spacing: -.02em; }
+.brand-mark { color: var(--accent); }
+.layout { background: var(--bg); }
+.rail { width: 104px; padding: 16px 8px; gap: 5px; background: #fff; }
+.rail-btn { width: 100%; height: 56px; display: flex; flex-direction: column; gap: 3px; border-radius: 12px; font-size: 18px; }
+.rail-label { display: block; font-size: 10px; line-height: 1.1; font-weight: 700; }
+.rail-btn:hover { color: var(--text); background: #f4f0ff; }
+.rail-btn.active { background: #eee8ff; border-color: #e2d6ff; color: #5731b3; }
+.chat { width: min(390px, 33vw); min-width: 300px; padding-top: 10px; background: #fbfbfe; }
+.setup-head { padding: 9px 16px 16px; }
+.setup-head h2 { font-size: 18px; letter-spacing: -.03em; }
+.palette-picker { margin-left: 10px; margin-right: 10px; }
+.palette-toggle, .msg.system, .msg.assistant, .composer-box, .stat, .saved-app-card { box-shadow: 0 5px 20px rgba(31,37,75,.035); }
+.msg.user { color: var(--text); background: #ede7ff; }
+.composer { background: #fbfbfe; }
+.composer-box { border-radius: 16px; box-shadow: 0 12px 30px rgba(48,35,99,.08); }
+.btn { border-radius: 10px; font-weight: 650; }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.primary:hover:not(:disabled) { background: #5d37c4; }
+.tabs { gap: 3px; padding: 8px 14px 0; overflow-x: auto; scrollbar-width: thin; }
+.tab { white-space: nowrap; font-weight: 650; }
+.tab.active { color: #5731b3; }
+.panel-toolbar { flex-wrap: wrap; gap: 8px; min-height: 56px; }
+#panel-preview { background: #f5f6fb; }
+.preview-empty { margin: auto; }
+#panel-preview .empty { color: var(--text-dim); }
+.pe-frame { background: #fff; opacity: 1; box-shadow: 0 20px 45px rgba(20,30,60,.08); }
+.pe-body i { background: linear-gradient(90deg, #e5e8f2, #f5f6fb); }
+.auth-gate { background: radial-gradient(circle at 50% 0, #eee8ff, #f7f8fc 60%); }
+.auth-gate-card { max-width: 430px; padding: 36px; border-radius: 22px; box-shadow: 0 30px 80px rgba(27,32,59,.12); }
+.auth-gate-card h1 { font-size: 25px; letter-spacing: -.04em; }
+.auth-gate-card input { background: #fff; }
+.oauth-btn { background: #fff; }
+.code { color: #cfe3d8; background: #1c2233; }
+
+@media (max-width: 1100px) {
+  .topbar { flex-wrap: wrap; }
+  .meter { margin-left: auto; }
+  .chat { width: 340px; min-width: 280px; }
+}
+@media (max-width: 800px) {
+  body { height: auto; min-height: 100vh; overflow: auto; }
+  .topbar { position: relative; padding: 12px; gap: 8px; }
+  .brand { width: 100%; }
+  .meter { min-width: 160px; flex: 1; order: 2; }
+  .layout { display: flex; flex-direction: column; min-height: calc(100vh - 140px); }
+  .rail { width: 100%; flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 7px 9px; }
+  .rail-btn { flex: 0 0 66px; height: 48px; }
+  .rail-spacer { display: none; }
+  .chat { order: 1; width: 100%; min-width: 0; max-height: 55vh; border-right: 0; border-bottom: 1px solid var(--line); }
+  .workspace { order: 2; min-height: 560px; }
+  .panel.active { min-height: 470px; }
+  .composer { position: sticky; }
+  .version-list { width: 210px; }
+}
+@media (max-width: 520px) {
+  .topbar .brand { margin-bottom: 5px; }
+  .topbar > .btn { flex: 1 1 auto; }
+  .meter { flex-basis: 100%; }
+  .chat { max-height: 60vh; }
+  .panel-toolbar { padding: 9px; }
+  .stat-bar { gap: 6px; }
+  .stat { min-width: 0; flex: 1 1 140px; }
+  .versions-split { flex-direction: column; }
+  .version-list { width: 100%; max-height: 170px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .auth-gate-card { padding: 24px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

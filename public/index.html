@@ -87,32 +87,37 @@
 
   <main class="layout">
     <nav class="rail" aria-label="Sections">
-      <button class="rail-btn active" type="button" data-rail="preview" title="Preview">✦</button>
-      <button class="rail-btn" type="button" data-rail="code" title="Code">&lt;/&gt;</button>
-      <button class="rail-btn" type="button" data-rail="health" title="Build Health">☷</button>
-      <button class="rail-btn" type="button" data-rail="security" title="Security">⛨</button>
-      <button class="rail-btn" type="button" data-rail="versions" title="Versions">◴</button>
-      <button class="rail-btn" type="button" data-rail="deploy" title="Deploy">☁</button>
+      <button class="rail-btn active" type="button" data-rail="preview" title="Preview" aria-label="Preview"><span aria-hidden="true">✦</span><span class="rail-label">Preview</span></button>
+      <button class="rail-btn" type="button" data-rail="code" title="Code" aria-label="Code"><span aria-hidden="true">&lt;/&gt;</span><span class="rail-label">Code</span></button>
+      <button class="rail-btn" type="button" data-rail="health" title="Build Health" aria-label="Build Health"><span aria-hidden="true">☷</span><span class="rail-label">Health</span></button>
+      <button class="rail-btn" type="button" data-rail="security" title="Security" aria-label="Security"><span aria-hidden="true">⛨</span><span class="rail-label">Security</span></button>
+      <button class="rail-btn" type="button" data-rail="versions" title="Versions" aria-label="Versions"><span aria-hidden="true">◴</span><span class="rail-label">Versions</span></button>
+      <button class="rail-btn" type="button" data-rail="deploy" title="Deploy" aria-label="Deploy"><span aria-hidden="true">☁</span><span class="rail-label">Deploy</span></button>
       <span class="rail-spacer"></span>
-      <button class="rail-btn" type="button" id="railSettings" title="Settings">⚙</button>
+      <button class="rail-btn" type="button" id="railSettings" title="Settings" aria-label="Settings"><span aria-hidden="true">⚙</span><span class="rail-label">Settings</span></button>
     </nav>
     <aside class="chat">
       <div class="setup-head">
-        <h2>Create your app</h2>
-        <p>Follow the steps, or just describe what you want.</p>
+        <h2>What do you want to build?</h2>
+        <p>Describe it in a sentence. Everything else — colours, images, payments — comes after, once there is something to change.</p>
       </div>
-      <!-- Always reachable: the template grid lives in the chat, which scrolls
-           away the moment someone types. This row does not move. -->
-      <div class="palette-picker" data-step="1" id="stepTemplate">
-        <a class="palette-toggle template-link" href="/templates.html" title="See all 16 templates, with a live preview of each">
-          <span class="pick-num">1</span>
-          <span class="pick-text"><b>Choose a starting point</b><small>16 free, working templates</small></span>
-          <span class="palette-chevron">›</span>
-        </a>
+      <!-- The alternative entry point, not the first step. Starting from a
+           template is a different way in for someone who would rather edit than
+           describe - it is never a thing you must do before describing. -->
+      <div class="start-alt" id="stepTemplate">
+        <span class="start-alt-or">or</span>
+        <a class="start-alt-link" href="/templates.html" title="See all 16 templates, with a live preview of each">start from one of 16 templates →</a>
       </div>
-      <div class="palette-picker" data-step="2" id="palettePicker">
+      <!-- Refine: optional, and hidden until an app exists. Asking someone to
+           set brand colours or upload a hero image before they have described
+           anything is asking them to decorate a thing that is not there yet. -->
+      <div class="refine" id="refinePanel">
+        <div class="refine-head">
+          <h3>Refine</h3>
+          <p>Optional. Ask for changes in the box below, or use these.</p>
+        </div>
+      <div class="palette-picker" data-step="style" id="palettePicker">
         <button type="button" class="palette-toggle" id="paletteToggleBtn" title="Pick a color palette the AI should build with">
-          <span class="pick-num">2</span>
           <span class="pick-text"><b>Brand style</b><small id="paletteToggleLabel">The AI is picking its own colours</small></span>
           <span class="palette-toggle-swatch" id="paletteToggleSwatch" hidden></span>
           <span class="palette-chevron">›</span>
@@ -133,9 +138,8 @@
           <button type="button" class="btn ghost mini" id="paletteClearBtn">No preference (let the AI choose)</button>
         </div>
       </div>
-      <div class="palette-picker" data-step="3" id="specPicker">
+      <div class="palette-picker" data-step="spec" id="specPicker">
         <button type="button" class="palette-toggle" id="specToggleBtn" title="What this app is for, and what must stay true">
-          <span class="pick-num">3</span>
           <span class="pick-text"><b>Non-negotiables</b><small id="specToggleLabel">Tell the AI what must stay true</small></span>
           <span class="palette-chevron">›</span>
         </button>
@@ -151,9 +155,8 @@
           <p class="gh-meta" id="specHint"></p>
         </div>
       </div>
-      <div class="palette-picker" data-step="4" id="payPicker">
+      <div class="palette-picker" data-step="pay" id="payPicker">
         <button type="button" class="palette-toggle" id="payToggleBtn" title="Sell something in the app the AI builds">
-          <span class="pick-num">4</span>
           <span class="pick-text"><b>Monetisation</b><small id="payToggleLabel">Add products, prices or subscriptions</small></span>
           <span class="palette-chevron">›</span>
         </button>
@@ -170,9 +173,8 @@
           <p class="gh-meta" id="payHint"></p>
         </div>
       </div>
-      <div class="palette-picker" data-step="5" id="imagePicker">
+      <div class="palette-picker" data-step="assets" id="imagePicker">
         <button type="button" class="palette-toggle" id="imageToggleBtn" title="Use your own images in the app the AI builds">
-          <span class="pick-num">5</span>
           <span class="pick-text"><b>Brand assets</b><small id="imageToggleLabel">Upload your own images or logo</small></span>
           <span class="palette-chevron">›</span>
         </button>
@@ -182,6 +184,7 @@
           <p class="gh-meta" id="imageHint"></p>
           <p class="gh-meta">PNG, JPEG, WebP or GIF. Each image is resized and re-encoded in your browser, which also strips location data from photos. SVG isn't accepted — it can contain scripts.</p>
         </div>
+      </div>
       </div>
       <div class="messages" id="messages">
         <div class="msg system">
@@ -213,7 +216,7 @@
           </select>
           <p class="hint" id="agentHint">Choose a task or let Auto route your request. All modes use your current model and consume usage. Review leaves code unchanged and does not run tests.</p>
           </details>
-          <div class="composer-title"><span class="pick-num">6</span> <b>Describe your app</b></div>
+          <div class="composer-title" id="composerTitle"><b>Describe your app</b></div>
           <textarea id="promptInput" rows="4" placeholder="e.g. a task tracker for a small team, with a board view and due dates…"></textarea>
           <div class="prompt-chips" id="promptChips" aria-label="Example prompts">
             <button type="button" class="chip">A CRM for a small team</button>
