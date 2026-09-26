@@ -2101,6 +2101,37 @@ function markStepsDone() {
   if (chips) chips.hidden = hasBuild;
 }
 
+// The workspace runs light by default and dark on request. The choice is the
+// customer's and it sticks, so the button reports the theme it will switch TO,
+// not the one currently showing - a button labelled with the current state
+// reads as a status line and gets clicked by mistake.
+function initThemeToggle() {
+  const btn = $("themeBtn");
+  if (!btn) return;
+  const icon = $("themeIcon"), label = $("themeLabel");
+  const root = document.documentElement;
+
+  const paint = () => {
+    const isDark = root.getAttribute("data-theme") === "dark";
+    if (icon) icon.textContent = isDark ? "\u2600\uFE0F" : "\uD83C\uDF19";
+    if (label) label.textContent = isDark ? "Light" : "Dark";
+    btn.setAttribute("aria-pressed", String(isDark));
+    btn.title = isDark ? "Switch to the light workspace" : "Switch to the dark workspace";
+  };
+
+  btn.addEventListener("click", () => {
+    const nowDark = root.getAttribute("data-theme") !== "dark";
+    if (nowDark) root.setAttribute("data-theme", "dark");
+    else root.removeAttribute("data-theme");
+    // Storage can throw in a locked-down browser; the theme should still flip
+    // for this session rather than the click doing nothing.
+    try { localStorage.setItem("vc_theme", nowDark ? "dark" : "light"); } catch (e) {}
+    paint();
+  });
+
+  paint();
+}
+
 function initPromptHelpers() {
   // Keep the collapsed summary honest about which agent is selected.
   const agent = $("agentSelect");
@@ -2174,6 +2205,7 @@ initImagePicker();
 initPayPicker();
 initSpecPanel();
 initPromptHelpers();
+initThemeToggle();
 markStepsDone();
 
 // Switches the workspace into multi-file mode. Deliberately a separate, explicit
