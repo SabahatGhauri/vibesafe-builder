@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="One first build forks into two paths: an app kept small and read stays changeable at six months, while an app that grows unread becomes something that can only be rebuilt.">
+  <defs>
+    <marker id="mArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4fc3ff"/>
+    </marker>
+    <marker id="mArrowBad" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#ff6b6b"/>
+    </marker>
+    <style>
+      .bx { fill:#141a21; stroke:#232b34; }
+      .t  { fill:#eef3f7; font:600 15px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+      .tag{ font:700 10.5px "Segoe UI",system-ui,sans-serif; letter-spacing:.5px; }
+    </style>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#0f1318"/>
+
+  <text x="40" y="46" class="lbl">THE SAME FIRST BUILD, TWO ENDINGS</text>
+
+  <!-- start -->
+  <rect class="bx" x="40" y="176" width="180" height="70" rx="12" stroke-width="1"/>
+  <text x="62" y="206" class="t">v1 works</text>
+  <text x="62" y="228" class="d">Everything is fine here.</text>
+
+  <!-- fork -->
+  <path d="M226 200 L296 128" stroke="#4fc3ff" stroke-width="2" fill="none" marker-end="url(#mArrow)"/>
+  <path d="M226 222 L296 294" stroke="#ff6b6b" stroke-width="2" fill="none" marker-end="url(#mArrowBad)"/>
+
+  <!-- top path: survivable -->
+  <rect class="bx" x="304" y="76" width="300" height="104" rx="12" stroke="#4fc3ff" stroke-opacity=".45" stroke-width="1"/>
+  <text x="326" y="104" class="tag" fill="#4fc3ff">KEPT SMALL, DIFFS READ</text>
+  <text x="326" y="130" class="d">One file you can read in a sitting</text>
+  <text x="326" y="150" class="d">You skim what changed each turn</text>
+  <text x="326" y="170" class="d">A working version to fall back to</text>
+
+  <path d="M612 128 L682 128" stroke="#4fc3ff" stroke-width="2" fill="none" marker-end="url(#mArrow)"/>
+
+  <rect class="bx" x="690" y="76" width="270" height="104" rx="12" stroke="#4fc3ff" stroke-opacity=".45" stroke-width="1"/>
+  <text x="712" y="104" class="tag" fill="#4fc3ff">SIX MONTHS LATER</text>
+  <text x="712" y="132" class="t" fill="#4fc3ff">You can still change it</text>
+  <text x="712" y="158" class="d">A rough map in your head is enough.</text>
+
+  <!-- bottom path: disposable -->
+  <rect class="bx" x="304" y="244" width="300" height="104" rx="12" stroke="#ff6b6b" stroke-opacity=".4" stroke-width="1"/>
+  <text x="326" y="272" class="tag" fill="#ff6b6b">GREW UNREAD</text>
+  <text x="326" y="298" class="d">Scope crept past one readable file</text>
+  <text x="326" y="318" class="d">Diffs went by unlooked-at</text>
+  <text x="326" y="338" class="d">Four ways to do the same thing</text>
+
+  <path d="M612 296 L682 296" stroke="#ff6b6b" stroke-width="2" fill="none" marker-end="url(#mArrowBad)"/>
+
+  <rect class="bx" x="690" y="244" width="270" height="104" rx="12" stroke="#ff6b6b" stroke-opacity=".4" stroke-width="1"/>
+  <text x="712" y="272" class="tag" fill="#ff6b6b">SIX MONTHS LATER</text>
+  <text x="712" y="300" class="t" fill="#ff6b6b">You can only rebuild it</text>
+  <text x="712" y="326" class="d">Nobody ever held the whole model.</text>
+
+  <text x="40" y="392" class="cap">Neither path is about which builder made it. Three of the four things that decide this are habits, not features.</text>
+</svg>

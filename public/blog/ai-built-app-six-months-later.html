@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>What Happens to an AI-Built App Six Months Later | VibeSafe Builder</title>
+<meta name="description" content="Nobody asks who maintains the code until something breaks. What actually makes an AI-built app survivable a year on — and what makes it disposable." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="VibeSafe Builder" />
+<meta property="og:title" content="What Happens to an AI-Built App Six Months Later" />
+<meta property="og:description" content="Nobody asks who maintains the code until something breaks. What actually makes an AI-built app survivable a year on — and what makes it disposable." />
+<meta property="og:image" content="https://vibesafebuilder.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:image" content="https://vibesafebuilder.com/og-image.png" />
+<meta property="og:url" content="https://vibesafebuilder.com/blog/ai-built-app-six-months-later.html" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="What Happens to an AI-Built App Six Months Later" />
+<meta name="twitter:description" content="Nobody asks who maintains the code until something breaks. What actually makes an AI-built app survivable a year on — and what makes it disposable." />
+<link rel="canonical" href="https://vibesafebuilder.com/blog/ai-built-app-six-months-later.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "What Happens to an AI-Built App Six Months Later",
+  "description": "Nobody asks who maintains the code until something breaks. What actually makes an AI-built app survivable a year on — and what makes it disposable.",
+  "url": "https://vibesafebuilder.com/blog/ai-built-app-six-months-later.html",
+  "datePublished": "2026-09-30",
+  "author": { "@type": "Organization", "name": "VibeSafe Builder" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "VibeSafe Builder",
+    "logo": { "@type": "ImageObject", "url": "https://vibesafebuilder.com/favicon.svg" }
+  },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://vibesafebuilder.com/blog/ai-built-app-six-months-later.html" }
+}
+</script>
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+<div class="promo" id="promo" role="region" aria-label="Free first build offer">
+  <style>
+    .promo { position: relative; z-index: 60; display: flex; align-items: center; justify-content: center; gap: 6px 14px; flex-wrap: wrap; padding: 9px 48px; background: linear-gradient(90deg, #6d4aec, #8b5cf6 50%, #4f7cff); color: #fff; font: 500 13.5px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; }
+    .promo b { font-weight: 700; }
+    .promo .promo-note { opacity: 0.85; font-size: 12.5px; }
+    .promo a.promo-cta { color: #1a1033; background: #fff; padding: 4px 12px; border-radius: 100px; font-weight: 700; font-size: 12.5px; text-decoration: none; white-space: nowrap; }
+    .promo a.promo-cta:hover { background: #efe9ff; }
+    .promo button { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent; color: #fff; font-size: 18px; line-height: 1; cursor: pointer; opacity: 0.8; }
+    .promo button:hover, .promo button:focus-visible { opacity: 1; background: rgba(255,255,255,0.15); }
+    @media (max-width: 600px) { .promo { padding: 8px 40px 8px 14px; font-size: 13px; gap: 4px 10px; } .promo .promo-long { display: none; } .promo .promo-note { font-size: 12px; } }
+  </style>
+  <span>🎉 <b>Your first app is free</b><span class="promo-long"> — build it and publish it to a live link</span>. No card, no API key.</span>
+  <span class="promo-note">The free build uses a lighter AI model.</span>
+  <a class="promo-cta" href="/app">Start free →</a>
+  <button type="button" aria-label="Dismiss this offer">×</button>
+  <script>
+    (function () {
+      var el = document.getElementById("promo"), KEY = "vc_promo_first_free_dismissed";
+      try { if (localStorage.getItem(KEY) === "1") el.hidden = true; } catch (e) {}
+      el.querySelector("button").addEventListener("click", function () {
+        el.hidden = true;
+        try { localStorage.setItem(KEY, "1"); } catch (e) {}
+      });
+    })();
+  </script>
+</div>
+
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#8b5cf6"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/demo.html">Demo</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/blog.html" class="active" aria-current="page">Blog</a>
+      <details class="nav-more">
+        <summary>More</summary>
+        <div class="nav-more-menu">
+          <a href="/user-guide.html">User guide</a>
+          <a href="/security.html">Security</a>
+          <a href="/deploy-guide.html">Deploy</a>
+          <a href="/about.html">About</a>
+          <a href="/legal.html">Legal</a>
+        </div>
+      </details>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Maintenance</div>
+    <h1>What Happens to an AI-Built App Six Months Later</h1>
+    <div class="post-meta">Published September 2026 · 7 min read</div>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <p>Most people choose an AI app builder by watching how fast it produces the first version. That is the easiest thing to compare and close to the least useful, because the first version is the cheapest part of an app&rsquo;s life. The question that decides whether you still have something in a year is a duller one: when this breaks, who understands it well enough to fix it?</p>
+      <figure class="post-figure">
+  <a class="post-figure-zoom" href="/img/blog/ai-built-app-six-months-later.svg" target="_blank" rel="noopener">
+  <img src="/img/blog/ai-built-app-six-months-later.svg" alt="Two paths from one first build: an app kept small and read stays changeable, while an app that grows unread becomes something you can only rebuild." width="1000" height="420" loading="lazy" decoding="async" />
+    <span class="post-figure-hint">Tap to enlarge</span>
+  </a>
+  <figcaption>The fork happens early and quietly. It is decided mostly by how much of the code you ever actually read.</figcaption>
+</figure>
+    </section>
+
+    <section>
+      <h2><span class="num">01</span>The handover problem, with yourself</h2>
+      <p>Inheriting a codebase from another developer is a known kind of difficult. You read it, you build a model of it, and eventually you can change things without fear. The work is real, but it ends.</p>
+      <p>An AI-built app hands you that same problem with one piece missing. Nobody ever held the model. The AI did not have one &mdash; it re-reads the code each turn and makes a locally sensible edit. You did not build one either, because you were describing outcomes rather than writing the thing that produced them.</p>
+      <p>So six months on you are not maintaining unfamiliar code. You are maintaining code that nobody, at any point, understood as a whole.</p>
+      <p>That is survivable. It just has to be planned for, and almost nobody does, because at the start everything works and the question feels theoretical.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">02</span>Why the debt accumulates differently</h2>
+      <p>Ordinary technical debt is usually deliberate. Someone takes a shortcut, knows it is a shortcut, and often leaves a note about it. It is a loan with a record of having been taken.</p>
+      <p>AI-generated debt differs in three specific ways.</p>
+      <p><strong>It is invisible when it is created.</strong> The code runs, the feature works, and nothing in the chat says &ldquo;I duplicated this logic in three places because I could not see the other two.&rdquo;</p>
+      <p><strong>It compounds through repetition.</strong> Each turn re-reads the code fresh, so the same idea gets solved slightly differently in different places. After forty turns there are four ways of doing one thing and no way to tell which is canonical.</p>
+      <p><strong>Nobody chose it.</strong> There is no decision to look back on, because there was never a decision &mdash; only an accumulation of locally reasonable edits that no one reviewed as a set.</p>
+      <p>This is the mechanism behind a complaint that turns up repeatedly in developer forums: that AI-assisted work produces volume fast and leaves a codebase people treat as a black box rather than something they read. The tone is often unkind, but the mechanism underneath it is real.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">03</span>What actually makes one survivable</h2>
+      <p>The difference between an AI-built app you can still change next year and one you can only rebuild comes down to four things. None of them is which builder you used.</p>
+      <ul>
+        <li><strong>Size.</strong> An app you can read in one sitting is an app you can fix. This is the strongest single predictor, and it is decided by scope discipline rather than tooling &mdash; by not asking for a platform when what you needed was a tool.</li>
+        <li><strong>Whether you ever read the diffs.</strong> Not every line, and not with full understanding. Reading what changed after each turn builds a rough map over time, and a rough map is the difference between fixing something and starting over.</li>
+        <li><strong>A working version you can return to.</strong> Version history turns a bad afternoon into a click backwards. Without it the only route out of a broken state is to prompt forward through it, which is how small problems become rewrites.</li>
+        <li><strong>Whether it runs without the platform.</strong> If it needs a particular runtime, a build pipeline or a vendor&rsquo;s servers, then maintaining it means keeping that relationship alive too. A file that runs on its own has one fewer dependency, permanently.</li>
+      </ul>
+      <p>Three of those four are habits, not features. A tool can make them cheaper or more expensive. No tool supplies them.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">04</span>Where this leaves the tools, including this one</h2>
+      <p>This is the reasoning behind generating single-file apps here: one HTML document, no build step, no dependency tree. Not because single files are elegant &mdash; at any real size they are not &mdash; but because an app small enough to live in one readable file is an app that stays changeable, and a file with no build step has nothing underneath it that can rot. Every change is also a version with a diff you can read and roll back, which makes the second habit above cheap enough that people actually do it.</p>
+      <p>Where that stops working is worth saying plainly. Past a certain size the single file becomes the problem rather than the protection, which is why larger projects here export as multi-file React into a repository you own. And none of it replaces reading what changed. A tool can hand you the diff. It cannot build the map in your head.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">05</span>The takeaway</h2>
+      <p>Before you start, ask what happens when this breaks in six months and you have forgotten all of it. If the answer is &ldquo;I would read it and work it out&rdquo;, you are building something that will last. If the answer is &ldquo;I would ask the AI to fix it and hope&rdquo;, you are building something disposable &mdash; which is a perfectly legitimate thing to build, as long as you know that is what you are doing.</p>
+      <p>Most of what gets made with these tools should be disposable. Prototypes, internal tools, one-off calculators, things that answer a question and then get deleted. The mistake is not building disposable software. It is building something disposable and then coming to depend on it.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">06</span>Related reading</h2>
+      <p class="post-sources">
+        <a href="/blog/ai-doom-loop.html">The AI doom loop</a> &mdash; why the same bug keeps coming back, and the architectural reason behind it.<br>
+        <a href="/blog/ai-app-builder-lock-in.html">The lock-in trap</a> &mdash; the four separate questions &ldquo;export your code&rdquo; does not answer.<br>
+        <a href="/blog/ai-app-builder-checklist.html">The pre-launch checklist</a> &mdash; 25 checks before you publish, tool-neutral.
+      </p>
+    </section>
+  </article>
+
+  <a class="back-to-blog" href="/blog.html">← Back to the blog</a>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/blog/what-is-vibesafe-builder.html">What is VibeSafe Builder?</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">vibesafe.info</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to vibesafe.info</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+<script>
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+<script src="/nav.js" defer></script>
+</body>
+</html>
