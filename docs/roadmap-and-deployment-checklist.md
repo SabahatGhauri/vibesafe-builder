@@ -1,6 +1,6 @@
 # VibeSafe Builder: suggestions and deployment checklist
 
-Updated: 22 September 2026.
+Updated: 7 October 2026.
 
 This is a planning checklist, not authorization to implement or deploy every item. Unchecked items are
 proposals or outstanding checks, not claims that the current product lacks every listed capability. Audit
@@ -24,8 +24,12 @@ existing features before implementing duplicates.
 - [x] **Test Payments end to end.** Confirmed working 22 Sept: link pasted, buy button built, checkout opened. Create a real Stripe payment link, paste it into the Payments
       panel, ask for a buy button, publish, and click it as a buyer. Only you can do this: it needs
       your Stripe account.
-- [ ] **Backlinks.** Every current link is either from a site we own or `nofollow`. Independent
-      followed links are the single biggest constraint on brand-name search. Directories, a Show HN
+- [ ] **Backlinks.** Still the single biggest constraint on brand-name search, but the wording
+      below was out of date: verified 3 Oct by fetching each profile and reading the `rel`
+      attribute, Dev.to and SaaSHub both give **followed** links. Peerlist, Indie Hackers, GitHub
+      and VS Marketplace are all `nofollow`. So the constraint is *few* followed links, not none.
+      For scale: the site outranking us for our own brand has 12 referring domains and a Domain
+      Authority of 2. Directories, a Show HN
       repost in a few weeks, articles on Dev.to or Hashnode.
       Ready-to-paste copy for each one is in `drafts/directory-submissions.md`, ordered by entity
       value rather than traffic — LinkedIn, Crunchbase and Wikidata first, because the failure we
@@ -55,11 +59,38 @@ existing features before implementing duplicates.
 - [ ] **5. Published-app analytics** (~half a day). Views per published app. Answers the first
       question every customer asks after publishing.
 - [ ] **6. Custom domains for published apps** (~2 days).
+- [ ] **7. Release brief (acceptance layer)** — suggested by Innokenty Bodrov on the Indie Hackers
+      thread, 2026-10-02, and checked against what we already ship rather than assumed new.
+      What Launch Check does today is open the published app in real headless Chromium and report
+      four things: console errors, uncaught exceptions, failed resource loads, mobile overflow.
+      That is fault detection. It says nothing crashed. It does not say signup, permissions, payment
+      and recovery work together as one safe customer journey.
+      The proposal is an artifact, not another scan: which journey was exercised end to end, which
+      critical findings were closed, what residual risk is being accepted, whether a recovery path
+      was tested.
+      **The design constraint, which is the whole point:** he pushed back on his own idea, asking
+      whether the residual-risk and recovery sections would change release decisions or become
+      another report people acknowledge and ignore. The honest answer is that the only thing in this
+      product that demonstrably changes behaviour is the publish block, because it is a gate rather
+      than a report. So accepting a residual risk has to be something you **write**, not something
+      you read — one typed sentence on why you are shipping with a known gap. And it is testable:
+      if no release is ever delayed or changed by that section, it is theatre and should be deleted
+      rather than redesigned.
+      He asked to hear how it turns out.
 
 Deliberately skipped: mobile via Expo, Vue/Svelte support, real-time collaboration. Weeks each,
 chasing a competitor's strength instead of building our own.
 
 ### Smaller outstanding items
+
+- [ ] **Revisit section 04 of `/compare.html` whenever a limit moves.** That page tells people when
+      to use a competitor instead, which is the only reason a vendor comparison is believed at all.
+      It currently says we do not do: payments or business logic that must run server-side (beyond
+      the built-in data backend), a large template library (16), genuinely large projects, and team
+      accounts or shared projects. Every one of those is on this roadmap. A stale "we cannot do
+      that" costs customers in the opposite direction to a stale price, and nobody notices because
+      nothing breaks. Check it when items 1 (payments phase 2/3) or 6 ship, or whenever team
+      accounts appear.
 
 - [ ] **Backfill the Report badge** onto the 19 apps published before it existed (one-off script over
       the stored HTML). New publishes already carry it.
