@@ -49,7 +49,8 @@ test("marketing pages are tied to the product entity", () => {
   }
 });
 
-test("homepage Organization has a raster logo", () => {
+test("homepage Organization has a raster logo and its LinkedIn page", () => {
   const org = jsonLd(path.join(PUBLIC, "landing.html")).find((d) => d["@type"] === "Organization");
   assert.match(org.logo.url, /\.png$/);
+  assert.ok(org.sameAs.some((u) => u.startsWith("https://www.linkedin.com/company/")), "LinkedIn company page missing from sameAs");
 });
