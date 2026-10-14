@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="Four steps of slopsquatting: the AI suggests a package that does not exist, an attacker registers that name, the next user or agent installs it, and the attacker's code runs inside the app. A registry check before installing breaks the chain.">
+  <defs>
+    <marker id="ssArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8b5cf6"/>
+    </marker>
+    <style>
+      .bx { fill:#141a21; stroke:#232b34; }
+      .bad{ fill:#1d1418; stroke:#ff6b81; stroke-opacity:.5; }
+      .t  { fill:#eef3f7; font:600 16px "Segoe UI",system-ui,sans-serif; }
+      .d  { fill:#8d9aa8; font:400 13px "Segoe UI",system-ui,sans-serif; }
+      .m  { fill:#c4b5fd; font:400 13px ui-monospace,Consolas,monospace; }
+      .cap{ fill:#5f6b78; font:400 12.5px "Segoe UI",system-ui,sans-serif; }
+      .lbl{ fill:#8b5cf6; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+      .fix{ fill:#4fc3ff; font:700 11px "Segoe UI",system-ui,sans-serif; letter-spacing:.6px; }
+    </style>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#0f1318"/>
+  <text x="40" y="46" class="lbl">HOW SLOPSQUATTING WORKS</text>
+
+  <rect class="bx" x="40"  y="70" width="205" height="150" rx="12"/>
+  <text x="58" y="100" class="t">1 · AI suggests it</text>
+  <text x="58" y="128" class="m">npm install</text>
+  <text x="58" y="146" class="m">react-codeshift</text>
+  <text x="58" y="178" class="d">The name sounds real.</text>
+  <text x="58" y="198" class="d">It does not exist.</text>
+
+  <rect class="bx" x="275" y="70" width="205" height="150" rx="12"/>
+  <text x="293" y="100" class="t">2 · Attacker claims it</text>
+  <text x="293" y="128" class="d">Models repeat the same</text>
+  <text x="293" y="148" class="d">invented names, so the</text>
+  <text x="293" y="168" class="d">attacker knows which</text>
+  <text x="293" y="188" class="d">ones to register.</text>
+
+  <rect class="bx" x="510" y="70" width="205" height="150" rx="12"/>
+  <text x="528" y="100" class="t">3 · Someone installs</text>
+  <text x="528" y="128" class="d">A person, or an AI agent,</text>
+  <text x="528" y="148" class="d">follows the same advice.</text>
+  <text x="528" y="168" class="d">This time there is</text>
+  <text x="528" y="188" class="d">no error.</text>
+
+  <rect class="bad" x="745" y="70" width="215" height="150" rx="12"/>
+  <text x="763" y="100" class="t">4 · Their code runs</text>
+  <text x="763" y="128" class="d">Inside your app, with</text>
+  <text x="763" y="148" class="d">your keys, your users'</text>
+  <text x="763" y="168" class="d">data and your build</text>
+  <text x="763" y="188" class="d">machine.</text>
+
+  <path d="M249 145 L270 145" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ssArrow)"/>
+  <path d="M484 145 L505 145" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ssArrow)"/>
+  <path d="M719 145 L740 145" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#ssArrow)"/>
+
+  <rect x="40" y="252" width="920" height="120" rx="12" fill="#141a21" stroke="#4fc3ff" stroke-width="1" stroke-opacity=".5"/>
+  <text x="62" y="282" class="fix">WHERE IT BREAKS</text>
+  <text x="62" y="312" class="t">Look the package up on npmjs.com or pypi.org before step 3.</text>
+  <text x="62" y="340" class="d">Missing means the AI invented it. Published last week, one version, no repository: treat it as hostile.</text>
+  <text x="40" y="402" class="cap">USENIX Security 2025: 19.7% of 2.23 million AI-recommended packages did not exist; 43% of invented names came back on every one of 10 runs.</text>
+</svg>
