@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Slopsquatting: When Your AI Invents a Package and Someone Else Owns It</title>
+<meta name="description" content="AI coding tools recommend packages that do not exist, and attackers register those names. What the research says about slopsquatting, the real cases, and five checks that stop it." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="VibeSafe Builder" />
+<meta property="og:title" content="Slopsquatting: When Your AI Invents a Package and Someone Else Owns It" />
+<meta property="og:description" content="AI coding tools recommend packages that do not exist, and attackers register those names. What the research says about slopsquatting, the real cases, and five checks that stop it." />
+<meta property="og:image" content="https://vibesafebuilder.com/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:image" content="https://vibesafebuilder.com/og-image.png" />
+<meta property="og:url" content="https://vibesafebuilder.com/blog/slopsquatting-ai-hallucinated-packages.html" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Slopsquatting: When Your AI Invents a Package and Someone Else Owns It" />
+<meta name="twitter:description" content="AI coding tools recommend packages that do not exist, and attackers register those names. What the research says about slopsquatting, the real cases, and five checks that stop it." />
+<link rel="canonical" href="https://vibesafebuilder.com/blog/slopsquatting-ai-hallucinated-packages.html" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Slopsquatting: When Your AI Invents a Package and Someone Else Owns It",
+  "description": "AI coding tools recommend packages that do not exist, and attackers register those names. What the research says about slopsquatting, the real cases, and five checks that stop it.",
+  "url": "https://vibesafebuilder.com/blog/slopsquatting-ai-hallucinated-packages.html",
+  "image": "https://vibesafebuilder.com/og-image.png",
+  "datePublished": "2026-10-14",
+  "dateModified": "2026-10-14",
+  "about": [
+    { "@type": "Thing", "name": "Slopsquatting" },
+    { "@type": "Thing", "name": "Software supply chain security" },
+    { "@type": "Thing", "name": "Vibe coding" }
+  ],
+  "citation": [
+    "https://www.usenix.org/conference/usenixsecurity25/presentation/spracklen",
+    "https://www.alphaxiv.org/abs/2605.17062",
+    "https://www.aikido.dev/blog/slopsquatting-ai-package-hallucination-attacks",
+    "https://labs.cloudsecurityalliance.org/research/csa-research-note-slopsquatting-ai-supply-chain-20260419-csa/"
+  ],
+  "author": { "@type": "Organization", "name": "VibeSafe Builder" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "VibeSafe Builder",
+    "logo": { "@type": "ImageObject", "url": "https://vibesafebuilder.com/favicon.svg" }
+  },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": "https://vibesafebuilder.com/blog/slopsquatting-ai-hallucinated-packages.html" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is slopsquatting?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Slopsquatting is a software supply chain attack where someone registers a package name that AI coding tools invent (hallucinate) but that does not exist yet. When a developer or an AI agent later installs the suggested package, they get the attacker's code. The term was coined by Seth Larson of the Python Software Foundation." }
+    },
+    {
+      "@type": "Question",
+      "name": "How often do AI models hallucinate package names?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A USENIX Security 2025 study of 16 models found that 19.7% of 2.23 million recommended packages did not exist, with commercial models averaging 5.2% and open-source models 21.7%. A 2026 preprint re-testing five newer frontier models measured rates between 4.62% and 6.10%." }
+    },
+    {
+      "@type": "Question",
+      "name": "How is slopsquatting different from typosquatting?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Typosquatting waits for a human to mistype a real package name. Slopsquatting waits for an AI to confidently recommend a name that never existed. Because models repeat the same invented names (43% reappeared on every one of 10 identical prompts in the USENIX study), an attacker can predict which names to register." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I protect an AI-built app from slopsquatting?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Check every unfamiliar package on its registry page before installing it, be suspicious of packages published very recently or with no history, commit a lockfile, do not let AI agents install packages unattended, and prefer fewer dependencies. Supply chain scanners such as Socket, Snyk or Aikido can flag new or suspicious packages automatically." }
+    }
+  ]
+}
+</script>
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="stylesheet" href="/docs.css" />
+</head>
+<body>
+<div class="promo" id="promo" role="region" aria-label="Free first build offer">
+  <style>
+    .promo { position: relative; z-index: 60; display: flex; align-items: center; justify-content: center; gap: 6px 14px; flex-wrap: wrap; padding: 9px 48px; background: linear-gradient(90deg, #6d4aec, #8b5cf6 50%, #4f7cff); color: #fff; font: 500 13.5px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; }
+    .promo b { font-weight: 700; }
+    .promo .promo-note { opacity: 0.85; font-size: 12.5px; }
+    .promo a.promo-cta { color: #1a1033; background: #fff; padding: 4px 12px; border-radius: 100px; font-weight: 700; font-size: 12.5px; text-decoration: none; white-space: nowrap; }
+    .promo a.promo-cta:hover { background: #efe9ff; }
+    .promo button { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent; color: #fff; font-size: 18px; line-height: 1; cursor: pointer; opacity: 0.8; }
+    .promo button:hover, .promo button:focus-visible { opacity: 1; background: rgba(255,255,255,0.15); }
+    @media (max-width: 600px) { .promo { padding: 8px 40px 8px 14px; font-size: 13px; gap: 4px 10px; } .promo .promo-long { display: none; } .promo .promo-note { font-size: 12px; } }
+  </style>
+  <span>🎉 <b>Your first app is free</b><span class="promo-long"> — build it and publish it to a live link</span>. No card, no API key.</span>
+  <span class="promo-note">The free build uses a lighter AI model.</span>
+  <a class="promo-cta" href="/app">Start free →</a>
+  <button type="button" aria-label="Dismiss this offer">×</button>
+  <script>
+    (function () {
+      var el = document.getElementById("promo"), KEY = "vc_promo_first_free_dismissed";
+      try { if (localStorage.getItem(KEY) === "1") el.hidden = true; } catch (e) {}
+      el.querySelector("button").addEventListener("click", function () {
+        el.hidden = true;
+        try { localStorage.setItem(KEY, "1"); } catch (e) {}
+      });
+    })();
+  </script>
+</div>
+
+
+<nav class="topnav">
+  <div class="inner">
+    <a class="logo" href="/">
+      <svg class="mark" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0a0d11"/><path d="M32 10 L50 32 L32 54 L14 32 Z" fill="#8b5cf6"/></svg>
+      VibeSafe <span>Builder</span>
+    </a>
+    <div class="nav-links">
+      <a href="/demo.html">Demo</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/blog.html" class="active" aria-current="page">Blog</a>
+      <details class="nav-more">
+        <summary>More</summary>
+        <div class="nav-more-menu">
+          <a href="/user-guide.html">User guide</a>
+          <a href="/security.html">Security</a>
+          <a href="/deploy-guide.html">Deploy</a>
+          <a href="/about.html">About</a>
+          <a href="/legal.html">Legal</a>
+        </div>
+      </details>
+    </div>
+    <a class="btn primary cta" href="/app">Open the builder</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="doc-hero">
+    <div class="doc-kicker"><span class="dot"></span> Security</div>
+    <h1>Slopsquatting: When Your AI Invents a Package and Someone Else Owns It</h1>
+    <div class="post-meta">Published October 2026 · 7 min read</div>
+  </div>
+
+  <article>
+    <section style="border-top:none; padding-top:8px;">
+      <p>Ask an AI coding tool for a feature and it will often tell you to install something first. Usually that package is real. Sometimes it is not: the model has blended two real names, or made one up that sounds right. On its own that is harmless, because the install just fails. The problem starts when someone notices the made-up name, registers it, and puts their own code behind it. The next person who follows the same advice installs it without an error.</p>
+      <p>That attack has a name, <strong>slopsquatting</strong>, coined by Seth Larson of the Python Software Foundation. It is no longer theoretical, and it matters most to exactly the people vibe coding is for: builders who accept an install command because the AI sounded sure.</p>
+      <figure class="post-figure">
+  <a class="post-figure-zoom" href="/img/blog/slopsquatting-ai-hallucinated-packages.svg" target="_blank" rel="noopener">
+  <img src="/img/blog/slopsquatting-ai-hallucinated-packages.svg" alt="Four steps of slopsquatting: the AI suggests a package that does not exist, an attacker registers that name, the next user or agent installs it, and the attacker's code runs inside the app." width="1000" height="420" loading="lazy" decoding="async" />
+    <span class="post-figure-hint">Tap to enlarge</span>
+  </a>
+  <figcaption>The attacker never has to trick anyone. They only have to get to the name first.</figcaption>
+</figure>
+    </section>
+
+    <section>
+      <h2><span class="num">01</span>How often AI tools invent packages</h2>
+      <p>The largest measurement so far is a USENIX Security 2025 paper, <em>&ldquo;We Have a Package for You!&rdquo;</em>, by Joseph Spracklen and colleagues at the University of Texas at San Antonio, the University of Oklahoma and Virginia Tech. It won a Distinguished Paper Award. They had 16 code-generating models write 576,000 Python and JavaScript samples, which together recommended 2.23 million packages.</p>
+      <ul>
+        <li><strong>19.7% of those packages did not exist</strong>: 440,445 hallucinations, covering 205,474 unique invented names.</li>
+        <li>Commercial models averaged <strong>5.2%</strong> and open-source models <strong>21.7%</strong>. GPT-4 Turbo was lowest at 3.59%.</li>
+        <li>Rates rose with the model&rsquo;s temperature setting, sharply at the maximum.</li>
+      </ul>
+      <p>Newer models are better, but not clean. A 2026 preprint by Aleksandr Churilov re-ran the test on five frontier models in April 2026 and measured rates between <strong>4.62%</strong> (Claude Haiku 4.5) and <strong>6.10%</strong> (GPT-5.4-mini). Its summary is the right one: the range has shrunk, the threat has not. It also found 127 invented names that all five models produced, 53 of which were still unregistered when it was written.</p>
+      <p>Around one in twenty is a small rate per suggestion and a large one per project. An app that pulls in a dozen libraries over a few weeks of prompting gets a lot of chances.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">02</span>Why repetition is what makes it an attack</h2>
+      <p>If hallucinated names were random, registering them would be a lottery. They are not random. In the USENIX study, when the same prompt was run ten times, <strong>43% of hallucinated names appeared every single time</strong> and 58% appeared more than once. An attacker does not need access to anyone&rsquo;s chat. They can ask the popular models the same questions beginners ask, collect the names that keep coming back, and register them.</p>
+      <p>The invented names are also plausible by design. The researchers sorted them into conflations of two real packages (38%), near-misses of real names (13%) and pure inventions (51%). A conflation like <code>express-mongoose</code> looks exactly like something that should exist, which is why nobody stops to check.</p>
+      <p>That is the difference from typosquatting. Typosquatting waits for a person to mistype. Slopsquatting waits for a model to be confidently wrong in a way that repeats.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">03</span>It has already happened</h2>
+      <ul>
+        <li><strong>huggingface-cli (2024).</strong> Researcher Bar Lanyado, then at Lasso Security, noticed models kept recommending <code>pip install huggingface-cli</code>, a package that did not exist. He registered an empty one as a test. It drew more than 30,000 real downloads in three months, and the hallucinated command had been copied into the README of a public Alibaba repository.</li>
+        <li><strong>react-codeshift (January 2026).</strong> Charlie Eriksen at Aikido found this name, apparently a blend of the real <code>jscodeshift</code> and <code>react-codemod</code>, inside a batch of 47 AI-generated agent skills. Through forks it spread to 237 repositories. Nobody had registered it, so he did, defensively. It kept getting a few downloads a day, largely from AI agents following the skill&rsquo;s instructions rather than from people.</li>
+        <li><strong>unused-imports (npm).</strong> Models suggest this name in place of the real <code>eslint-plugin-unused-imports</code>. A malicious package was sitting on it and was still drawing about 233 downloads a week in early February 2026, before npm put it under a security hold.</li>
+      </ul>
+      <p>The second case is the one to notice. The download came from an agent, not a human. As AI tools gain the ability to run install commands themselves, the moment where a person might have looked twice disappears.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">04</span>Five checks that stop it</h2>
+      <p>None of these need a security background. They are the same checks a careful developer does by habit, written down because vibe coding skips the habit.</p>
+      <ul>
+        <li><strong>Look up any package you do not recognise before installing it.</strong> Open its page on npmjs.com or pypi.org. If it does not exist, the AI invented it. If it exists, check that the repository link works and points at a real project.</li>
+        <li><strong>Treat a brand-new package as suspicious.</strong> A package first published last week, with one version, one maintainer and no repository, is the profile of a squatted name. The Cloud Security Alliance suggests having tools flag anything registered in the last 30 to 90 days.</li>
+        <li><strong>Do not let an agent install packages unattended.</strong> If your tool can run <code>npm install</code> or <code>pip install</code> on its own, require approval for new dependencies, or keep an allowlist.</li>
+        <li><strong>Commit your lockfile.</strong> <code>package-lock.json</code> or its equivalent pins exactly what was installed, so a later install cannot quietly pull something different.</li>
+        <li><strong>Prefer fewer dependencies.</strong> Every package is a name you are trusting. If the AI wants a library to format a date or shuffle a list, ask it to write the ten lines instead.</li>
+      </ul>
+      <p>If you are shipping something real, supply chain scanners such as Socket, Snyk or Aikido automate the first two checks and are worth the setup time.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">05</span>Where this tool stands, honestly</h2>
+      <p>VibeSafe Builder narrows the problem rather than solving it, and the split is worth knowing.</p>
+      <p><strong>Multi-file React projects:</strong> the model cannot add a package. The <code>package.json</code> is written by the builder, not the AI, with four fixed dependencies (React, React DOM, Vite and its React plugin). The model is told it may import only React and the project&rsquo;s own files, and the in-browser preview refuses any other import with an error rather than fetching it. An invented package name has nowhere to go.</p>
+      <p><strong>Single-file apps:</strong> these can load a library from a public CDN, and the page&rsquo;s security policy only allows four CDN hosts (jsDelivr, unpkg, cdnjs and esm.sh). That stops scripts from arbitrary servers, but those CDNs serve any public npm package, including a squatted one. If the AI invents a name nobody has registered, the script fails to load and <a href="/security.html">Launch Check</a> will usually surface it as a console error or exception when it opens the app in a real browser. If someone <em>has</em> registered that name, nothing here checks who published it. So the advice above still applies: look at any <code>&lt;script src&gt;</code> line you do not recognise before you publish.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">06</span>The takeaway</h2>
+      <p>An AI suggesting a package is not evidence that the package exists, or that the thing at that name is what the AI meant. The fix is cheap: ten seconds on the registry page before you install anything unfamiliar. The attack only works on people who skip it, and AI tools make skipping it feel normal.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">07</span>Common questions</h2>
+      <p><strong>What is slopsquatting?</strong> A supply chain attack where someone registers a package name that AI tools hallucinate, so anyone who follows the AI&rsquo;s advice installs the attacker&rsquo;s code.</p>
+      <p><strong>How often do AI models invent package names?</strong> In the USENIX 2025 study, 19.7% of recommended packages did not exist (5.2% for commercial models, 21.7% for open-source). Frontier models tested in April 2026 ranged from 4.62% to 6.10%.</p>
+      <p><strong>Is it different from typosquatting?</strong> Yes. Typosquatting relies on human typos. Slopsquatting relies on models repeating the same invented names, which makes the targets predictable.</p>
+      <p><strong>What is the single most useful habit?</strong> Look up any unfamiliar package on its registry before installing it, and be wary of anything published very recently.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">08</span>Sources</h2>
+      <p class="post-sources">
+        <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/spracklen" target="_blank" rel="noopener">Spracklen et al. — We Have a Package for You! (USENIX Security 2025)</a><br>
+        <a href="https://arxiv.org/html/2406.10279v3" target="_blank" rel="noopener">The same paper, full text on arXiv</a><br>
+        <a href="https://www.alphaxiv.org/abs/2605.17062" target="_blank" rel="noopener">Churilov — The Range Shrinks, the Threat Remains (2026 preprint)</a><br>
+        <a href="https://www.aikido.dev/blog/slopsquatting-ai-package-hallucination-attacks" target="_blank" rel="noopener">Aikido — Slopsquatting: the AI package hallucination attack already happening</a><br>
+        <a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-slopsquatting-ai-supply-chain-20260419-csa/" target="_blank" rel="noopener">Cloud Security Alliance — Research note on slopsquatting</a>
+      </p>
+    </section>
+
+    <section>
+      <h2><span class="num">09</span>Related reading</h2>
+      <p class="post-sources">
+        <a href="/blog/ai-app-security-database-leaks.html">Why your AI-built app might already be exposing your database</a> &mdash; the other most common AI-app security failure.<br>
+        <a href="/blog/ai-app-builder-checklist.html">The pre-launch checklist</a> &mdash; 25 checks before you publish, tool-neutral.<br>
+        <a href="/security.html">How VibeSafe Builder scans every build</a> &mdash; what Launch Check does and does not catch.
+      </p>
+    </section>
+  </article>
+
+  <a class="back-to-blog" href="/blog.html">← Back to the blog</a>
+</div>
+
+<footer>
+  <div class="wrap foot-wrap">
+    <div class="foot-links">
+      <a href="/app">Open the builder</a>
+      <a href="/how-it-works.html">How it works</a>
+      <a href="/user-guide.html">User guide</a>
+      <a href="/security.html">Security</a>
+      <a href="/deploy-guide.html">Deploy</a>
+      <a href="/pricing.html">Pricing</a>
+      <a href="/compare.html">Compare</a>
+      <a href="/templates.html">Templates</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/about.html">About</a>
+      <a href="/blog/what-is-vibesafe-builder.html">What is VibeSafe Builder?</a>
+      <a href="/legal.html">Legal</a>
+      <a href="https://vibesafe.info" target="_blank" rel="noopener">vibesafe.info</a>
+    </div>
+    <div class="foot-legal">© 2026 SG Digital Ventures LLC — Wyoming, USA · VibeSafe Builder is a product of SG Digital Ventures LLC's multi-SaaS portfolio, sibling to vibesafe.info</div>
+  </div>
+</footer>
+
+<script src="/chatwidget.js"></script>
+<script>
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+<script src="/nav.js" defer></script>
+</body>
+</html>
