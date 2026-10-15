@@ -118,6 +118,11 @@
       "permanent": true
     },
     {
+      "source": "/faq",
+      "destination": "/faq.html",
+      "permanent": true
+    },
+    {
       "source": "/pricing",
       "destination": "/pricing.html",
       "permanent": true

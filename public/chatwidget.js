@@ -7,12 +7,12 @@
     {
       q: "What does it do?",
       keys: ["what does it do", "what is this", "what is vibesafe builder", "what do you do"],
-      a: "You describe an app in chat and VibeSafe Builder generates a complete, single-file web app. You see the cost before every generation, every change is a version you can roll back, and every build is security-scanned before you publish it. See <a href=\"/how-it-works.html\">how it works</a>.",
+      a: "You describe an app in chat and VibeSafe Builder generates a complete, working web app: one portable HTML file, or a multi-file React project for bigger ideas. You see the cost before every generation, every change is a version you can roll back, and every build is security-scanned before you publish it. See <a href=\"/how-it-works.html\">how it works</a>.",
     },
     {
       q: "Pricing?",
       keys: ["pricing", "price", "cost", "how much", "plans"],
-      a: "Two options: <strong>Bring Your Own Key</strong> — $0 platform fee, you pay Anthropic directly at their standard rates. Or the <strong>Managed plan</strong> — $15/month, no API key needed, we cover up to $10/month of usage. Full breakdown on the <a href=\"/#pricing\">pricing section</a>.",
+      a: "Two options: <strong>Bring Your Own Key</strong> — $0 platform fee, you pay Anthropic directly at their standard rates. Or the <strong>Managed plan</strong> — $15/month, no API key needed, we cover up to $10/month of usage. Your first build is free. Full breakdown on the <a href=\"/pricing.html\">pricing page</a>.",
     },
     {
       q: "Is my code safe?",
@@ -22,7 +22,7 @@
     {
       q: "Get started",
       keys: ["get started", "start building", "sign up", "begin", "how do i start"],
-      a: "Click <a href=\"/app\">Open the builder</a>, describe the app you want (or pick a free template), and hit Build it. No account needed for Bring Your Own Key mode. Full walkthrough in the <a href=\"/user-guide.html\">User Guide</a>.",
+      a: "Click <a href=\"/app\">Open the builder</a>, create a free account (every plan needs one), then describe the app you want or pick a free template. Your first build is free, with no card and no API key. Full walkthrough in the <a href=\"/user-guide.html\">User Guide</a>.",
     },
     {
       q: "Can I roll back a change?",
@@ -35,13 +35,33 @@
       a: "Yes. The Code tab has a Download .html button — your app is one portable file you can open locally, host anywhere, or hand to someone else.",
     },
     {
+      q: "Is there a free trial?",
+      keys: ["free trial", "free build", "try it", "for free", "is it free"],
+      a: "Yes. Every new account gets one free build with no card and no API key, on a lighter AI model (Claude Sonnet 5). You can also try the <a href=\"/demo.html\">interactive demo</a> with no account at all.",
+    },
+    {
+      q: "Can my app take payments?",
+      keys: ["payment", "stripe", "sell", "checkout", "buy button"],
+      a: "Yes, through Stripe Payment Links. Create a link in your own Stripe account, paste it into Monetisation in the builder, and the AI adds the buy button. Money goes straight to you; we never handle it.",
+    },
+    {
+      q: "Can my app collect forms?",
+      keys: ["form", "waitlist", "contact form", "submissions", "collect emails"],
+      a: "Yes. The Forms tab creates contact and waitlist forms with a private inbox, CSV export and optional email notifications. See <a href=\"/user-guide.html#forms\">Forms in the user guide</a>.",
+    },
+    {
+      q: "Can my app have logins or shared data?",
+      keys: ["login", "log in", "accounts", "sign up", "database", "shared data", "backend", "upload"],
+      a: "Yes. Ask for it and the app uses a built-in backend: data shared between visitors, its own sign-up and log-in for visitors, and file uploads. These work once the app is published. <a href=\"/user-guide.html#app-data\">More in the user guide</a>.",
+    },
+    {
       q: "Who built this?",
       keys: ["who built", "who made", "parent company", "company", "about"],
       a: "VibeSafe Builder is built by SG Digital Ventures LLC, a Wyoming-based SaaS company also behind the code security scanner VibeSafe. More on the <a href=\"/about.html\">About page</a>.",
     },
   ];
   const FALLBACK =
-    "I don't have a canned answer for that one. Try the <a href=\"/user-guide.html\">User Guide</a> or email <a href=\"mailto:contact@vibesafebuilder.com\">contact@vibesafebuilder.com</a>.";
+    "I don't have a canned answer for that one. Try the <a href=\"/faq.html\">FAQ</a>, the <a href=\"/user-guide.html\">User Guide</a>, or email <a href=\"mailto:contact@vibesafebuilder.com\">contact@vibesafebuilder.com</a>.";
 
   function match(text) {
     const t = text.toLowerCase();

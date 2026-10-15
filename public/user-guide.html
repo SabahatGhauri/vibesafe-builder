@@ -70,6 +70,7 @@
         <summary class="active">More</summary>
         <div class="nav-more-menu">
           <a href="/user-guide.html" class="active" aria-current="page">User guide</a>
+          <a href="/faq.html">FAQ</a>
           <a href="/security.html">Security</a>
           <a href="/deploy-guide.html">Deploy</a>
           <a href="/about.html">About</a>
@@ -85,7 +86,7 @@
   <div class="doc-hero">
     <div class="doc-kicker"><span class="dot"></span> User Guide</div>
     <h1>How to use VibeSafe Builder — from first prompt to published app</h1>
-    <p class="lead">This guide walks through the whole journey: picking a mode, building and fixing an app, reading the cost meter, rolling back a version, and shipping it. Total time to your first working app: about 2 minutes.</p>
+    <p class="lead">This guide walks through the whole journey: your free first build, picking how to pay, building and fixing an app, adding forms, payments and your own images, rolling back a version, and shipping it. Total time to your first working app: about 2 minutes.</p>
   </div>
 
   <div class="toc glass">
@@ -93,17 +94,23 @@
     <ol>
       <li><a href="#what-it-does">What VibeSafe Builder does</a></li>
       <li><a href="#account">Create your account</a></li>
-      <li><a href="#choose-mode">Choose a mode: bring your key, or go Managed</a></li>
+      <li><a href="#free-build">Your first build is free</a></li>
+      <li><a href="#choose-mode">Choose how to pay: bring your key, or go Managed</a></li>
       <li><a href="#first-build">Build your first app</a></li>
+      <li><a href="#agent-modes">Agent modes: Auto, Build, Debug and Review</a></li>
       <li><a href="#cost">Read the cost estimate and spend meter</a></li>
-      <li><a href="#preview-code">The workspace tabs</a></li>
-      <li><a href="#iterate">Ask for changes — and what happens when a fix doesn't work</a></li>
+      <li><a href="#preview-code">Find your way around the builder</a></li>
+      <li><a href="#refine">Refine: colours, rules, products and images</a></li>
+      <li><a href="#iterate">Ask for changes, and what happens when a fix doesn't work</a></li>
       <li><a href="#versions">Version history and rollback</a></li>
-      <li><a href="#security">The security tab</a></li>
+      <li><a href="#security">The security scan and Launch Check</a></li>
+      <li><a href="#app-data">Shared data, sign-ins and uploads inside your app</a></li>
+      <li><a href="#forms">Forms: contact and waitlist</a></li>
       <li><a href="#multi-file">Building something bigger: multi-file React projects</a></li>
       <li><a href="#github">Connecting GitHub</a></li>
       <li><a href="#vercel">Deploying to your own Vercel account</a></li>
       <li><a href="#ship">Download or publish</a></li>
+      <li><a href="#my-apps">My Apps, and where your work is saved</a></li>
       <li><a href="#managed-budget">Managed plan budget and limits</a></li>
       <li><a href="#troubleshooting">Troubleshooting</a></li>
     </ol>
@@ -112,162 +119,228 @@
   <article>
     <section id="what-it-does">
       <h2><span class="num">01</span>What VibeSafe Builder does</h2>
-      <p>You describe an app in plain English, and VibeSafe Builder generates a complete, working app. For most requests that's a single self-contained HTML file, live in seconds. For a bigger idea, start a multi-file React project instead (§10) — real components in separate files, a backend for shared data when you need one, and a path to a repository on GitHub and a deployment on your own Vercel account when it's ready for the world. Either way: every generation shows its cost <em>before</em> you commit to it, every change is a version you can roll back, and every build is scanned for common security mistakes before you can publish or feel good about sharing it.</p>
+      <p>You describe an app in plain English, and VibeSafe Builder generates a complete, working app. For most requests that's a single self-contained HTML file, live in seconds. For a bigger idea, start a multi-file React project instead (§15): real components in separate files, with a path to a repository on GitHub and a deployment on your own Vercel account when it's ready for the world.</p>
+      <p>Either kind of app can grow beyond a page: shared data, its own sign-in for visitors, file uploads (§13), contact and waitlist forms (§14), and buy buttons through your own Stripe account (§09). And either way, every generation shows its cost <em>before</em> you commit to it, every change is a version you can roll back, and every build is scanned for common security mistakes before you can publish it.</p>
+      <p>Prefer to look before signing up? The <a href="/demo.html">interactive demo</a> walks through the real workspace with no account and nothing to spend.</p>
     </section>
 
     <section id="account">
       <h2><span class="num">02</span>Create your account</h2>
-      <p>Every account — whether you'll bring your own API key or go Managed — starts by signing up at <a href="/app">the builder</a>. Three ways in, all landing you in the same place:</p>
+      <p>Every account, whether you'll bring your own API key or go Managed, starts by signing up at <a href="/app">the builder</a>. There are three ways in, all landing you in the same place:</p>
       <ul>
-        <li><strong>Email and password</strong> — enter your name, email, and a password (at least 8 characters).</li>
+        <li><strong>Email and password</strong>: enter your name, email, and a password (at least 8 characters). We email you a link to confirm your address; click it, then come back and log in.</li>
         <li><strong>Continue with Google</strong></li>
-        <li><strong>Continue with GitHub</strong> — this is a sign-in only. It just confirms who you are; it does not give VibeSafe Builder access to your repositories. Pushing code to GitHub is a separate connection you make later, with its own explicit permission screen — see §11.</li>
+        <li><strong>Continue with GitHub</strong>: this is a sign-in only. It confirms who you are; it does not give VibeSafe Builder access to your repositories. Pushing code to GitHub is a separate connection you make later, with its own explicit permission screen (§16).</li>
       </ul>
-      <p>Your password is handled by Supabase Auth, our authentication provider — it's stored hashed, and we never see or handle it in plaintext ourselves.</p>
+      <p>Your password is handled by Supabase Auth, our authentication provider. It's stored hashed, and we never see or handle it in plaintext ourselves. Forgot it? Use <strong>Forgot your password?</strong> on the sign-in screen.</p>
+    </section>
+
+    <section id="free-build">
+      <h2><span class="num">03</span>Your first build is free</h2>
+      <p>Every new account gets <strong>one free build</strong> with no API key and no card. Just sign up and describe your app. You can publish the result to a live link like any other build.</p>
+      <p>To keep that free, the free build runs on a lighter AI model (Claude Sonnet 5) rather than Claude Opus 5, which both paid options use, so expect a less polished result. A failed attempt doesn't use up your free build. Once it's used, add your own Anthropic key or upgrade to Managed to keep going (§04). The free offer is limited and can be paused at any time.</p>
     </section>
 
     <section id="choose-mode">
-      <h2><span class="num">03</span>Choose a mode: bring your key, or go Managed</h2>
-      <p>Open <a href="/app">the builder</a> and click <strong>⚙ Settings</strong> in the top bar. You have two ways to pay for generations:</p>
+      <h2><span class="num">04</span>Choose how to pay: bring your key, or go Managed</h2>
+      <p>Open <strong>⚙ Settings</strong> in the left-hand rail. You have two ways to pay for generations:</p>
       <div class="steps">
         <div class="step glass">
           <div class="stepnum">A</div>
           <div>
             <h3>Bring Your Own Key (free platform fee)</h3>
-            <p>Paste an Anthropic API key (get one at <a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a>) into the <strong>Anthropic API key</strong> field. It's stored only in your browser and sent straight to our server per-request — we never log or store it. You're billed by Anthropic directly, at their standard rates, with no markup from us.</p>
+            <p>Paste an Anthropic API key (get one at <a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a>) into the <strong>Anthropic API key</strong> field, and click <strong>Check key</strong> to confirm it works before you build. It's stored only in your browser and sent with each build so it can reach Anthropic; we never store it on our servers. You're billed by Anthropic directly, at their standard rates, with no markup from us.</p>
           </div>
         </div>
         <div class="step glass">
           <div class="stepnum">B</div>
           <div>
             <h3>Managed plan ($15/month)</h3>
-            <p>Enter your email under <strong>Managed plan</strong> and click <strong>Email me a sign-in link</strong>. Click the link in your inbox, and you're signed in — no API key needed. We cover up to $10/month of Anthropic usage on our own key. Subscribe via the <a href="/pricing.html">pricing page</a> on the homepage first if you haven't already.</p>
+            <p>No API key needed: we cover up to $10/month of Anthropic usage on our own key. Click <strong>⬆ Upgrade to Pro</strong> in the top bar (or in Settings) to subscribe through Stripe. If you've already paid, enter your email under <strong>Managed plan</strong> in Settings and click <strong>Email me a sign-in link</strong>.</p>
           </div>
         </div>
       </div>
-      <p>You can also set a <strong>session spend cap</strong> in the same Settings panel (BYOK mode only) — generation is blocked once a new request would push your successful-build spend past that number.</p>
+      <p>In BYOK mode you can also set a <strong>session spend cap</strong> in the same Settings panel ($5 by default). Generation is blocked when a new request could push your successful-build spend past that number. The Managed plan has its own monthly budget instead (§20).</p>
     </section>
 
     <section id="first-build">
-      <h2><span class="num">04</span>Build your first app</h2>
-      <p>Two ways to start, both in the chat panel on the left:</p>
+      <h2><span class="num">05</span>Build your first app</h2>
+      <p>The builder opens on one question: <strong>What do you want to build?</strong> Two ways to answer it:</p>
       <ul>
-        <li><strong>Describe it</strong> — type something like "a habit tracker with streaks" or "an invoice generator" into the composer and click <strong>Build it</strong>.</li>
-        <li><strong>Start from a template</strong> — pick one of the 16 free templates shown above the composer for an instant v1 at zero generation cost, then keep chatting to customize it.</li>
+        <li><strong>Describe it</strong>: type something like "a habit tracker with streaks" or "an invoice generator" and press <strong>Enter</strong> (or the ➤ button). Use <strong>Shift + Enter</strong> for a new line. The suggestion chips under the box fill in a starting idea, and in Chrome and Edge the 🎤 button lets you dictate instead of typing.</li>
+        <li><strong>Start from a template</strong>: click <strong>start from one of 16 templates</strong> for an instant v1 at zero generation cost, then keep chatting to customise it. You can browse them all, with live previews, on the <a href="/templates.html">templates page</a>.</li>
       </ul>
-      <p>Generation streams in live; you'll see the assistant's one-line summary followed by the app appearing in the Preview tab on the right.</p>
+      <p>Generation streams in live; you'll see the assistant's one-line summary in the chat, followed by the app appearing in the Preview tab on the right.</p>
+    </section>
+
+    <section id="agent-modes">
+      <h2><span class="num">06</span>Agent modes: Auto, Build, Debug and Review</h2>
+      <p>The <strong>Agent</strong> menu next to the message box decides what kind of job your request is. Leave it on Auto unless you want to force one:</p>
+      <ul>
+        <li><strong>Auto</strong> picks for you. Requests starting with "review", "audit" or "explain" go to Review; on an existing app, requests starting with "fix", "debug", "repair" or "diagnose" go to Debug; everything else is Build.</li>
+        <li><strong>Build</strong> creates or changes features. This is the normal mode.</li>
+        <li><strong>Debug</strong> focuses the AI on a problem you describe. It doesn't run your code or prove the fix works, so check the preview afterwards.</li>
+        <li><strong>Review</strong> reads your app and writes a plain-English report in the chat, without changing any code or creating a version. It's model-assisted inspection, not a security certification or a test run.</li>
+      </ul>
+      <p>All modes use the same model and count as normal usage, including against the free build. Debug and Review need an app to work on.</p>
     </section>
 
     <section id="cost">
-      <h2><span class="num">05</span>Read the cost estimate and spend meter</h2>
-      <p>Before you hit send, the composer shows an estimated cost range for that specific request. After it completes, the top bar's <strong>build spend</strong> meter updates — but only for generations that actually produced a working app. If a generation fails (an invalid response, a refusal, a timeout), its cost shows separately as "failed (not counted)" and is never added to your spend total. This is the "failures don't count" principle from the homepage, made literal.</p>
+      <h2><span class="num">07</span>Read the cost estimate and spend meter</h2>
+      <p>Before you hit send, the composer shows an estimated cost for that specific request. After it completes, the top bar's <strong>build spend</strong> meter updates, but only for generations that actually produced a working app. If a generation fails (an invalid response, a refusal, a timeout), its cost shows separately as "failed (not counted)" and is never added to your spend total. This is the "failures don't count" principle from the homepage, made literal.</p>
     </section>
 
     <section id="preview-code">
-      <h2><span class="num">06</span>The workspace tabs</h2>
-      <p>The panel on the right of the chat has several tabs. Which ones you see depends on whether your current project is a single file or a multi-file React project (§10):</p>
+      <h2><span class="num">08</span>Find your way around the builder</h2>
+      <p>The <strong>rail on the left</strong> holds <strong>📂 My Apps</strong> (§19), <strong>＋ New Project</strong>, a light/dark switch, shortcuts to the main tabs, and <strong>⚙ Settings</strong>. Click <strong>« Collapse</strong> to shrink it to icons. The line between the chat and the workspace can be dragged to give either side more room (or moved with the arrow keys; double-click it to reset).</p>
+      <p>The workspace on the right has these tabs. Some only light up for a multi-file React project (§15):</p>
       <ul>
-        <li><strong>Preview</strong> — your app running live in a sandboxed iframe, exactly as a user would see it.</li>
-        <li><strong>Build Health</strong> — a combined pass/fail verdict from the security scan and Launch Check together, for multi-file projects.</li>
-        <li><strong>Code</strong> — the full source, with <strong>Copy code</strong> and <strong>Download</strong> buttons.</li>
-        <li><strong>Versions</strong> — every generation you've kept, see §8.</li>
-        <li><strong>GitHub</strong> — push a multi-file project to a repository you own, see §11.</li>
-        <li><strong>Deploy</strong> — deploy a multi-file project to your own Vercel account, see §12.</li>
-        <li><strong>Security</strong> — the scan results for the current version, see §9.</li>
-        <li><strong>Launch Check</strong> — loads your app in a real browser to catch console errors, crashes, and mobile-layout breaks that a static scan can't see.</li>
+        <li><strong>Preview</strong>: your app running live in a sandboxed frame, exactly as a user would see it. The 🚀 <strong>Publish</strong> button lives here.</li>
+        <li><strong>Build Health</strong>: a combined pass/fail verdict from the security scan and Launch Check together.</li>
+        <li><strong>Code</strong>: the full source, with <strong>Copy code</strong> and <strong>Download</strong> buttons.</li>
+        <li><strong>Versions</strong>: every generation you've kept (§11).</li>
+        <li><strong>GitHub</strong>: push a React project to a repository you own (§16).</li>
+        <li><strong>Forms</strong>: create contact and waitlist forms and read what people send (§14).</li>
+        <li><strong>Deploy</strong>: deploy a React project to your own Vercel account (§17).</li>
+        <li><strong>Security</strong>: the scan results for the current version (§12).</li>
+        <li><strong>Launch Check</strong>: loads your app in a real browser to catch console errors, crashes, and mobile-layout breaks that a static scan can't see.</li>
+      </ul>
+    </section>
+
+    <section id="refine">
+      <h2><span class="num">09</span>Refine: colours, rules, products and images</h2>
+      <p>Once you have an app, a <strong>Refine</strong> panel appears above the message box. Everything in it is optional; you can always just ask for changes in plain English instead.</p>
+      <ul>
+        <li><strong>Brand style</strong>: pick a colour palette, or set your own background, primary, accent and text colours. The AI then builds, and keeps editing, with those colours instead of choosing its own. Choose "No preference" to hand it back.</li>
+        <li><strong>Non-negotiables</strong>: write down what the app is for and up to 12 short rules that must stay true ("totals always include tax", "never ask for a phone number"). The AI reads them before every build, so a later change can't quietly undo an earlier decision, and it tells you in the chat when a request would break one.</li>
+        <li><strong>Monetisation</strong>: sell something from your app. Create a payment link in your own Stripe account, paste it here with a product name and price (up to 5 products), and ask the AI for a buy button. Buyers check out on Stripe's own page and the money goes straight to you; we never handle the payment and no secret key is needed. Only links on <code>buy.stripe.com</code> or <code>donate.stripe.com</code> are accepted.</li>
+        <li><strong>Brand assets</strong>: add your own logo, a hero image or a page background (PNG, JPEG, WebP or GIF). Images are resized in your browser, which also strips location data from photos, and are embedded when you preview, publish or download, so the file you own still contains them. SVG isn't accepted because it can contain scripts.</li>
       </ul>
     </section>
 
     <section id="iterate">
-      <h2><span class="num">07</span>Ask for changes — and what happens when a fix doesn't work</h2>
-      <p>Keep chatting to iterate: "add dark mode", "the delete button doesn't work", "make it mobile-friendly". Each request only touches what you asked for — the model is instructed to preserve everything that already works rather than silently rewriting your app.</p>
+      <h2><span class="num">10</span>Ask for changes, and what happens when a fix doesn't work</h2>
+      <p>Keep chatting to iterate: "add dark mode", "the delete button doesn't work", "make it mobile-friendly". Each request only touches what you asked for. The model is instructed to preserve everything that already works rather than silently rewriting your app.</p>
       <div class="callout warn glass">
         <div class="cal-label">Doom-loop protection</div>
-        If you report the same problem twice in a row, a banner appears — <em>"Same problem twice — switching strategy"</em> — and the next attempt re-diagnoses the issue from scratch instead of repeating the fix that already failed you.
+        If you ask for a fix twice in a row, a banner appears, <em>"Same problem twice — switching strategy"</em>, and the next attempt re-diagnoses the issue from scratch instead of repeating the fix that already failed you.
       </div>
     </section>
 
     <section id="versions">
-      <h2><span class="num">08</span>Version history and rollback</h2>
-      <p>Every successful generation is saved as a version in the <strong>Versions</strong> tab, newest first, each showing its cost and a short note. Click any version to see a line-by-line diff against the one before it. Click <strong>Restore</strong> on any older version to make it current again — nothing is lost, later versions stay in the list. Version history lives in your browser's localStorage (capped at the most recent 20 versions to stay within storage limits), so it survives a page reload but not a browser data wipe — download the app if you want a permanent copy.</p>
+      <h2><span class="num">11</span>Version history and rollback</h2>
+      <p>Every successful generation is saved as a version in the <strong>Versions</strong> tab, newest first, each showing its cost and a short note. Click any version to see a line-by-line diff against the one before it. Click <strong>Restore</strong> on any older version to make it current again. Nothing is lost; later versions stay in the list. Version history lives in your browser's localStorage (the most recent 20 versions, to stay within storage limits), so it survives a page reload but not a browser data wipe. Download the app if you want a permanent copy.</p>
     </section>
 
     <section id="security">
-      <h2><span class="num">09</span>The security tab</h2>
-      <p>Every generation is checked against a set of common AI-coding mistakes — hardcoded API keys and secrets, <code>eval()</code> / dynamic code execution, passwords written to localStorage, insecure requests, and more. The <strong>Security</strong> tab badge turns red if anything critical is found, with a plain-English explanation of each issue and how to ask the AI to fix it. This same check runs again, server-side, the moment you try to publish — so a bypassed or stale client-side result can never slip a critical issue onto a public link.</p>
-      <p>Deploying to your own Vercel account runs a related but separate check, the <strong>Publish Security Check</strong> — see §12.</p>
+      <h2><span class="num">12</span>The security scan and Launch Check</h2>
+      <p>Every generation is checked against a set of common AI-coding mistakes: hardcoded API keys and secrets, <code>eval()</code> and other dynamic code execution, passwords written to localStorage, insecure requests, and more. The <strong>Security</strong> tab badge turns red if anything critical is found, with a plain-English explanation of each issue and how to ask the AI to fix it. The same check runs again, server-side, the moment you try to publish, so a bypassed or stale result in your browser can never slip a critical issue onto a public link. The full list is on the <a href="/security.html">security page</a>.</p>
+      <p><strong>Launch Check</strong> goes further: click <strong>🚀 Run Launch Check</strong> and the builder opens your app in a real headless browser, then reports console errors, crashes, files that failed to load, and layouts that overflow on a phone screen.</p>
+      <p>Deploying to your own Vercel account runs a related but separate check, the <strong>Publish Security Check</strong> (§17).</p>
+    </section>
+
+    <section id="app-data">
+      <h2><span class="num">13</span>Shared data, sign-ins and uploads inside your app</h2>
+      <p>Most apps just save to the visitor's own browser, and that's what the AI does by default. When your request clearly needs more, it uses a built-in backend instead. There's nothing to set up, but these features <strong>only work once the app is published</strong> (§18); in the preview, the app falls back to saving locally or tells you to publish.</p>
+      <ul>
+        <li><strong>Shared data</strong>: ask for "a guestbook everyone can see", "a leaderboard" or "a list my whole team edits", and data is shared across every visitor and device, like a public whiteboard. Each app can hold up to 1,000 records.</li>
+        <li><strong>Visitor accounts</strong>: ask for "parents log in and see only their own children" or "each user has their own saved items", and the app gets its own sign-up and log-in. Whatever a signed-in visitor creates is private to them unless the app marks it shared. These accounts belong to your app alone and have nothing to do with VibeSafe Builder accounts.</li>
+        <li><strong>File uploads</strong>: ask for "attach a CV" or "add a photo to each listing", and visitors can upload PNG, JPEG, GIF, WebP or PDF files, up to 2MB each and 200 per app. The type is checked from the file's contents, not its name. Anyone with a file's link can open it, so don't use uploads for anything private.</li>
+      </ul>
+    </section>
+
+    <section id="forms">
+      <h2><span class="num">14</span>Forms: contact and waitlist</h2>
+      <p>The <strong>Forms</strong> tab gives your app a working contact form or waitlist, with no form service to sign up for and no AI credits spent receiving submissions. You need a confirmed email address to create one.</p>
+      <div class="steps">
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Create the form</h3><p>Give it a name and pick a type: <strong>Contact</strong> (name, email, message) or <strong>Waitlist</strong> (name, email). Tick <strong>Email new submissions</strong> to be notified at your account's address, and optionally <strong>send a confirmation</strong> to the person who submits, with a subject and message you write yourself.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Put it in your app</h3><p>Click <strong>Add to build prompt</strong> and the AI wires the form into your app on the next build (the normal cost estimate applies), or <strong>Copy HTML</strong> to paste the snippet yourself.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Read submissions</h3><p>Submissions land in the form's inbox, private to your account. From there you can refresh, <strong>Download CSV</strong>, pause the form, delete all submissions, or delete the form.</p></div></div>
+      </div>
+      <p>During the pilot each account can have 20 forms, receive 300 submissions per calendar month (UTC) and store 1,000 submissions, with up to 10 submissions per form per minute. An email marked "sent" means our email provider accepted it, not that it reached the inbox.</p>
     </section>
 
     <section id="multi-file">
-      <h2><span class="num">10</span>Building something bigger: multi-file React projects</h2>
-      <p>Everything above works the same way for a single-file app or a bigger project — the difference is what you start with. Click <strong>⚛ New React project</strong> (in the chat, or from the empty state on the GitHub or Deploy tabs) instead of building a single page, and the builder generates a real project instead: components, hooks, and styles in separate files, assembled with Vite so it's a genuinely portable, buildable codebase — not something specific to this builder.</p>
+      <h2><span class="num">15</span>Building something bigger: multi-file React projects</h2>
+      <p>Everything above works the same way for a single-file app or a bigger project; the difference is what you start with. Click <strong>⚛ New React project</strong> (in the chat, or from the empty state on the GitHub or Deploy tabs) instead of building a single page, and the builder generates a real project: components, hooks, and styles in separate files, assembled with Vite so it's a genuinely portable, buildable codebase. Starting one clears the current chat and versions, so save or download what you have first (it's also kept in My Apps, §19).</p>
       <ul>
-        <li><strong>Targeted edits.</strong> Ask for a change and only the files that need it get rewritten — the rest of your project is left alone.</li>
-        <li><strong>Visual editing.</strong> Click any element in the Preview to edit its text or style directly, without writing a prompt for small changes.</li>
-        <li><strong>A real backend, when you ask for it.</strong> If a request clearly needs data shared between people or across devices — a shared list, a leaderboard, a guestbook — the AI reaches for a built-in backend API automatically. There are no accounts on it by default (everyone who visits a published app shares the same data, like a public whiteboard); ask specifically for per-visitor accounts if you need private data per user.</li>
+        <li><strong>Targeted edits.</strong> Ask for a change and only the files that need it get rewritten. The rest of your project is left alone.</li>
+        <li><strong>Visual editing.</strong> Click <strong>✎ Edit visually</strong>, then click any element in the Preview to change its text, colour, background, font size and weight, alignment, padding, margin or corner radius directly, with undo and redo. No prompt, no cost.</li>
+        <li><strong>Build status and preview links.</strong> The Preview shows whether the project builds, with any errors linked to the file they're in. <strong>🔗 Share preview</strong> creates a link to a snapshot of the current build, so you can show someone your progress without publishing.</li>
+        <li><strong>The same backend.</strong> Shared data, visitor accounts and uploads (§13) work here too.</li>
       </ul>
-      <p>Once you're in a multi-file project, three more tabs light up: <strong>GitHub</strong> (§11), <strong>Deploy</strong> (§12), and <strong>Build Health</strong>, which combines the security scan and Launch Check into one verdict.</p>
+      <p>Once you're in a React project, the <strong>GitHub</strong> (§16) and <strong>Deploy</strong> (§17) tabs light up.</p>
     </section>
 
     <section id="github">
-      <h2><span class="num">11</span>Connecting GitHub</h2>
-      <p>The GitHub tab pushes a multi-file project into a real repository you own — so your code isn't trapped in the builder. This is a separate connection from signing in with GitHub (§02): signing in only confirms who you are, while connecting here asks for permission to create and write to repositories, shown on GitHub's own consent screen before anything happens.</p>
+      <h2><span class="num">16</span>Connecting GitHub</h2>
+      <p>The GitHub tab pushes a multi-file project into a real repository you own, so your code isn't trapped in the builder. This is a separate connection from signing in with GitHub (§02): signing in only confirms who you are, while connecting here asks for permission to create and write to repositories, shown on GitHub's own consent screen before anything happens.</p>
       <div class="steps">
         <div class="step glass"><div class="stepnum">1</div><div><h3>Connect GitHub</h3><p>On the GitHub tab, click <strong>Connect GitHub</strong> and approve the permission request. This is a one-time authorization per account.</p></div></div>
         <div class="step glass"><div class="stepnum">2</div><div><h3>Choose or create a repository</h3><p>Pick an existing repo from the dropdown, or click <strong>+ New repo</strong> to create one without leaving the builder.</p></div></div>
-        <div class="step glass"><div class="stepnum">3</div><div><h3>Push</h3><p>Click <strong>⬆ Push</strong> to commit the current version to the repository — every file, as one commit. <strong>⬇ Pull</strong> brings changes made outside the builder back in, and the tab shows recent commits and lets you switch branches.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Push</h3><p>Click <strong>⬆ Push</strong> to commit the current version to the repository, every file as one commit. <strong>⬇ Pull</strong> brings changes made outside the builder back in, and the tab shows recent commits and lets you switch branches.</p></div></div>
       </div>
-      <p>Disconnect any time from the GitHub tab — this removes the stored connection only, it doesn't touch anything already pushed to GitHub.</p>
+      <p>Disconnect any time from the GitHub tab. This removes the stored connection only; it doesn't touch anything already pushed to GitHub.</p>
     </section>
 
     <section id="vercel">
-      <h2><span class="num">12</span>Deploying to your own Vercel account</h2>
-      <p>The Deploy tab puts a multi-file project live on <strong>your own</strong> Vercel account — your domain, your bill, and it keeps working whether or not you ever open this builder again. This is different from the built-in <strong>Publish</strong> button (§13): Vercel builds your project from real source with <code>npm install</code> and a real Vite build, the same as if you'd pushed it yourself.</p>
+      <h2><span class="num">17</span>Deploying to your own Vercel account</h2>
+      <p>The Deploy tab puts a multi-file project live on <strong>your own</strong> Vercel account: your domain, your bill, and it keeps working whether or not you ever open this builder again. This is different from the built-in <strong>Publish</strong> button (§18): Vercel builds your project from real source with <code>npm install</code> and a real Vite build, the same as if you'd pushed it yourself.</p>
       <div class="steps">
-        <div class="step glass"><div class="stepnum">1</div><div><h3>Get a Vercel token</h3><p>In Vercel, go to <strong>Settings → Tokens → Create Token</strong>. Under <strong>Scope</strong>, choose the single project you want to deploy to — not your whole account. A project-scoped token can only ever touch that one project; VibeSafe Builder never sees your other projects or their environment variables.</p></div></div>
-        <div class="step glass"><div class="stepnum">2</div><div><h3>Connect it</h3><p>Paste the token into the Deploy tab. It's encrypted before it's stored and never sent back to your browser — even the connection status only shows a masked hint like <code>vcp_••••1234</code>.</p></div></div>
-        <div class="step glass"><div class="stepnum">3</div><div><h3>Deploy a preview, or deploy to production</h3><p><strong>Deploy preview</strong> creates a new, unlisted deployment you can check before anyone sees it. <strong>Deploy to production</strong> replaces what's live at your project's main URL — you're asked to confirm before it runs.</p></div></div>
+        <div class="step glass"><div class="stepnum">1</div><div><h3>Get a Vercel token</h3><p>In Vercel, go to <strong>Settings → Tokens → Create Token</strong>. Under <strong>Scope</strong>, choose the single project you want to deploy to, not your whole account. A project-scoped token can only ever touch that one project; VibeSafe Builder never sees your other projects or their environment variables.</p></div></div>
+        <div class="step glass"><div class="stepnum">2</div><div><h3>Connect it</h3><p>Paste the token into the Deploy tab. It's encrypted before it's stored and never sent back to your browser; even the connection status only shows a masked hint like <code>vcp_••••1234</code>. <strong>Test connection</strong> checks it at any time.</p></div></div>
+        <div class="step glass"><div class="stepnum">3</div><div><h3>Deploy a preview, or deploy to production</h3><p><strong>Deploy preview</strong> creates a new, unlisted deployment you can check before anyone sees it. <strong>Deploy to production</strong> replaces what's live at your project's main URL. You're asked to confirm before it runs.</p></div></div>
       </div>
       <div class="callout warn glass">
         <div class="cal-label">Deployment Protection</div>
-        Vercel projects are protected by default — visitors are asked to log in to Vercel before they can see the site. The Deploy tab tells you when this is on. Deploying still works either way; protection only affects whether the public can see the result.
+        Vercel projects are protected by default: visitors are asked to log in to Vercel before they can see the site. The Deploy tab tells you when this is on. Deploying still works either way; protection only affects whether the public can see the result.
       </div>
-      <p><strong>Making it public.</strong> When you're ready for anyone to see it, click <strong>Make public…</strong> on the Deploy tab. This runs the <strong>Publish Security Check</strong> first — a scan of every file in your project for live credentials (API keys, database passwords, tokens) and other serious issues. A live credential blocks the change outright, with no way to override it; there's no legitimate reason to knowingly publish a working key, and it may already need rotating if it reached this point. You'll then be asked to type the project's name to confirm — a real safeguard, not a checkbox, since this is the one action here that exposes your app to the whole internet. After it runs, the builder actually checks that the site is reachable by an outside visitor, rather than just trusting Vercel's response.</p>
-      <p><strong>Making it private again.</strong> <strong>Make private…</strong> restores protection to exactly the mode it was in before — not a generic default, so if you'd only protected preview deployments, that's what comes back.</p>
-      <p>Every connect, deploy, and protection change is recorded in an activity log on the Deploy tab, and you can disconnect your Vercel account at any time — this only removes the stored token, your deployed sites stay online.</p>
+      <p><strong>Making it public.</strong> When you're ready for anyone to see it, click <strong>Make public…</strong> on the Deploy tab. This runs the <strong>Publish Security Check</strong> first: a scan of every file in your project for live credentials (API keys, database passwords, tokens) and other serious issues. A live credential blocks the change outright, with no way to override it; there's no legitimate reason to knowingly publish a working key, and it may already need rotating if it reached this point. You'll then be asked to type the project's name to confirm, since this is the one action here that exposes your app to the whole internet. After it runs, the builder checks that the site really is reachable by an outside visitor, rather than just trusting Vercel's response.</p>
+      <p><strong>Making it private again.</strong> <strong>Make private…</strong> restores protection to exactly the mode it was in before, not a generic default, so if you'd only protected preview deployments, that's what comes back.</p>
+      <p>Every connect, deploy, and protection change is recorded in an activity log on the Deploy tab, and you can disconnect your Vercel account at any time. This only removes the stored token; your deployed sites stay online.</p>
     </section>
 
     <section id="ship">
-      <h2><span class="num">13</span>Download or publish</h2>
+      <h2><span class="num">18</span>Download or publish</h2>
       <div class="steps">
         <div class="step glass">
           <div class="stepnum">↓</div>
-          <div><h3>Download .html</h3><p>From the Code tab — saves the current version as <code>my-app.html</code>, a single portable file you can open locally, host anywhere, or hand to someone else. This is your app; there's no lock-in. Installable to a phone's home screen out of the box.</p></div>
+          <div><h3>Download .html</h3><p>From the Code tab. It saves the current version as a single portable file you can open locally, host anywhere, or hand to someone else, with your images and payment links already filled in. This is your app; there's no lock-in. It's installable to a phone's home screen out of the box.</p></div>
         </div>
         <div class="step glass">
           <div class="stepnum">🚀</div>
-          <div><h3>Publish</h3><p>From the Preview tab — uploads the current version to a shareable link at <code>vibesafebuilder.com/p/&lt;id&gt;</code>. Blocked automatically if the security scan finds a critical issue. Publishing is public: anyone with the link can open it, installable to their home screen, and works offline. Click <strong>Republish</strong> after later changes to update the same link.</p></div>
+          <div><h3>Publish</h3><p>From the Preview tab. It uploads the current version to a public link (<code>/p/&lt;id&gt;</code>) that anyone can open, install to their home screen and use offline. Publishing is blocked if the security scan finds a critical issue, or if the app still points at an image or buy button you haven't set up. Click <strong>Republish</strong> after later changes to update the same link.</p></div>
         </div>
       </div>
-      <p style="margin-top:14px;">These two work the same way for multi-file projects. For a real custom domain, or to host the project entirely under your own control, GitHub (§11) and Vercel (§12) are the paths built for that — see also the full <a href="/deploy-guide.html">deployment guide</a> for every other option, from Netlify to Cloudflare Pages.</p>
+      <p style="margin-top:14px;">Every published app carries a small <strong>⚑ Report</strong> link so anyone can flag abuse; apps that break the rules can be taken offline. Both options work the same way for multi-file projects. For a real custom domain, or to host the project entirely under your own control, GitHub (§16) and Vercel (§17) are the paths built for that. See also the full <a href="/deploy-guide.html">deployment guide</a> for every other option, from Netlify to Cloudflare Pages.</p>
+    </section>
+
+    <section id="my-apps">
+      <h2><span class="num">19</span>My Apps, and where your work is saved</h2>
+      <p>Your current project, its chat and its versions are saved automatically in this browser as you work, and come back when you reload. Click <strong>＋ New Project</strong> to start something else; the app you were on is kept in <strong>📂 My Apps</strong>, so nothing is lost by switching. Open My Apps to go back to any of them.</p>
+      <p>Because this is stored in your browser, it doesn't follow you to another device or browser, and clearing site data removes it. Download your app, push it to GitHub, or publish it if you want a copy that lives somewhere else.</p>
     </section>
 
     <section id="managed-budget">
-      <h2><span class="num">14</span>Managed plan budget and limits</h2>
-      <p>The Managed plan's $10/month included usage is tracked automatically. If you hit that limit mid-month, generation pauses with a message telling you exactly how much you've used — you can wait for the next billing cycle, or switch to your own API key in Settings to keep going immediately. BYOK mode has no monthly cap beyond the session spend cap you set yourself.</p>
+      <h2><span class="num">20</span>Managed plan budget and limits</h2>
+      <p>The Managed plan's $10/month included usage is tracked automatically. If you hit that limit mid-month, generation pauses with a message telling you exactly how much you've used. You can wait for the next billing cycle, or switch to your own API key in Settings to keep going immediately. You're never charged overage. BYOK mode has no monthly cap beyond the session spend cap you set yourself.</p>
     </section>
 
     <section id="troubleshooting">
-      <h2><span class="num">15</span>Troubleshooting</h2>
+      <h2><span class="num">21</span>Troubleshooting</h2>
       <ul>
-        <li><strong>"Invalid API key" error</strong> — double-check the key in Settings; it should start with <code>sk-ant-</code>.</li>
-        <li><strong>Generation blocked by the spend cap</strong> — raise the session cap in Settings, or wait if you're near your intended budget on purpose.</li>
-        <li><strong>Lost my project</strong> — BYOK projects live in browser localStorage only; if you cleared browser data or switched devices without downloading first, it can't be recovered. Reload the same browser/profile to have it restored automatically.</li>
-        <li><strong>Publish button is disabled</strong> — you need at least one generated version, and the current version must pass the security scan.</li>
-        <li><strong>Make public is blocked</strong> — the Publish Security Check found a live credential or a serious issue. A live credential can't be overridden — remove it from the code and rotate it, since it may already be compromised. Other issues can be reviewed and, if you're sure, continued past.</li>
-        <li><strong>Vercel connection doesn't work / can't change protection</strong> — reconnect with a fresh token if it was revoked or expired, and make sure it's scoped to the project you're deploying to. Some tokens can deploy but aren't permitted to change project settings — if Make Public says so, turn Deployment Protection off directly in your Vercel project settings instead.</li>
-        <li><strong>GitHub push fails</strong> — reconnect GitHub from the GitHub tab; a token can expire or be revoked outside the builder.</li>
-        <li><strong>Something else</strong> — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a>.</li>
+        <li><strong>"Invalid API key" error</strong>: click <strong>Check key</strong> in Settings. A valid key starts with <code>sk-ant-</code>.</li>
+        <li><strong>Asked for a key after one build</strong>: your free build is used. Add your own Anthropic key or upgrade to Managed (§04).</li>
+        <li><strong>Generation blocked by the spend cap</strong>: raise the session cap in Settings, or stop there if you're near your intended budget on purpose.</li>
+        <li><strong>Debug or Review won't run</strong>: both need an existing app. Build or open one first.</li>
+        <li><strong>Lost my project</strong>: projects live in this browser's storage (§19). If you cleared browser data or switched devices without downloading first, it can't be recovered. Reload the same browser and profile to have it restored, or look in My Apps.</li>
+        <li><strong>Shared data or uploads don't work in the preview</strong>: they only work once the app is published (§13).</li>
+        <li><strong>Publish button is disabled or publishing is refused</strong>: you need at least one generated version, and the current version must pass the security scan. If it mentions an image or a payment link, check Brand assets or Monetisation (§09) and publish again.</li>
+        <li><strong>Can't create a form</strong>: confirm your email address first, and check you're under the pilot limits (§14).</li>
+        <li><strong>Make public is blocked</strong>: the Publish Security Check found a live credential or a serious issue. A live credential can't be overridden; remove it from the code and rotate it, since it may already be compromised. Other issues can be reviewed and, if you're sure, continued past.</li>
+        <li><strong>Vercel connection doesn't work or can't change protection</strong>: reconnect with a fresh token if it was revoked or expired, and make sure it's scoped to the project you're deploying to. Some tokens can deploy but aren't permitted to change project settings; if Make Public says so, turn Deployment Protection off directly in your Vercel project settings instead.</li>
+        <li><strong>GitHub push fails</strong>: reconnect GitHub from the GitHub tab. A token can expire or be revoked outside the builder.</li>
+        <li><strong>Something else</strong>: see the <a href="/faq.html">FAQ</a>, or email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a>.</li>
       </ul>
     </section>
   </article>
@@ -279,6 +352,7 @@
       <a href="/app">Open the builder</a>
       <a href="/how-it-works.html">How it works</a>
       <a href="/user-guide.html">User guide</a>
+      <a href="/faq.html">FAQ</a>
       <a href="/security.html">Security</a>
       <a href="/deploy-guide.html">Deploy</a>
       <a href="/pricing.html">Pricing</a>
