@@ -95,6 +95,7 @@ nav .cta { margin-left: auto; padding: 8px 16px; font-size: 13.5px; border-radiu
 .doc-hero h1 { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -0.01em; margin-bottom: 10px; }
 .doc-hero .meta { color: var(--dim); font-size: 13.5px; }
 .doc-hero p.lead { color: var(--dim); font-size: 16px; max-width: 640px; margin-top: 14px; }
+.doc-hero p.lead a { color: var(--accent2); }
 
 /* ---------- table of contents ---------- */
 .toc { border-radius: 14px; padding: 18px 20px; margin: 28px 0 36px; }
