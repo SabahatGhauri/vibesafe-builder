@@ -597,7 +597,7 @@
     </div>
   </nav>
 
-  <div class="wrap">
+  <main class="wrap">
     <div class="hero">
       <div>
         <div class="hero-eyebrow glass"><span class="dot"></span> AI app builder · first build free</div>
@@ -875,7 +875,7 @@ Know what a build may cost before you start, review every change, and check for 
         <a href="/pricing.html">See the full plan comparison and pricing questions →</a>
       </p>
     </section>
-  </div>
+  </main>
 
   <footer>
     <div class="wrap foot-wrap">
@@ -911,6 +911,10 @@ Know what a build may cost before you start, review every change, and check for 
     });
     // Scroll-reveal via IntersectionObserver
     const io = new IntersectionObserver((entries) => {
+      // No viewport height (crawlers, screenshot tools): show everything now.
+      // The observer hands us the viewport size for free, so there's no need to
+      // read window.innerHeight up front, which forced a full layout mid-parse.
+      if (entries[0] && entries[0].rootBounds && !entries[0].rootBounds.height) { revealAll(); return; }
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
     // rootMargin reaches two screens ahead so a renderer that never scrolls
     // (Google's, for one) still ends up with the whole page revealed.
@@ -922,8 +926,8 @@ Know what a build may cost before you start, review every change, and check for 
     // reports no viewport height (crawlers, screenshot tools) would otherwise
     // capture the page with most of its text still at opacity 0. Real visitors
     // have normally scrolled by then, so the animation still plays for them.
-    const revealAll = () => document.querySelectorAll(".reveal").forEach(el => el.classList.add("in"));
-    if (!window.innerHeight) revealAll(); else setTimeout(revealAll, 3000);
+    function revealAll() { document.querySelectorAll(".reveal").forEach(el => el.classList.add("in")); io.disconnect(); }
+    setTimeout(revealAll, 3000);
 
     // 3D hero card parallax on mouse move
     const heroArea = document.getElementById("heroCards");
@@ -1092,7 +1096,7 @@ Know what a build may cost before you start, review every change, and check for 
     }
 
   </script>
-  <script src="/chatwidget.js"></script>
+  <script src="/chatwidget.js" defer></script>
 <script>
   window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
 </script>
