@@ -81,7 +81,7 @@
   </div>
 </nav>
 
-<div class="wrap">
+<main class="wrap">
   <div class="doc-hero">
     <div class="doc-kicker"><span class="dot"></span> Deployment Guide</div>
     <h1>Where to put your app once it's built</h1>
@@ -217,7 +217,7 @@
       <p>Your downloaded file already includes a manifest and icon, so it's installable to a phone's home screen wherever you host it. What it <em>won't</em> have outside our own domain is offline caching — that part of our Launch Check / publish pipeline registers a service worker scoped to <code>vibesafebuilder.com/p/&lt;id&gt;</code> specifically, since offline caching requires the host to serve that worker file itself. If you self-host and want offline support too, you'd add your own small service-worker script to the platform you choose — outside the scope of this guide, but every platform above supports it the same way any static site does.</p>
     </section>
   </article>
-</div>
+</main>
 
 <footer>
   <div class="wrap foot-wrap">
@@ -240,7 +240,7 @@
   </div>
 </footer>
 
-<script src="/chatwidget.js"></script>
+<script src="/chatwidget.js" defer></script>
 <script>
   window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
 </script>
