@@ -62,6 +62,13 @@
         <input type="password" id="gateConfirmInput" placeholder="Retype your password" autocomplete="new-password" />
       </label>
 
+      <!-- Honeypot: people never see or fill this; form-filling bots do. See lib/botGuard.js. -->
+      <div class="auth-gate-hp" aria-hidden="true">
+        <label>Website <input type="text" id="gateWebsiteInput" name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+      <!-- Cloudflare Turnstile renders here only when the server has keys configured. -->
+      <div id="gateCaptcha" class="auth-gate-captcha" hidden></div>
+
       <button class="btn primary" type="button" id="gateSubmitBtn" style="width:100%; margin-top:10px;">Create account</button>
       <div class="auth-gate-status" id="gateStatus"></div>
 
