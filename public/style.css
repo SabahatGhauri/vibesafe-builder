@@ -73,6 +73,10 @@
 .auth-gate-contact a { color: var(--text-dim); text-decoration: underline; margin-left: 4px; }
 .auth-gate-contact a:hover { color: var(--accent); }
 .auth-gate-forgot { display: block; text-align: center; font-size: 12px; margin-top: 10px; }
+/* Bot honeypot: off-screen rather than display:none, since some bots skip hidden fields. */
+.auth-gate-hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.auth-gate-captcha { display: flex; justify-content: center; margin-top: 10px; }
+.auth-gate-captcha[hidden] { display: none; }
 
 body {
   font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;

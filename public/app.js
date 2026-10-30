@@ -51,6 +51,48 @@ function showFirstRunNotice(kind, starter) {
   }
 }
 
+/* ---------------- bot protection on the auth gate ---------------- */
+// Cloudflare Turnstile, loaded only when /api/config hands us a site key (the
+// server only does that once its secret is set too). Without one, nothing here
+// loads and the forms behave exactly as before. Tokens are single-use, so the
+// widget is reset after every attempt.
+const captcha = {
+  siteKey: null,
+  widgetId: null,
+  init(siteKey) {
+    if (this.siteKey) return;
+    this.siteKey = siteKey;
+    const box = $("gateCaptcha");
+    if (!box) return;
+    window.__vsTurnstileReady = () => {
+      if (!window.turnstile) return;
+      box.hidden = false;
+      this.widgetId = window.turnstile.render(box, { sitekey: siteKey, theme: "auto" });
+    };
+    const s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__vsTurnstileReady";
+    s.async = true;
+    s.defer = true;
+    document.head.appendChild(s);
+  },
+  token() {
+    if (!this.siteKey || !window.turnstile || this.widgetId === null) return "";
+    return window.turnstile.getResponse(this.widgetId) || "";
+  },
+  reset() {
+    if (window.turnstile && this.widgetId !== null) window.turnstile.reset(this.widgetId);
+  },
+};
+
+// Sent with sign-up and password-reset requests: the honeypot's value (always
+// empty for a person) and the Turnstile token, if the widget is on.
+function botFields() {
+  const fields = { website: $("gateWebsiteInput")?.value || "" };
+  const token = captcha.token();
+  if (token) fields.turnstileToken = token;
+  return fields;
+}
+
 /* ---------------- managed plan (Supabase magic-link sign-in) ---------------- */
 const managed = {
   sb: null,
@@ -62,6 +104,7 @@ const managed = {
       const cfg = await (await fetch("/api/config")).json();
       if (!cfg.managedPlanAvailable) { if (!state.apiKey) showFirstRunNotice("key"); return; }
       this.budget = cfg.managedBudget || 10;
+      if (cfg.turnstileSiteKey) captcha.init(cfg.turnstileSiteKey);
       this.sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
       const { data } = await this.sb.auth.getSession();
       this.session = data.session;
@@ -227,7 +270,7 @@ const managed = {
     const r = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name: name || undefined }),
+      body: JSON.stringify({ email, password, name: name || undefined, ...botFields() }),
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || "Couldn't create your account.");
@@ -236,7 +279,10 @@ const managed = {
 
   async signIn(email, password) {
     if (!this.sb) throw new Error("Sign-in isn't available right now.");
-    const { error } = await this.sb.auth.signInWithPassword({ email, password });
+    // The token is ignored unless CAPTCHA protection is also switched on in
+    // Supabase (Auth > Attack Protection), with the same Turnstile secret.
+    const captchaToken = captcha.token() || undefined;
+    const { error } = await this.sb.auth.signInWithPassword({ email, password, options: { captchaToken } });
     if (error) throw error;
   },
 
@@ -248,7 +294,7 @@ const managed = {
     const r = await fetch("/api/request-password-reset", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, ...botFields() }),
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || "Couldn't send reset link.");
@@ -348,6 +394,8 @@ $("gateForgotLink")?.addEventListener("click", async (e) => {
   } catch (err) {
     status.textContent = "Couldn't send reset link: " + (err.message || "unknown error");
     status.className = "auth-gate-status error";
+  } finally {
+    captcha.reset();
   }
 });
 
@@ -400,6 +448,7 @@ $("gateSubmitBtn")?.addEventListener("click", async () => {
   } finally {
     btn.disabled = false;
     btn.textContent = originalText;
+    captcha.reset();
   }
 });
 
