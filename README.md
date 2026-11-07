@@ -24,7 +24,7 @@ before you spend it, makes every change reversible, and scans every build before
   plus a real-browser Launch Check
 - **Apps you own** — download a single file and host it anywhere, or sync a project to GitHub and
   deploy to Vercel
-- **15 free templates** to start from
+- **16 free templates** to start from
 
 ## Plans
 

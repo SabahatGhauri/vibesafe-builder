@@ -63,7 +63,7 @@ nav.topnav .inner { display: flex; align-items: center; gap: 28px; width: 100%; 
 .nav-links a:hover, .nav-links a.active { color: var(--text); }
 /* Top nav: main links, a "More" dropdown, and a normal-sized button that never wraps. */
 .nav-links { display: flex; align-items: center; gap: 22px; font-size: 13.5px; flex-wrap: nowrap; }
-.nav-links a { white-space: nowrap; }
+.nav-links a { white-space: nowrap; display: inline-block; padding: 5px 0; min-height: 24px; }
 nav .cta { margin-left: auto; padding: 8px 16px; font-size: 13.5px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
 .nav-more { position: relative; }
 .nav-more summary { list-style: none; cursor: pointer; color: var(--dim); white-space: nowrap; transition: color 0.2s; user-select: none; }

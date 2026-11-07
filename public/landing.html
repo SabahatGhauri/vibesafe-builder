@@ -185,7 +185,7 @@
   .nav-links a:hover { color: var(--text); }
   /* Top nav: main links, a "More" dropdown, and a normal-sized button that never wraps. */
   .nav-links { display: flex; align-items: center; gap: 22px; font-size: 13.5px; flex-wrap: nowrap; }
-  .nav-links a { white-space: nowrap; }
+  .nav-links a { white-space: nowrap; display: inline-block; padding: 5px 0; min-height: 24px; }
   nav .cta { margin-left: auto; padding: 8px 16px; font-size: 13.5px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
   .nav-more { position: relative; }
   .nav-more summary { list-style: none; cursor: pointer; color: var(--dim); white-space: nowrap; transition: color 0.2s; user-select: none; }
@@ -600,7 +600,7 @@
   <main class="wrap">
     <div class="hero">
       <div>
-        <div class="hero-eyebrow glass"><span class="dot"></span> First build free · no credit burn</div>
+        <div class="hero-eyebrow glass"><span class="dot"></span> First build free · no card, no API key</div>
         <div class="kinetic">
           <h1>
             <span class="word h1-brand" style="animation-delay:0.01s">VibeSafe Builder</span><br/>
@@ -748,7 +748,7 @@ Know what a build may cost before you start, review every change, and check for 
         </div>
         <div class="bcard glass b-narrow reveal">
           <div class="ic">🚀</div>
-          <div class="pain">Stuck in your browser</div>
+          <div class="pain">Nowhere to share it</div>
           <h3>Publish &amp; share</h3>
           <p>One click puts your app live at a shareable link — security-checked before it goes out.</p>
         </div>
@@ -845,7 +845,7 @@ Know what a build may cost before you start, review every change, and check for 
           <div class="plan-note">Connect your own Anthropic API key. You're billed by Anthropic at their standard rates — we add no markup.</div>
           <ul>
             <li class="strong">All 16 free templates, zero tokens</li>
-            <li>Unlimited generations at your own pace</li>
+            <li>No platform limit on builds: you pay Anthropic per build</li>
             <li>Full version history, diffs &amp; rollback</li>
             <li>Security scan + Launch Check on every build</li>
             <li>Publish to a shareable link</li>
@@ -864,7 +864,7 @@ Know what a build may cost before you start, review every change, and check for 
             <li>No Anthropic account required</li>
             <li>Up to $10/mo of generations covered — switch to your own key any time if you go past it</li>
           </ul>
-          <input type="email" id="managedEmailInput" placeholder="you@example.com" autocomplete="email"
+          <input type="email" id="managedEmailInput" aria-label="Email for your Managed plan account" placeholder="you@example.com" autocomplete="email"
             style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--glass-border); background:var(--bg-panel); color:var(--text); font-size:14px; margin-bottom:10px;" />
           <div id="managedEmailError" style="color:var(--danger); font-size:12.5px; margin:-4px 0 8px; min-height:16px;"></div>
           <button class="btn primary" type="button" id="getManagedBtn" style="width:100%; text-align:center; display:block; cursor:pointer;">Get managed access</button>

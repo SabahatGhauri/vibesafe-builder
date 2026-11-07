@@ -167,7 +167,7 @@
           <input id="specPurpose" maxlength="200" placeholder="e.g. Track my reading and show a streak" />
           <div class="spec-rules" id="specRules"></div>
           <form class="spec-add" id="specAddForm">
-            <input id="specRuleInput" maxlength="140" placeholder="Add something that must stay true…" />
+            <input id="specRuleInput" aria-label="New rule for the app spec" maxlength="140" placeholder="Add something that must stay true…" />
             <button class="btn ghost mini" type="submit">Add</button>
           </form>
           <p class="gh-meta" id="specHint"></p>
@@ -183,9 +183,9 @@
           <p class="gh-meta"><a href="https://dashboard.stripe.com/payment-links" target="_blank" rel="noopener">Create a payment link in Stripe ↗</a> — takes about a minute.</p>
           <div class="pay-items" id="payItems"></div>
           <form class="pay-add" id="payAddForm">
-            <input id="payLabel" maxlength="60" placeholder="What are you selling? e.g. Starter plan" required />
-            <input id="payPrice" maxlength="24" placeholder="Price shown to buyers, e.g. $29" />
-            <input id="payUrl" maxlength="300" placeholder="https://buy.stripe.com/…" required />
+            <input id="payLabel" aria-label="What you are selling" maxlength="60" placeholder="What are you selling? e.g. Starter plan" required />
+            <input id="payPrice" aria-label="Price shown to buyers" maxlength="24" placeholder="Price shown to buyers, e.g. $29" />
+            <input id="payUrl" aria-label="Stripe payment link" maxlength="300" placeholder="https://buy.stripe.com/…" required />
             <button class="btn ghost mini" type="submit">Add product</button>
           </form>
           <p class="gh-meta" id="payHint"></p>
@@ -235,7 +235,7 @@
           <p class="hint" id="agentHint">Choose a task or let Auto route your request. All modes use your current model and consume usage. Review leaves code unchanged and does not run tests.</p>
           </details>
           <div class="composer-title" id="composerTitle"><b>Describe your app</b></div>
-          <textarea id="promptInput" rows="4" placeholder="e.g. a task tracker for a small team, with a board view and due dates…"></textarea>
+          <textarea id="promptInput" aria-label="Describe the app you want to build" rows="4" placeholder="e.g. a task tracker for a small team, with a board view and due dates…"></textarea>
           <div class="prompt-chips" id="promptChips" aria-label="Example prompts">
             <button type="button" class="chip">A CRM for a small team</button>
             <button type="button" class="chip">An invoicing dashboard</button>
@@ -408,12 +408,12 @@
               <button class="btn ghost mini" type="button" id="ghDisconnectBtn">Disconnect</button>
             </div>
             <div class="gh-row">
-              <select id="ghRepoSelect"></select>
+              <select id="ghRepoSelect" aria-label="GitHub repository"></select>
               <button class="btn ghost" type="button" id="ghNewRepoBtn">+ New repo</button>
             </div>
             <div class="gh-row" id="ghBranchRow" hidden>
               <label class="gh-meta">Branch</label>
-              <select id="ghBranchSelect"></select>
+              <select id="ghBranchSelect" aria-label="GitHub branch"></select>
             </div>
             <div class="gh-row">
               <button class="btn primary" type="button" id="ghPushBtn" disabled>⬆ Push</button>
@@ -449,11 +449,11 @@
             </div>
 
             <div class="gh-row">
-              <input type="password" id="vcToken" placeholder="vcp_…" autocomplete="off" spellcheck="false" />
+              <input type="password" id="vcToken" aria-label="Vercel access token" placeholder="vcp_…" autocomplete="off" spellcheck="false" />
               <button class="btn primary" type="button" id="vcConnectBtn">Connect</button>
             </div>
             <div class="gh-row" id="vcProjectRow" hidden>
-              <select id="vcProjectSelect"></select>
+              <select id="vcProjectSelect" aria-label="Vercel project"></select>
               <button class="btn primary" type="button" id="vcProjectConfirmBtn">Use this project</button>
             </div>
             <p class="gh-meta">Your token is encrypted before it is stored and is never sent back to your browser. VibeSafe Builder uses it only to deploy this project — nothing else.</p>

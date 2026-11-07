@@ -194,7 +194,7 @@ const managed = {
     try {
       const r = await fetch("/api/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await this.headers()) },
         body: JSON.stringify({ email }),
       });
       const data = await r.json();
@@ -1269,14 +1269,28 @@ $("publishBtn").addEventListener("click", async () => {
       state.pendingPublishKey =
         (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()) + Math.random().toString(36).slice(2);
     }
+    if (!managed.isSignedIn()) {
+      addMsg("system", "🛑 Sign in to publish. Your project stays saved in this browser.");
+      return;
+    }
     const r = await fetch("/api/publish", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(await managed.headers()) },
       // Scanned as source above, published with images embedded: a data URI is
       // content, not code, and the scanner has nothing useful to say about it.
       body: JSON.stringify({ code: isMulti() ? code : withAssets(code), files: isMulti() ? currentFiles() : null, kind: state.kind, id: state.publishId, publishKey: state.pendingPublishKey }),
     });
     const data = await r.json();
+    // An app published before apps had owners can't be updated in place (no
+    // account can prove it made it). Publish this version to a new link instead.
+    if (r.status === 409 && data.code === "legacy_unowned") {
+      addMsg("system", `ℹ️ Your old link was published before apps were tied to accounts, so it can't be updated. Publishing this version to a new link. Email contact@vibesafebuilder.com if you'd like the old link moved to your account.`);
+      state.publishId = null;
+      state.pendingPublishKey = null;
+      saveProject();
+      $("publishBtn").click();
+      return;
+    }
     if (!r.ok) {
       const detail = data.blockers ? " (" + data.blockers.join("; ") + ")" : "";
       throw new Error((data.error || "Publish failed") + detail);
@@ -1564,7 +1578,7 @@ async function runLaunchCheck() {
   try {
     const r = await fetch("/api/launch-check", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(await managed.headers()) },
       body: JSON.stringify({ code }),
     });
     const data = await r.json();
