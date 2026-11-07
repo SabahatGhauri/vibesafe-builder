@@ -114,7 +114,7 @@
         <div class="vcw-chips" id="vcwChips"></div>
       </div>
       <form class="vcw-foot" id="vcwForm">
-        <input id="vcwInput" type="text" placeholder="Ask a question..." autocomplete="off" />
+        <input id="vcwInput" type="text" aria-label="Ask a question about VibeSafe Builder" placeholder="Ask a question..." autocomplete="off" />
         <button type="submit">➤</button>
       </form>
     `;

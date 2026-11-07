@@ -125,7 +125,7 @@ const build = {
       }
       const r = await fetch("/api/preview-link", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await managed.headers()) },
         body: JSON.stringify({ files: currentFiles(), id: state.previewId || null }),
       });
       const data = await r.json();

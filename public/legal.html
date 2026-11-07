@@ -85,7 +85,7 @@
   <div class="doc-hero">
     <div class="doc-kicker"><span class="dot"></span> Legal &amp; Privacy</div>
     <h1>Legal &amp; Privacy</h1>
-    <div class="meta">Last updated: August 13, 2026 · VibeSafe Builder · a product of SG Digital Ventures LLC</div>
+    <div class="meta">Last updated: November 7, 2026 · VibeSafe Builder · a product of SG Digital Ventures LLC</div>
     <p class="lead">This page covers our Privacy Policy, Terms of Service, and Cookie Policy in one place. We kept it as plain-English as a legal page can be — the same principle behind the product itself.</p>
   </div>
 
@@ -103,6 +103,7 @@
       <li><a href="#managed">Managed plan mode</a></li>
       <li><a href="#publishing">Publishing your app</a></li>
       <li><a href="#payments">Payments</a></li>
+      <li><a href="#integrations">Forms, app accounts and connected services</a></li>
       <li><a href="#cookies">Cookie policy</a></li>
       <li><a href="#terms">Terms of Service</a></li>
       <li><a href="#your-rights">Your rights</a></li>
@@ -125,13 +126,13 @@
       <h3>Information you provide directly</h3>
       <ul>
         <li><strong>Your Anthropic API key</strong> — only if you use Bring Your Own Key mode. See §3.</li>
-        <li><strong>Email address</strong> — only if you sign up for the Managed plan (via Stripe Checkout and Supabase magic-link sign-in).</li>
+        <li><strong>Email address and sign-in details</strong> — when you create an account. You can sign in with an email and password (the password is stored hashed by our authentication provider, Supabase), or with Google or GitHub, in which case we receive your name and email from that provider.</li>
         <li><strong>Prompts and app code</strong> — what you type in chat and the app it generates, sent to Anthropic's API to produce a response.</li>
         <li><strong>Messages</strong> — if you use the on-site chat assistant or email us directly.</li>
       </ul>
       <h3>Information collected automatically</h3>
       <ul>
-        <li><strong>Usage data</strong> — for Managed-plan customers only: build count and dollars spent per billing period, used solely to enforce the monthly budget.</li>
+        <li><strong>Usage data</strong> — for Managed-plan customers and free trial builds: build count and dollars spent per period, used solely to enforce budgets and the free trial limit.</li>
         <li><strong>Standard server logs</strong> — request timestamps and IP address, used for security and abuse prevention, retained briefly by our hosting provider (Vercel).</li>
       </ul>
       <p>We do not run third-party analytics or advertising trackers on vibesafebuilder.com.</p>
@@ -139,7 +140,7 @@
 
     <section id="byok">
       <h2><span class="num">03</span>Bring Your Own Key mode</h2>
-      <p>This is the default mode and requires no account. Here's exactly what happens to your data:</p>
+      <p>You need an account to use the builder, but in this mode your Anthropic key and your projects stay in your browser. Here's exactly what happens to your data:</p>
       <ul>
         <li>Your Anthropic API key is stored only in your browser's <code>localStorage</code>. It is sent to our server with each generation request (over HTTPS, as an <code>x-anthropic-key</code> header), used once to call the Anthropic API on your behalf, and is never written to a database or log by us.</li>
         <li>Your chat history, generated code, and version history live only in your browser's <code>localStorage</code>. We do not have a database of BYOK projects — if you clear your browser data or switch devices, that project is gone unless you downloaded it first.</li>
@@ -151,7 +152,7 @@
       <h2><span class="num">04</span>Managed plan mode</h2>
       <p>If you subscribe to the $15/month Managed plan, we handle the Anthropic costs on our own key so you don't need one. This requires:</p>
       <ul>
-        <li><strong>An email address</strong>, used to create a Supabase-authenticated account and sign you in via a magic link (no password to store or leak).</li>
+        <li><strong>An account</strong> (email and password, Google or GitHub sign-in), managed by Supabase.</li>
         <li><strong>A Stripe subscription</strong>, so we know your subscription is active. We never see or store your card number — Stripe handles that entirely (see §6).</li>
         <li><strong>Usage tracking</strong> — we record the dollar cost and count of your generations per billing period, solely to enforce the $10/month usage budget included in the plan. We do not store the resulting app code server-side beyond generating the response; your project's version history still lives in your browser's localStorage, same as BYOK mode.</li>
       </ul>
@@ -163,7 +164,7 @@
       <ul>
         <li>The app's full HTML/CSS/JS is uploaded to our database and served publicly at a link like <code>vibesafebuilder.com/p/xxxxxx</code> — anyone with the link can view and use it.</li>
         <li>We run a server-side security scan before accepting the publish (hardcoded keys/secrets, <code>eval()</code>) and refuse to publish if it fails, regardless of what the client-side scan showed.</li>
-        <li>Republishing the same app overwrites the content at that link. There is currently no self-service "unpublish" button — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> and we'll take a published app down.</li>
+        <li>A published app is tied to the account that published it, and only that account can update it. Republishing overwrites the content at that link. There is currently no self-service "unpublish" button — email <a href="mailto:contact@vibesafebuilder.com">contact@vibesafebuilder.com</a> and we'll take a published app down.</li>
         <li>Don't publish an app containing anyone else's personal data, or data you weren't authorized to share — publishing makes it public on the internet.</li>
       </ul>
     </section>
@@ -173,12 +174,32 @@
       <p>Managed-plan payments are processed by Stripe, Inc. We receive a webhook confirming your subscription is active and your billing email — never your card number, CVC, or full payment details. See <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a> for how they handle payment data. BYOK mode has no platform fee, so no payment information passes through us at all — you pay Anthropic directly for token usage.</p>
     </section>
 
+    <section id="integrations">
+      <h2><span class="num">06a</span>Forms, app accounts and connected services</h2>
+      <ul>
+        <li><strong>Forms in your apps.</strong> If you add a contact or waitlist form, what visitors submit (for example their name, email and message) is stored in our database so it can appear in your inbox, and may be emailed to you and, if you turn it on, a confirmation to the visitor. For that data you are the controller and we process it on your behalf. You can export or delete submissions from the builder.</li>
+        <li><strong>Accounts inside your apps.</strong> If your app lets its own visitors sign up, their usernames and hashed passwords, and the records your app saves, are stored in our database and scoped to your app.</li>
+        <li><strong>Files and images.</strong> Files your app's visitors upload, and images you upload to your app, are stored so the app can serve them.</li>
+        <li><strong>GitHub and Vercel.</strong> If you connect GitHub or Vercel, we store the access token those services give us, encrypted, so we can push your code or deploy to your own account when you ask. Disconnecting deletes it.</li>
+      </ul>
+      <h3>Service providers we use</h3>
+      <ul>
+        <li><strong>Anthropic</strong> — AI model provider; receives your prompts and app code.</li>
+        <li><strong>Supabase</strong> — authentication and our database (accounts, usage, published apps, forms).</li>
+        <li><strong>Vercel</strong> — hosting and standard server logs.</li>
+        <li><strong>Stripe</strong> — payments.</li>
+        <li><strong>Resend</strong> — sends account, billing and form notification emails.</li>
+        <li><strong>GitHub and Vercel</strong> — only if you connect them, to act on your own accounts.</li>
+      </ul>
+      <p>These providers are based in the United States, so your data is processed there.</p>
+    </section>
+
     <section id="cookies">
       <h2><span class="num">07</span>Cookie policy</h2>
       <p>We don't use advertising or third-party tracking cookies. The site uses:</p>
       <ul>
         <li><strong>Browser localStorage</strong> (not a cookie, but similar in spirit) — stores your BYOK API key, spend cap, chat history, and version history locally so your project persists between visits.</li>
-        <li><strong>A session token</strong> (Managed plan only) — set after magic-link sign-in, used to authenticate your generation requests and check your subscription status.</li>
+        <li><strong>A session token</strong> — set after you sign in, used to authenticate your requests and check your plan.</li>
         <li><strong>Stripe's own cookies</strong> during checkout, governed by Stripe's cookie policy, not ours.</li>
       </ul>
       <p>You can clear localStorage at any time via your browser settings — this logs you out of BYOK mode and erases any unpublished, undownloaded project.</p>
@@ -204,7 +225,7 @@
       <h3>Managed plan billing</h3>
       <p>The Managed plan is $15/month via Stripe subscription, covering up to $10/month of Anthropic usage at our cost. Usage beyond that pauses generation until your next billing cycle, or you can switch to your own API key at any time in Settings. Cancel anytime through the Stripe customer portal link included in your subscription confirmation email.</p>
       <h3>Termination</h3>
-      <p>We may suspend access for abuse (attempts to bypass security gates, generate harmful content, or abuse the Managed plan's shared budget). You may stop using the service at any time; BYOK mode has nothing to cancel since there's no account.</p>
+      <p>We may suspend access for abuse (attempts to bypass security gates, generate harmful content, or abuse the Managed plan's shared budget or the free trial). You may stop using the service at any time; BYOK mode has nothing to cancel.</p>
       <h3>Limitation of liability</h3>
       <p>SG Digital Ventures LLC is not liable for losses arising from code generated by the service, including bugs, security issues the scanner didn't catch, or Anthropic API costs incurred under your own key. The security scan is a best-effort first line of defense, not a substitute for a professional security review.</p>
     </section>

@@ -1,5 +1,31 @@
 # Security notes
 
+## FIXED (2026-11-07) — the publish API let anyone overwrite any published app
+
+The 2026-08-18 fix closed the database: the anon key can no longer write
+`published_apps`. But `POST /api/publish` and `POST /api/preview-link` still
+took an optional app id from the request body and wrote that row with the
+service-role key, with no check on the caller at all. Every app's id is in its
+public `/p/<id>` URL, so anyone could replace any customer's live app. Found in
+the 7 Nov third-party audit.
+
+Fix:
+
+- Both routes need a signed-in account with a confirmed email (`requirePublisher`
+  in lib/app.js).
+- `published_apps.owner_id` (migration 012) records who published each app.
+  `lib/publishAuth.js` refuses a write to an id owned by another account.
+- Apps published before 012 have no owner and are locked. The builder publishes
+  their next version to a new link. Move one to its maker by hand once you know
+  who that is: `update published_apps set owner_id = '<user id>' where id = '<app id>';`
+- Migration 012 also drops the anon "public read" policy, which let anyone list
+  every app and preview (with their backend keys) through Supabase REST.
+  `GET /p/:id` reads through the service role by exact id instead.
+
+Deploy order: run migration 012 first, then deploy. Code deployed before the
+migration fails closed on publish (the owner_id column is missing), and `/p/:id`
+keeps working either way because it now uses the service role.
+
 ## FIXED (2026-08-18) — anyone with the public anon key could overwrite any published app
 
 **Found:** 2026-08-18, while introspecting the live schema into `db/schema.sql`.

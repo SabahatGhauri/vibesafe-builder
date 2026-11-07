@@ -59,14 +59,17 @@ create table if not exists published_apps (
 );
 alter table published_apps enable row level security;
 
--- Only public SELECT is granted. GET /p/:id serves published apps through the anon
--- client, so reads must be public; WRITES go through the service-role client in
--- POST /api/publish and therefore need no policy at all.
--- The former "public insert"/"public update" policies (using(true)) were removed by
--- db/migrations/001 -- they allowed any holder of the public anon key to overwrite
--- any published app. See docs/security-notes.md.
+-- No anon access at all. GET /p/:id reads through the service role by exact id,
+-- and every write goes through the service role in lib/deploy.js.
+-- db/migrations/001 removed the "public insert"/"public update" policies, which let
+-- any holder of the anon key overwrite any app. db/migrations/012 removed "public
+-- read", which let the anon key list every app and preview. See docs/security-notes.md.
+-- owner_id is the account that published it; lib/publishAuth.js refuses writes to
+-- an id owned by someone else. Apps from before 012 have no owner and are locked.
+alter table published_apps add column if not exists owner_id uuid references auth.users(id) on delete set null;
+create index if not exists published_apps_owner_idx on published_apps (owner_id);
 drop policy if exists "public read" on published_apps;
-create policy "public read" on published_apps for select using (true);
+revoke select, insert, update, delete on published_apps from anon, authenticated;
 
 -- Idempotency ledger so a retried publish returns the original result instead of
 -- re-running. Keyed by a client-supplied UUID, not app_id, so deliberate
@@ -204,3 +207,29 @@ as $$
 $$;
 revoke execute on function record_generation_stat(text, numeric, boolean) from public, anon, authenticated;
 grant execute on function record_generation_stat(text, numeric, boolean) to service_role;
+
+/* ============================ platform-key spend guard (migration 012) ============================ */
+
+-- One build on the platform key in flight per account. See lib/usageGuard.js.
+create table if not exists generation_locks (
+  user_id   uuid primary key references auth.users(id) on delete cascade,
+  locked_at timestamptz not null default now()
+);
+alter table generation_locks enable row level security;
+
+-- Atomic spend recording for managed_usage (Managed plan and free trial).
+create or replace function add_usage(p_user uuid, p_period text, p_amount numeric, p_build integer)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  insert into managed_usage (user_id, period, dollars_spent, build_count, updated_at)
+  values (p_user, p_period, greatest(p_amount, 0), greatest(p_build, 0), now())
+  on conflict (user_id, period) do update
+    set dollars_spent = managed_usage.dollars_spent + greatest(excluded.dollars_spent, 0),
+        build_count   = managed_usage.build_count + greatest(excluded.build_count, 0),
+        updated_at    = now();
+$$;
+revoke all on function add_usage(uuid, text, numeric, integer) from public, anon, authenticated;
+grant execute on function add_usage(uuid, text, numeric, integer) to service_role;

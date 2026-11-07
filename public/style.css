@@ -183,8 +183,8 @@ body {
 .template-card .t-name { font-size: 12.5px; font-weight: 700; margin-top: 3px; }
 .template-card .t-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 .template-card .t-use-prompt {
-  align-self: flex-start; background: none; border: none; padding: 0; margin: 0;
-  font-size: 10.5px; color: var(--text-dim); cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  align-self: flex-start; background: none; border: none; padding: 6px 0; margin: 0; min-height: 24px;
+  font-size: 11.5px; color: var(--text-dim); cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
 }
 .template-card .t-use-prompt:hover { color: var(--accent); }
 
