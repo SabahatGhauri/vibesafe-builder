@@ -170,6 +170,8 @@ const managed = {
       if (headerBtn) headerBtn.hidden = !onFree;
       if (settingsBtn) settingsBtn.hidden = !onFree;
       this.planEmail = status.email || null;
+      if (onFree) this.renderBilling(null);
+      else this.refreshBilling();
     } catch {
       // Non-fatal — badge just stays hidden/stale if this fails; sign-in itself is unaffected.
     }
@@ -271,11 +273,82 @@ const managed = {
   async signOut() {
     if (this.sb) await this.sb.auth.signOut();
   },
+
+  /* ---- cancel / keep the Pro plan (Settings) ----
+     Cancelling sets the Stripe subscription to end at the close of the paid
+     period, so the customer keeps Pro until then and can undo it. The server
+     only ever acts on the signed-in account's own subscription. */
+  async billingCall(method, path) {
+    const headers = await this.headers();
+    if (!headers["x-vc-session"]) throw new Error("Please sign in first.");
+    const r = await fetch(path, { method, headers });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || "Something went wrong. Please try again.");
+    return data;
+  },
+
+  async refreshBilling() {
+    try {
+      this.renderBilling(await this.billingCall("GET", "/api/billing/subscription"));
+    } catch {
+      // No Stripe subscription found (e.g. Pro granted by hand): show no cancel controls.
+      this.renderBilling(null);
+    }
+  },
+
+  renderBilling(sub, note) {
+    const box = $("billingBox");
+    if (!box) return;
+    $("cancelSubConfirm").hidden = true;
+    if (!sub || !sub.hasSubscription) {
+      box.hidden = true;
+      return;
+    }
+    box.hidden = false;
+    const date = sub.periodEnd
+      ? new Date(sub.periodEnd).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
+      : null;
+    this.billingDate = date;
+    $("billingStatus").textContent = (note ? note + " " : "") + (sub.cancelAtPeriodEnd
+      ? `Your subscription is cancelled. You keep Pro until ${date || "the end of this billing period"} and won't be charged again.`
+      : date ? `Renews on ${date}.` : "");
+    $("cancelSubBtn").hidden = sub.cancelAtPeriodEnd;
+    $("resumeSubBtn").hidden = !sub.cancelAtPeriodEnd;
+  },
+
+  askCancel() {
+    $("cancelSubConfirmText").textContent =
+      `You keep Pro until ${this.billingDate || "the end of the period you've paid for"}. After that you won't be charged again, and you can still build with your own API key.`;
+    $("cancelSubBtn").hidden = true;
+    $("cancelSubConfirm").hidden = false;
+  },
+
+  async changeSubscription(path, btn, note) {
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Working…";
+    try {
+      this.renderBilling(await this.billingCall("POST", path), note);
+    } catch (err) {
+      $("billingStatus").textContent = "🛑 " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  },
 };
 managed.init();
 
 $("upgradeBtn")?.addEventListener("click", (e) => managed.startUpgrade(e.currentTarget));
 $("upgradeBtnSettings")?.addEventListener("click", (e) => managed.startUpgrade(e.currentTarget));
+
+$("cancelSubBtn")?.addEventListener("click", () => managed.askCancel());
+$("cancelSubNo")?.addEventListener("click", () => {
+  $("cancelSubConfirm").hidden = true;
+  $("cancelSubBtn").hidden = false;
+});
+$("cancelSubYes")?.addEventListener("click", (e) => managed.changeSubscription("/api/billing/cancel", e.currentTarget, "✓ Done."));
+$("resumeSubBtn")?.addEventListener("click", (e) => managed.changeSubscription("/api/billing/resume", e.currentTarget, "✓ Your Pro plan will continue."));
 
 $("signOutBtn")?.addEventListener("click", async () => {
   await managed.signOut();
