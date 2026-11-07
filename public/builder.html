@@ -534,6 +534,17 @@
           <span class="hint" id="managedSignedInPlan" style="margin-top:4px;"></span>
         </label>
         <button class="btn primary" type="button" id="upgradeBtnSettings" hidden style="margin-top:8px; width:100%;">⬆ Upgrade to Pro — $15/mo</button>
+        <div id="billingBox" hidden style="margin-top:8px;">
+          <span class="hint" id="billingStatus"></span>
+          <button class="btn ghost danger" type="button" id="cancelSubBtn" hidden style="margin-top:8px; width:100%;">Cancel subscription</button>
+          <div class="vc-confirm danger" id="cancelSubConfirm" hidden>
+            <p><b>Cancel your Pro plan?</b></p>
+            <p id="cancelSubConfirmText">You keep Pro until the end of the period you've paid for. After that you won't be charged again, and you can still build with your own API key.</p>
+            <button class="btn ghost danger" type="button" id="cancelSubYes">Yes, cancel</button>
+            <button class="btn ghost" type="button" id="cancelSubNo">Keep my plan</button>
+          </div>
+          <button class="btn ghost" type="button" id="resumeSubBtn" hidden style="margin-top:8px; width:100%;">Keep my Pro plan</button>
+        </div>
         <button class="btn ghost" type="button" id="signOutBtn" style="margin-top:8px;">Sign out</button>
       </div>
 
