@@ -18,13 +18,14 @@ Fix:
 - Apps published before 012 have no owner and are locked. The builder publishes
   their next version to a new link. Move one to its maker by hand once you know
   who that is: `update published_apps set owner_id = '<user id>' where id = '<app id>';`
-- Migration 012 also drops the anon "public read" policy, which let anyone list
+- Migration 013 drops the anon "public read" policy, which let anyone list
   every app and preview (with their backend keys) through Supabase REST.
   `GET /p/:id` reads through the service role by exact id instead.
 
-Deploy order: run migration 012 first, then deploy. Code deployed before the
-migration fails closed on publish (the owner_id column is missing), and `/p/:id`
-keeps working either way because it now uses the service role.
+Deploy order: run migration 012, deploy, then run migration 013. Code deployed
+before 012 fails closed on publish (the owner_id column is missing). 013 before
+the deploy would take every published app offline, because the old code reads
+`/p/:id` with the anon key.
 
 ## FIXED (2026-08-18) — anyone with the public anon key could overwrite any published app
 

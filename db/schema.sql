@@ -62,7 +62,7 @@ alter table published_apps enable row level security;
 -- No anon access at all. GET /p/:id reads through the service role by exact id,
 -- and every write goes through the service role in lib/deploy.js.
 -- db/migrations/001 removed the "public insert"/"public update" policies, which let
--- any holder of the anon key overwrite any app. db/migrations/012 removed "public
+-- any holder of the anon key overwrite any app. db/migrations/013 removed "public
 -- read", which let the anon key list every app and preview. See docs/security-notes.md.
 -- owner_id is the account that published it; lib/publishAuth.js refuses writes to
 -- an id owned by someone else. Apps from before 012 have no owner and are locked.

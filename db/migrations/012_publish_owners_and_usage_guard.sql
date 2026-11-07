@@ -1,7 +1,7 @@
--- 012: who owns a published app, who can read the table, and atomic spend.
+-- 012: who owns a published app, a per-account build lock, and atomic spend.
 --
 -- Run this in the Supabase SQL editor BEFORE deploying the code that ships with
--- it. Safe to re-run.
+-- it, and 013 AFTER that deploy is live. Safe to re-run.
 --
 -- 1. published_apps.owner_id
 --    POST /api/publish used to accept any app id and overwrite that row, with no
@@ -17,17 +17,7 @@ alter table public.published_apps
   add column if not exists owner_id uuid references auth.users(id) on delete set null;
 create index if not exists published_apps_owner_idx on public.published_apps (owner_id);
 
--- 2. No more public listing of every app
---    The "public read" policy let anyone with the anon key (served by
---    /api/config) list every published app and preview, including unlisted
---    previews and each app's injected backend key, straight from Supabase REST.
---    GET /p/:id now reads through the service role, by exact id only, so the
---    anon role needs no access at all.
-
-drop policy if exists "public read" on public.published_apps;
-revoke select, insert, update, delete on public.published_apps from anon, authenticated;
-
--- 3. One platform-key build in flight per account (lib/usageGuard.js)
+-- 2. One platform-key build in flight per account (lib/usageGuard.js)
 
 create table if not exists public.generation_locks (
   user_id   uuid primary key references auth.users(id) on delete cascade,
@@ -36,7 +26,7 @@ create table if not exists public.generation_locks (
 alter table public.generation_locks enable row level security;
 -- No policies: service-role only.
 
--- 4. Atomic spend recording
+-- 3. Atomic spend recording
 --    Replaces read-then-write, which lost spend when two builds finished at once.
 
 create or replace function public.add_usage(p_user uuid, p_period text, p_amount numeric, p_build integer)
